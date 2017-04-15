@@ -85,6 +85,7 @@ bot.on('message', message => {
     var file = 'playerdata/user_resources.json';
     // Author Username
     var uName = message.author.username;
+
     // Display Resources
     var data = jsonfile.readFileSync(file);
     var msg = data[uName]['name'] + "'s Kingdom's Resources:\n"
@@ -94,52 +95,20 @@ bot.on('message', message => {
     + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
     + "Iron:white_medium_square:: " + data[uName]['iron'] + "\n"
     + "Coins: " + data[uName]['coin'] + "\n";
-    // Send Message
-    message.channel.sendMessage(msg);
-      //data = JSON.parse(obj);
-    /*
-    jsonfile.readFile(file, function (err, obj) {
-      //console.dir(obj);
-      // Message to Send
-
-      var msg = obj[uName]['name'] + "'s Kingdom's Resources:\n"
-      + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-      + "Manpower:guardsman:: " + obj[uName]['manpower'] + "\n"
-      + "Lumber:evergreen_tree:: " + obj[uName]['lumber'] + "\n"
-      + "Stone:full_moon:: " + obj[uName]['stone'] + "\n"
-      + "Iron:white_medium_square:: " + obj[uName]['iron'] + "\n"
-      + "Coins: " + obj[uName]['coin'] + "\n";
-      // Send Message
-      message.channel.sendMessage(msg);
-
-      //data = JSON.parse(obj);
-    });*/
-/*
-    var msg = data[uName]['name'] + "'s Kingdom's Resources:\n"
-    + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-    + "Manpower:guardsman:: " + data[uName]['manpower'] + "\n"
-    + "Lumber:evergreen_tree:: " + data[uName]['lumber'] + "\n"
-    + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
-    + "Iron:white_medium_square:: " + data[uName]['iron'] + "\n"
-    + "Coins: " + data[uName]['coin'] + "\n";
-    // Send Message
-    message.channel.sendMessage(msg);*/
 
     // Display Army Comp
     file = 'playerdata/user_army.json'
-    jsonfile.readFile(file, function (err, obj) {
-      //console.dir(obj);
-      // Message to Send
-      var msg = "-----------Army Composition----------\n"
-      + "Swordsmen: " + obj[uName]['swordsmen'] + "\n"
-      + "Spearmen: " + obj[uName]['spearmen'] + "\n"
-      + "Archers: " + obj[uName]['archers'] + "\n"
-      + "Crossbowmen: " + obj[uName]['crossbowmen'] + "\n"
-      + "Light Cavalry: " + obj[uName]['light_cavalry'] + "\n"
-      + "Heavy Cavalry" + obj[uName]['heavy_cavalry'] + "\n";
-      // Send Message
-      message.channel.sendMessage(msg);
-    });
+    data = jsonfile.readFileSync(file);
+    msg += "-----------Army Composition----------\n"
+    + "Swordsmen: " + data[uName]['swordsmen'] + "\n"
+    + "Spearmen: " + data[uName]['spearmen'] + "\n"
+    + "Archers: " + data[uName]['archers'] + "\n"
+    + "Crossbowmen: " + data[uName]['crossbowmen'] + "\n"
+    + "Light Cavalry: " + data[uName]['light_cavalry'] + "\n"
+    + "Heavy Cavalry" + data[uName]['heavy_cavalry'] + "\n";
+    
+    // Send Message
+    message.channel.sendMessage(msg);
   }
   else if (message.content === 'recoverManpower') {
     var jsonfile = require('jsonfile');
