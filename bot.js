@@ -39,11 +39,12 @@ bot.on('message', message => {
     var settings = new Object();
     jsonfile.readFile(settingsFile, function (err, settings) {
       if(err) console.error("Read error: " + err);
+      settings["playersCount"] += 1;
+      jsonfile.writeFile(settingsFile, settings, function (err) {
+        if (err) console.error("Write error: " + err);
+      });
     });
-    settings["playersCount"] += 1;
-    jsonfile.writeFile(settingsFile, settings, function (err) {
-      if (err) console.error("Write error: " + err);
-    });
+
 
     //Message Author:
     var uName = message.author.username;
@@ -51,104 +52,116 @@ bot.on('message', message => {
     //Resources
     var resourceFile = 'playerdata/user_resources.json';
     var resources = new Object();
-    resources[uName] = {
-      name: uName,
-      manpower: 1000,
-      lumber: 1000,
-      stone: 1000,
-      iron: 1000,
-      coins: 5000,
-    };
-    jsonfile.writeFile(resourceFile, resources, function (err) {
-      if (err) console.error(err);
-      if (DEBUG) console.log(resources);
+    jsonfile.readFile(resourceFile, function (err, resources) {
+      if(err) console.error("Read error: " + err);
+      resources[uName] = {
+        name: uName,
+        manpower: 1000,
+        lumber: 1000,
+        stone: 1000,
+        iron: 1000,
+        coins: 5000,
+      };
+      jsonfile.writeFile(resourceFile, resources, function (err) {
+        if (err) console.error(err);
+        if (DEBUG) console.log(resources);
+      });
     });
+
 
     //Army Composition
     var armyFile = 'playerdata/user_army.json';
     var army = new Object();
-    army[uName] = {
-      swordsmen: 100,
-      spearmen: 0,
-      archers: 0,
-      crossbowmen: 0,
-      light_cavalry: 0,
-      heavy_cavalry: 0,
-    };
-    jsonfile.writeFile(armyFile, army, function (err) {
-      if (err) console.error(err);
-      if (DEBUG) console.log(army);
+    jsonfile.readFile(armyFile, function (err, army) {
+      if(err) console.error("Read error: " + err);
+      army[uName] = {
+        swordsmen: 100,
+        spearmen: 0,
+        archers: 0,
+        crossbowmen: 0,
+        light_cavalry: 0,
+        heavy_cavalry: 0,
+      };
+      jsonfile.writeFile(armyFile, army, function (err) {
+        if (err) console.error(err);
+        if (DEBUG) console.log(army);
+      });
     });
+
 
     //Infrastructure
     var buildingsFile = 'playerdata/user_buildings.json';
     var buildings = new Object();
-    buildings[uName] = {
-      land: 3,
-      housing: {
-        level: 1,
-        base_cost: {
-          lumber: 100,
-          stone: 100,
+    jsonfile.readFile(buildingsFile, function (err, buildings) {
+      if(err) console.error("Read error: " + err);
+      buildings[uName] = {
+        land: 3,
+        housing: {
+          level: 1,
+          base_cost: {
+            lumber: 100,
+            stone: 100,
+          },
         },
-      },
-      lumber_yard: {
-        level: 0,
-        base_cost: {
-          lumber: 300,
-          stone: 50,
+        lumber_yard: {
+          level: 0,
+          base_cost: {
+            lumber: 300,
+            stone: 50,
+          },
         },
-      },
-      quarry: {
-        level: 0,
-        base_cost: {
-          lumber: 50,
-          stone: 200,
+        quarry: {
+          level: 0,
+          base_cost: {
+            lumber: 50,
+            stone: 200,
+          },
         },
-      },
-      mine: {
-        level: 0,
-        base_cost: {
-          lumber: 100,
-          stone: 500,
+        mine: {
+          level: 0,
+          base_cost: {
+            lumber: 100,
+            stone: 500,
+          },
         },
-      },
-      market: {
-        level: 0,
-        base_cost: {
-          lumber: 800,
-          stone: 450,
+        market: {
+          level: 0,
+          base_cost: {
+            lumber: 800,
+            stone: 450,
+          },
         },
-      },
-      infantry_barracks: {
-        level: 0,
-        base_cost: {
-          lumber: 150,
-          stone: 150,
-          coins: 100,
+        infantry_barracks: {
+          level: 0,
+          base_cost: {
+            lumber: 150,
+            stone: 150,
+            coins: 100,
+          },
         },
-      },
-      archery_range: {
-        level: 0,
-        base_cost: {
-          lumber: 250,
-          stone: 150,
-          coins: 100,
+        archery_range: {
+          level: 0,
+          base_cost: {
+            lumber: 250,
+            stone: 150,
+            coins: 100,
+          },
         },
-      },
-      stables: {
-        level: 0,
-        base_cost: {
-          lumber: 150,
-          stone: 250,
-          coins: 300,
+        stables: {
+          level: 0,
+          base_cost: {
+            lumber: 150,
+            stone: 250,
+            coins: 300,
+          },
         },
-      },
-    };
-    jsonfile.writeFile(buildingsFile, buildings, function (err) {
-      if (err) console.error(err);
-      if (DEBUG) console.log(buildings);
+      };
+      jsonfile.writeFile(buildingsFile, buildings, function (err) {
+        if (err) console.error(err);
+        if (DEBUG) console.log(buildings);
+      });
     });
+
 
 
   }
