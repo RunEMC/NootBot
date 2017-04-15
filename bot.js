@@ -88,8 +88,8 @@ bot.on('message', message => {
 
     // Display Resources
     var data = jsonfile.readFileSync(file);
-    var msg = data[uName]['name'] + "'s Kingdom's Resources:\n"
-    + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+    var msg = data[uName]['name'] + "'s Kingdom\n"
+    + "----------Resources----------\n"
     + "Manpower:guardsman:: " + data[uName]['manpower'] + "\n"
     + "Lumber:evergreen_tree:: " + data[uName]['lumber'] + "\n"
     + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
@@ -99,14 +99,14 @@ bot.on('message', message => {
     // Display Army Comp
     file = 'playerdata/user_army.json'
     data = jsonfile.readFileSync(file);
-    msg += "-----------Army Composition----------\n"
+    msg += "----------Army Composition----------\n"
     + "Swordsmen: " + data[uName]['swordsmen'] + "\n"
     + "Spearmen: " + data[uName]['spearmen'] + "\n"
     + "Archers: " + data[uName]['archers'] + "\n"
     + "Crossbowmen: " + data[uName]['crossbowmen'] + "\n"
     + "Light Cavalry: " + data[uName]['light_cavalry'] + "\n"
     + "Heavy Cavalry" + data[uName]['heavy_cavalry'] + "\n";
-    
+
     // Send Message
     message.channel.sendMessage(msg);
   }
