@@ -178,7 +178,7 @@ bot.on('message', message => {
     + "Archers: " + data[uName]['archers'] + "\n"
     + "Crossbowmen: " + data[uName]['crossbowmen'] + "\n"
     + "Light Cavalry: " + data[uName]['light_cavalry'] + "\n"
-    + "Heavy Cavalry" + data[uName]['heavy_cavalry'] + "\n";
+    + "Heavy Cavalry: " + data[uName]['heavy_cavalry'] + "\n";
 
     // Send Message
     message.channel.sendMessage(msg);
