@@ -46,41 +46,98 @@ bot.on('message', message => {
       if (err) console.error("Write error: " + err);
     });
 
+    //Message Author:
+    var uName = message.author.username;
     //Resources
     var resourceFile = 'playerdata/user_resources.json';
     var resources = new Object();
-    resources[message.author.username] = {
-      name: message.author.username,
+    resources[uName] = {
+      name: uName,
       manpower: 1000,
       lumber: 1000,
       stone: 1000,
       iron: 1000,
-      bronze: 1000
+      coin: 5000,
     };
     jsonfile.writeFile(resourceFile, resources, function (err) {
       if (err) console.error(err);
     });
     //Army Composition
     var armyFile = 'playerdata/user_army.json';
-    var army = {
-
+    var army = new Object();
+    army[uName] = {
+      swordsmen: 100,
+      spearmen: 0,
+      archers: 0,
+      crossbowmen: 0,
+      light_cavalry: 0,
+      heavy_cavalry: 0,
     };
+    jsonfile.writeFile(armyFile, army, function (err) {
+      if (err) console.error(err);
+    });
 
 
   }
   else if (message.content === 'playerInfo') {
+    // Requires
     var jsonfile = require('jsonfile');
     var file = 'playerdata/user_resources.json';
+    // Author Username
+    var uName = message.author.username;
+    // Display Resources
+    var data = jsonfile.readFileSync(file);
+    var msg = data[uName]['name'] + "'s Kingdom's Resources:\n"
+    + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+    + "Manpower:guardsman:: " + data[uName]['manpower'] + "\n"
+    + "Lumber:evergreen_tree:: " + data[uName]['lumber'] + "\n"
+    + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
+    + "Iron:white_medium_square:: " + data[uName]['iron'] + "\n"
+    + "Coins: " + data[uName]['coin'] + "\n";
+    // Send Message
+    message.channel.sendMessage(msg);
+      //data = JSON.parse(obj);
+    /*
     jsonfile.readFile(file, function (err, obj) {
-      console.dir(obj);
+      //console.dir(obj);
+      // Message to Send
 
-      var msg = obj['name'] + "'s Kingdom's Statistics:\n"
+      var msg = obj[uName]['name'] + "'s Kingdom's Resources:\n"
       + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-      + "Manpower:guardsman:: " + obj['manpower'] + "\n"
-      + "Lumber:evergreen_tree:: " + obj['lumber'] + "\n"
-      + "Stone:full_moon:: " + obj['stone'] + "\n"
-      + "Iron:white_medium_square:: " + obj['iron'] + "\n"
-      + "Bronze: " + obj['bronze'] + "\n";
+      + "Manpower:guardsman:: " + obj[uName]['manpower'] + "\n"
+      + "Lumber:evergreen_tree:: " + obj[uName]['lumber'] + "\n"
+      + "Stone:full_moon:: " + obj[uName]['stone'] + "\n"
+      + "Iron:white_medium_square:: " + obj[uName]['iron'] + "\n"
+      + "Coins: " + obj[uName]['coin'] + "\n";
+      // Send Message
+      message.channel.sendMessage(msg);
+
+      //data = JSON.parse(obj);
+    });*/
+/*
+    var msg = data[uName]['name'] + "'s Kingdom's Resources:\n"
+    + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+    + "Manpower:guardsman:: " + data[uName]['manpower'] + "\n"
+    + "Lumber:evergreen_tree:: " + data[uName]['lumber'] + "\n"
+    + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
+    + "Iron:white_medium_square:: " + data[uName]['iron'] + "\n"
+    + "Coins: " + data[uName]['coin'] + "\n";
+    // Send Message
+    message.channel.sendMessage(msg);*/
+
+    // Display Army Comp
+    file = 'playerdata/user_army.json'
+    jsonfile.readFile(file, function (err, obj) {
+      //console.dir(obj);
+      // Message to Send
+      var msg = "-----------Army Composition----------\n"
+      + "Swordsmen: " + obj[uName]['swordsmen'] + "\n"
+      + "Spearmen: " + obj[uName]['spearmen'] + "\n"
+      + "Archers: " + obj[uName]['archers'] + "\n"
+      + "Crossbowmen: " + obj[uName]['crossbowmen'] + "\n"
+      + "Light Cavalry: " + obj[uName]['light_cavalry'] + "\n"
+      + "Heavy Cavalry" + obj[uName]['heavy_cavalry'] + "\n";
+      // Send Message
       message.channel.sendMessage(msg);
     });
   }
