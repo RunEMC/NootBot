@@ -2,9 +2,8 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 const token = "MTc3MTc3ODgwNjkyOTE2MjI1.CgqxkA.tN-6-EssqGux38sScsLXY4up2uo";
 
-//const hook = new Discord.WebhookClient('webhook id', 'webhook token');
-
-//hook.sendMessage('I am now alive!');
+//Debug mode?
+const DEBUG = true;
 
 //Get random integer, inclusive
 function randomNum(min, max) {
@@ -48,6 +47,7 @@ bot.on('message', message => {
 
     //Message Author:
     var uName = message.author.username;
+
     //Resources
     var resourceFile = 'playerdata/user_resources.json';
     var resources = new Object();
@@ -57,11 +57,13 @@ bot.on('message', message => {
       lumber: 1000,
       stone: 1000,
       iron: 1000,
-      coin: 5000,
+      coins: 5000,
     };
     jsonfile.writeFile(resourceFile, resources, function (err) {
       if (err) console.error(err);
+      if (DEBUG) console.log(resources);
     });
+
     //Army Composition
     var armyFile = 'playerdata/user_army.json';
     var army = new Object();
@@ -75,6 +77,77 @@ bot.on('message', message => {
     };
     jsonfile.writeFile(armyFile, army, function (err) {
       if (err) console.error(err);
+      if (DEBUG) console.log(army);
+    });
+
+    //Infrastructure
+    var buildingsFile = 'playerdata/user_buildings.json';
+    var buildings = new Object();
+    buildings[uName] = {
+      land: 3,
+      housing: {
+        level: 1,
+        base_cost: {
+          lumber: 100,
+          stone: 100,
+        },
+      },
+      lumber_yard: {
+        level: 0,
+        base_cost: {
+          lumber: 300,
+          stone: 50,
+        },
+      },
+      quarry: {
+        level: 0,
+        base_cost: {
+          lumber: 50,
+          stone: 200,
+        },
+      },
+      mine: {
+        level: 0,
+        base_cost: {
+          lumber: 100,
+          stone: 500,
+        },
+      },
+      market: {
+        level: 0,
+        base_cost: {
+          lumber: 800,
+          stone: 450,
+        },
+      },
+      infantry_barracks: {
+        level: 0,
+        base_cost: {
+          lumber: 150,
+          stone: 150,
+          coins: 100,
+        },
+      },
+      archery_range: {
+        level: 0,
+        base_cost: {
+          lumber: 250,
+          stone: 150,
+          coins: 100,
+        },
+      },
+      stables: {
+        level: 0,
+        base_cost: {
+          lumber: 150,
+          stone: 250,
+          coins: 300,
+        },
+      },
+    };
+    jsonfile.writeFile(buildingsFile, buildings, function (err) {
+      if (err) console.error(err);
+      if (DEBUG) console.log(buildings);
     });
 
 
@@ -94,7 +167,7 @@ bot.on('message', message => {
     + "Lumber:evergreen_tree:: " + data[uName]['lumber'] + "\n"
     + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
     + "Iron:white_medium_square:: " + data[uName]['iron'] + "\n"
-    + "Coins: " + data[uName]['coin'] + "\n";
+    + "Coins: " + data[uName]['coins'] + "\n";
 
     // Display Army Comp
     file = 'playerdata/user_army.json'
@@ -110,6 +183,11 @@ bot.on('message', message => {
     // Send Message
     message.channel.sendMessage(msg);
   }
+  else if (message.content === 'test') {
+
+  }
+
+  /* Template For Player Actions
   else if (message.content === 'recoverManpower') {
     var jsonfile = require('jsonfile');
     var file = 'playerdata/user_resources.json';
@@ -125,6 +203,7 @@ bot.on('message', message => {
       });
     });
   }
+  */
 });
 
 bot.login(token);
