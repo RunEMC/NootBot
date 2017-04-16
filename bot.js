@@ -12,40 +12,50 @@ function randomNum(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Bad implementation of a sleep function
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
 bot.on('ready', () => {
   console.log("I am ready!");
 });
 
 bot.on('message', message => {
   if (message.content === 'ping') {
-    message.channel.sendMessage('pong');
-    message.reply(message.author.avatarURL);
+    if (DEBUG) {
+      message.channel.sendMessage('pong');
+      message.reply(message.author.avatarURL);
 
-    const vChan = message.member.voiceChannel;
-    vChan.join().then(connection => {
-      connection.playFile('audio/rickroll.mp3');
-      return console.log('Connected!').catch(console.error);
-    });
-  }
-  else if (message.content === 'rickrollme') {
-    const vChan = message.member.voiceChannel;
-    var mp3Duration = require('mp3-duration');
-
-    mp3Duration('audio/rickroll.mp3', function (err, duration) {
-      if (err) return console.log(err.message);
+      const vChan = message.member.voiceChannel;
       vChan.join().then(connection => {
         connection.playFile('audio/rickroll.mp3');
         return console.log('Connected!').catch(console.error);
       });
-    });
-
-    vChan.leave();
+    }
   }
-  else if (message.content === 'fuckoffbloodywanker') {
+  else if (message.content === 'rickrollme') {
+    const vChan = message.member.voiceChannel;
+
+    vChan.join().then(connection => {
+      const dispatcher = connection.playFile('audio/rickroll.mp3');
+      dispatcher.on('end', () => {
+        if (DEBUG) console.log("Song ended.");
+        vChan.leave();
+      });
+      return console.log('Connected!').catch(console.error);
+    });
+  }
+  else if (message.content === 'leave') {
     const vChan = message.member.voiceChannel;
     vChan.leave();
   }
-  else if (message.content === 'newPlayer') {
+  else if (message.content === 'newNation') {
     // Require jsonfile
     var jsonfile = require('jsonfile');
     // Check gamesettings
@@ -59,7 +69,6 @@ bot.on('message', message => {
       });
     });
 
-
     //Message Author:
     var uName = message.author.username;
 
@@ -70,11 +79,11 @@ bot.on('message', message => {
       if(err) console.error("Read error: " + err);
       resources[uName] = {
         name: uName,
-        manpower: 1000,
-        lumber: 1000,
-        stone: 1000,
-        iron: 1000,
-        coins: 5000,
+        manpower: 200,
+        lumber: 100,
+        stone: 100,
+        iron: 0,
+        coins: 500,
       };
       jsonfile.writeFile(resourceFile, resources, function (err) {
         if (err) console.error(err);
@@ -82,19 +91,36 @@ bot.on('message', message => {
       });
     });
 
-
     //Army Composition
     var armyFile = 'playerdata/user_army.json';
     var army = new Object();
     jsonfile.readFile(armyFile, function (err, army) {
       if(err) console.error("Read error: " + err);
       army[uName] = {
-        swordsmen: 100,
-        spearmen: 0,
-        archers: 0,
-        crossbowmen: 0,
-        light_cavalry: 0,
-        heavy_cavalry: 0,
+        swordsmen: {
+          have: 100,
+          max: 100,
+        },
+        spearmen: {
+          have: 0,
+          max: 0,
+        },
+        archers: {
+          have: 0,
+          max: 0,
+        },
+        crossbowmen: {
+          have: 0,
+          max: 0,
+        },
+        light_cavalry: {
+          have: 0,
+          max: 0,
+        },
+        heavy_cavalry: {
+          have: 0,
+          max: 0,
+        },
       };
       jsonfile.writeFile(armyFile, army, function (err) {
         if (err) console.error(err);
@@ -102,14 +128,18 @@ bot.on('message', message => {
       });
     });
 
-
     //Infrastructure
     var buildingsFile = 'playerdata/user_buildings.json';
     var buildings = new Object();
     jsonfile.readFile(buildingsFile, function (err, buildings) {
       if(err) console.error("Read error: " + err);
       buildings[uName] = {
-        land: 3,
+        land: {
+          level: 1,
+          base_cost: {
+            coins: 500,
+          },
+        },
         housing: {
           level: 1,
           base_cost: {
@@ -176,10 +206,8 @@ bot.on('message', message => {
       });
     });
 
-
-
   }
-  else if (message.content === 'playerInfo') {
+  else if (message.content === 'nationInfo') {
     // Requires
     var jsonfile = require('jsonfile');
     var file = 'playerdata/user_resources.json';
@@ -189,7 +217,7 @@ bot.on('message', message => {
     // Display Resources
     var data = jsonfile.readFileSync(file);
     var msg = data[uName]['name'] + "'s Kingdom\n"
-    + "----------Resources----------\n"
+    + "----------Resources (decisions)----------\n"
     + "Manpower:guardsman:: " + data[uName]['manpower'] + "\n"
     + "Lumber:evergreen_tree:: " + data[uName]['lumber'] + "\n"
     + "Stone:full_moon:: " + data[uName]['stone'] + "\n"
@@ -199,13 +227,26 @@ bot.on('message', message => {
     // Display Army Comp
     file = 'playerdata/user_army.json'
     data = jsonfile.readFileSync(file);
-    msg += "----------Army Composition----------\n"
-    + "Swordsmen: " + data[uName]['swordsmen'] + "\n"
-    + "Spearmen: " + data[uName]['spearmen'] + "\n"
-    + "Archers: " + data[uName]['archers'] + "\n"
-    + "Crossbowmen: " + data[uName]['crossbowmen'] + "\n"
-    + "Light Cavalry: " + data[uName]['light_cavalry'] + "\n"
-    + "Heavy Cavalry: " + data[uName]['heavy_cavalry'] + "\n";
+    msg += "----------Army Composition (recruit [unit])----------\n"
+    + "Swordsmen: " + data[uName]['swordsmen']['have'] + "/" + data[uName]['swordsmen']['max'] + "\n"
+    + "Spearmen: " + data[uName]['spearmen']['have'] + "/" + data[uName]['spearmen']['max'] + "\n"
+    + "Archers: " + data[uName]['archers']['have'] + "/" + data[uName]['archers']['max'] + "\n"
+    + "Crossbowmen: " + data[uName]['crossbowmen']['have'] + "/" + data[uName]['crossbowmen']['max'] + "\n"
+    + "Light Cavalry: " + data[uName]['light_cavalry']['have'] + "/" + data[uName]['light_cavalry']['max'] + "\n"
+    + "Heavy Cavalry: " + data[uName]['heavy_cavalry']['have'] + "/" + data[uName]['heavy_cavalry']['max'] + "\n";
+
+    // Display Infrastructure
+    file = 'playerdata/user_buildings.json'
+    data = jsonfile.readFileSync(file);
+    msg += "----------Infrastructure Level (upgrade [infrastructure])----------\n"
+    + "Land: " + data[uName]['land']['level'] + "\n"
+    + "Lumber Yard: " + data[uName]['lumber_yard']['level'] + "\n"
+    + "Quarry: " + data[uName]['quarry']['level'] + "\n"
+    + "Mine: " + data[uName]['mine']['level'] + "\n"
+    + "Market: " + data[uName]['market']['level'] + "\n"
+    + "Infantry Barracks: " + data[uName]['infantry_barracks']['level'] + "\n"
+    + "Archery Range: " + data[uName]['archery_range']['level'] + "\n"
+    + "Stables: " + data[uName]['stables']['level'] + "\n";
 
     // Send Message
     message.channel.sendMessage(msg);
