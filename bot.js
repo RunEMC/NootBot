@@ -27,6 +27,20 @@ bot.on('message', message => {
       return console.log('Connected!').catch(console.error);
     });
   }
+  else if (message.content === 'rickrollme') {
+    const vChan = message.member.voiceChannel;
+    var mp3Duration = require('mp3-duration');
+
+    mp3Duration('audio/rickroll.mp3', function (err, duration) {
+      if (err) return console.log(err.message);
+      vChan.join().then(connection => {
+        connection.playFile('audio/rickroll.mp3');
+        return console.log('Connected!').catch(console.error);
+      });
+    });
+
+    vChan.leave();
+  }
   else if (message.content === 'fuckoffbloodywanker') {
     const vChan = message.member.voiceChannel;
     vChan.leave();
