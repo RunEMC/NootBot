@@ -251,8 +251,21 @@ bot.on('message', message => {
     // Send Message
     message.channel.sendMessage(msg);
   }
-  else if (message.content === 'test') {
+  else if (message.content.startsWith('upgrade')) {
+    // Get the infrastructure to upgrade
+    var building = message.content.split(" ");
+    building.splice(0, 1);
 
+    // Get the available buildings
+    var buildingsFile = 'playerdata/user_buildings.json';
+    var buildings = jsonfile.readFileSync(buildingsFile);
+
+    // Get the player's resources
+    var resourcesFile = 'playerdata/user_resources.json';
+    var resources = jsonfile.readFileSync(buildingsFile);
+
+    // Compare and build if player has the resources
+    
   }
 
   /* Template For Player Actions
