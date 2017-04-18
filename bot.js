@@ -265,7 +265,8 @@ bot.on('message', message => {
     var resources = jsonfile.readFileSync(buildingsFile);
 
     // Compare and build if player has the resources
-    
+    if ()
+
   }
 
   /* Template For Player Actions
