@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
-const token = "MTc3MTc3ODgwNjkyOTE2MjI1.CgqxkA.tN-6-EssqGux38sScsLXY4up2uo";
+const token = require('./token.js');
+const Game = require('./game.js');
 
 //Debug mode?
 const DEBUG = true;
@@ -56,6 +57,9 @@ bot.on('message', message => {
     vChan.leave();
   }
   else if (message.content === 'newNation') {
+    var nationinfo = Game.newNation(message.author.username);
+    message.channel.sendMessage(nationinfo);
+    /*
     // Require jsonfile
     var jsonfile = require('jsonfile');
     // Check gamesettings
@@ -205,9 +209,13 @@ bot.on('message', message => {
         if (DEBUG) console.log(buildings);
       });
     });
-
+*/
   }
   else if (message.content === 'nationInfo') {
+
+    var nationinfo = Game.NationInfo(message.author.username);
+    message.channel.sendMessage(nationinfo);
+    /*
     // Requires
     var jsonfile = require('jsonfile');
     var file = 'playerdata/user_resources.json';
@@ -250,6 +258,7 @@ bot.on('message', message => {
 
     // Send Message
     message.channel.sendMessage(msg);
+    */
   }
   else if (message.content.startsWith('upgrade')) {
     // Get the infrastructure to upgrade
@@ -265,7 +274,7 @@ bot.on('message', message => {
     var resources = jsonfile.readFileSync(buildingsFile);
 
     // Compare and build if player has the resources
-    if ()
+    //if ()
 
   }
 
@@ -288,4 +297,4 @@ bot.on('message', message => {
   */
 });
 
-bot.login(token);
+bot.login(token.gimmietoken());
