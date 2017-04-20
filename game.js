@@ -1,6 +1,9 @@
 // Require jsonfile
 var jsonfile = require('jsonfile');
 
+// DEBUG mode
+const DEBUG = true;
+
 function newNation(uName) {
   // Check gamesettings
   var settingsFile = 'playerdata/game_settings.json';
@@ -160,6 +163,7 @@ function nationInfo(uName) {
 
   // Display Resources
   var data = jsonfile.readFileSync(file);
+  console.log(uName);
   var msg = data[uName]['name'] + "'s Kingdom\n"
   + "----------Resources (decisions)----------\n"
   + "Manpower:guardsman:: " + data[uName]['manpower'] + "\n"
@@ -195,6 +199,10 @@ function nationInfo(uName) {
   return msg;
 }
 
-exports.NewNation = newNation(username);
+exports.NewNation = function(uName) {
+  return newNation(uName);
+}
 
-exports.NationInfo = nationInfo(username);
+exports.NationInfo = function(uName) {
+  return nationInfo(uName);
+}

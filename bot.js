@@ -57,7 +57,7 @@ bot.on('message', message => {
     vChan.leave();
   }
   else if (message.content === 'newNation') {
-    var nationinfo = Game.newNation(message.author.username);
+    var nationinfo = Game.NewNation(message.author.username);
     message.channel.sendMessage(nationinfo);
     /*
     // Require jsonfile
