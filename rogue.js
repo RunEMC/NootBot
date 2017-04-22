@@ -31,7 +31,32 @@ function newPlayerSettings(uName) {
   var statsFile = 'roguedata/player_stats.json';
   var stats = new Object();
   jsonfile.readFile(statsFile, function (err, stats) {
-    if(err) console.error("Read error: " + err);
+    if (err) console.error("Read error: " + err);
+
+    // Randomly distribute 5 skill points
+    var str = 0;
+    var dex = 0;
+    var int = 0;
+    var luck = 0;
+    for (var i = 0; i < 5; ++i) {
+      switch (randomNum(1, 4)) {
+        case 1:
+          str++;
+          break;
+        case 2:
+          dex++;
+          break;
+        case 3:
+          int++;
+          break;
+        case 4:
+          luck++;
+          break;
+        default:
+          str++;
+        }
+    }
+    // Create new player stats
     stats[uName] = {
       name: uName,
       level: 1,
@@ -43,6 +68,11 @@ function newPlayerSettings(uName) {
       mpCur: 2,
       atk: 5,
       def: 5,
+      str: str,
+      dex: dex,
+      int: int,
+      luck: luck,
+      skillpts: 3,
     };
     jsonfile.writeFile(statsFile, stats, function (err) {
       if (err) console.error(err);
@@ -98,8 +128,12 @@ function playerInfo(uName) {
   "------ " + data[uName]['name'] + "'s Stats ------\n" +
   "Level: " + data[uName]['level'] + "\t\t" + "Exp: " + data[uName]['expCur'] + "/" + data[uName]['expNext'] + "\n" +
   "HP: " + data[uName]['hpCur'] + "/" + data[uName]['hpMax'] + "\t\t" + "MP: " + data[uName]['mpCur'] + "/" + data[uName]['mpMax'] + "\n" +
-  "Atk: " + data[uName]['atk'] + "\t\t" + "Def: " + data[uName]['def'];
-
+  "Atk: " + data[uName]['atk'] + "\t\t" + "Def: " + data[uName]['def'] + "\n" +
+  "Strn: " + data[uName]['str'] + "\t\t" + "Dext: " + data[uName]['dex'] + "\n" +
+  "Intl: " + data[uName]['int'] + "\t\t" + "Luck: " + data[uName]['luck'] + "\n";
+  if (data[uName]['skillpts'] >= 1) {
+    msg += "You have " + data[uName]['skillpts'] + " unspent skillpoint(s).";
+  }
   return msg;
 }
 
