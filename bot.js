@@ -107,6 +107,32 @@ bot.on('message', message => {
     var msg = RogueGame.PlayerInfo(authUser);
     message.channel.sendMessage(msg);
   }
+  else if (message.content.startsWith('explore')) {
+
+    var msg = "";
+
+    // Get the location to explore
+    var location = message.content.split(" ");
+    location.splice(0, 1);
+    if (location.length) {
+      // Check if the player is already exploring
+      // if ()
+
+      // Check if the player is already in the location
+      // if ()
+
+      // Set the message
+      msg = RogueGame.Explore(authUser, location[0]);
+    }
+    else {
+
+      msg =
+      "------Explorable Locations (explore [location])------\n" +
+      "Sewers (lvl 1) - [sewers]";
+    }
+    message.channel.sendMessage(msg);
+
+  }
   /* Template For Player Actions
   else if (message.content === 'recoverManpower') {
     var jsonfile = require('jsonfile');

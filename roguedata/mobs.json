@@ -1,0 +1,13 @@
+{
+  "mob_list": ["goblin", "giant rat"],
+  "goblin": {
+    "hp": 5,
+    "atkmin": 0,
+    "atkmax": 3
+  },
+  "giant rat": {
+    "hp": 6,
+    "atkmin": 0,
+    "atkmax": 4
+  }
+}

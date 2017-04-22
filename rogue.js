@@ -118,12 +118,12 @@ function newPlayer(uName) {
   return msg;
 }
 
+// Display Player info
 function playerInfo(uName) {
-  var file = 'roguedata/player_stats.json';
-
   // Display Player Stats
+  var file = 'roguedata/player_stats.json';
   var data = jsonfile.readFileSync(file);
-  if (DEBUG) console.log(uName);
+
   var msg =
   "------ " + data[uName]['name'] + "'s Stats ------\n" +
   "Level: " + data[uName]['level'] + "\t\t" + "Exp: " + data[uName]['expCur'] + "/" + data[uName]['expNext'] + "\n" +
@@ -132,15 +132,34 @@ function playerInfo(uName) {
   "Strn: " + data[uName]['str'] + "\t\t" + "Dext: " + data[uName]['dex'] + "\n" +
   "Intl: " + data[uName]['int'] + "\t\t" + "Luck: " + data[uName]['luck'] + "\n";
   if (data[uName]['skillpts'] >= 1) {
-    msg += "You have " + data[uName]['skillpts'] + " unspent skillpoint(s).";
+    msg += "You have " + data[uName]['skillpts'] + " unspent stat point(s).";
   }
   return msg;
 }
 
+// Adventure
+function explore(uName, location) {
+  // Get info for the location
+  var file = 'roguedata/mobs.json';
+  var mobs = jsonfile.readFileSync(file);
+  file = 'roguedata/mob_drops.json';
+  var drops = jsonfile.readFileSync(file);
+  file = 'roguedata/locations.json';
+  var locations = jsonfile.readFileSync(file);
+  console.log(mobs, drops, locations);
+
+
+
+}
+
+
+// Exports
 exports.NewPlayer = function(uName) {
   return newPlayer(uName);
 }
-
 exports.PlayerInfo = function(uName) {
   return playerInfo(uName);
+}
+exports.Explore = function(uName, location) {
+  return explore(uName, location);
 }

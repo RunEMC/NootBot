@@ -1,0 +1,10 @@
+{
+  "sewers": {
+    "mobs": ["goblin", "giant rat"],
+    "quests": [],
+    "spawnChance": {
+      "goblin": 0.5,
+      "giant rat": 0.5
+    }
+  }
+}
