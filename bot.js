@@ -57,6 +57,7 @@ bot.on('message', message => {
     const vChan = message.member.voiceChannel;
     vChan.leave();
   }
+
   // Kingdom Game
   else if (message.content === 'newNation') {
     var nationinfo = NationGame.NewNation(message.author.username);
@@ -103,7 +104,6 @@ bot.on('message', message => {
     var msg = RogueGame.PlayerInfo(message.author.username);
     message.channel.sendMessage(msg);
   }
-
   /* Template For Player Actions
   else if (message.content === 'recoverManpower') {
     var jsonfile = require('jsonfile');

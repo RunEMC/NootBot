@@ -35,6 +35,8 @@ function newPlayerSettings(uName) {
     stats[uName] = {
       name: uName,
       level: 1,
+      expCur: 0,
+      expNext: 10,
       hpCur: 5,
       hpMax: 5,
       mpMax: 2,
@@ -62,6 +64,9 @@ function newPlayer(uName) {
   if (isExist(uName, settings['players'])) {
     console.log("Player exists.")
     msg = "Player already exists\n";
+
+    // Make newplayer anyways if in debug
+    if (DEBUG) newPlayerSettings(uName);
   }
   else {
     // Update Player Count and players list
@@ -91,6 +96,7 @@ function playerInfo(uName) {
   if (DEBUG) console.log(uName);
   var msg =
   "------ " + data[uName]['name'] + "'s Stats ------\n" +
+  "Level: " + data[uName]['level'] + "\t\t" + "Exp: " + data[uName]['expCur'] + "/" + data[uName]['expNext'] + "\n" +
   "HP: " + data[uName]['hpCur'] + "/" + data[uName]['hpMax'] + "\t\t" + "MP: " + data[uName]['mpCur'] + "/" + data[uName]['mpMax'] + "\n" +
   "Atk: " + data[uName]['atk'] + "\t\t" + "Def: " + data[uName]['def'];
 
