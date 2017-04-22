@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 const token = require('./token.js');
-const Game = require('./game.js');
+const NationGame = require('./nationgame.js');
+const RogueGame = require('./rogue.js');
 
 //Debug mode?
 const DEBUG = true;
@@ -58,12 +59,12 @@ bot.on('message', message => {
   }
   // Kingdom Game
   else if (message.content === 'newNation') {
-    var nationinfo = Game.NewNation(message.author.username);
+    var nationinfo = NationGame.NewNation(message.author.username);
     message.channel.sendMessage(nationinfo);
   }
   else if (message.content === 'nationInfo') {
 
-    var nationinfo = Game.NationInfo(message.author.username);
+    var nationinfo = NationGame.NationInfo(message.author.username);
     message.channel.sendMessage(nationinfo);
 
   }
@@ -95,18 +96,9 @@ bot.on('message', message => {
     message.channel.sendMessage(msg)
   }
   else if (message.content === 'newPlayer') {
-    // Check gamesettings
-    var settingsFile = 'playerdata/game_settings_rogue.json';
-    var settings = new Object();
-    jsonfile.readFile(settingsFile, function (err, settings) {
-      if(err) console.error("Read error: " + err);
-      settings["playersCount"] += 1;
-      jsonfile.writeFile(settingsFile, settings, function (err) {
-        if (err) console.error("Write error: " + err);
-      });
-    });
+    RogueGame.NewPlayer(message.author.username);
 
-    
+
   }
   else if (message.content === 'playerInfo') {
 

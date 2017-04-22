@@ -208,21 +208,3 @@ exports.NewNation = function(uName) {
 exports.NationInfo = function(uName) {
   return nationInfo(uName);
 }
-
-
-// Rogue Like Adventure Game
-function newPlayer(uName) {
-
-}
-
-function playerInfo(uName) {
-
-}
-
-exports.NewPlayer = function(uName) {
-  return newPlayer(uName);
-}
-
-exports.PlayerInfo = function(uName) {
-  return playerInfo(uName);
-}
