@@ -96,12 +96,12 @@ bot.on('message', message => {
     message.channel.sendMessage(msg)
   }
   else if (message.content === 'newPlayer') {
-    RogueGame.NewPlayer(message.author.username);
-
-
+    var msg = RogueGame.NewPlayer(message.author.username);
+    message.channel.sendMessage(msg);
   }
   else if (message.content === 'playerInfo') {
-
+    var msg = RogueGame.PlayerInfo(message.author.username);
+    message.channel.sendMessage(msg);
   }
 
   /* Template For Player Actions
