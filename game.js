@@ -4,9 +4,11 @@ var jsonfile = require('jsonfile');
 // DEBUG mode
 const DEBUG = true;
 
+
+// Kingdom Building Game
 function newNation(uName) {
   // Check gamesettings
-  var settingsFile = 'playerdata/game_settings.json';
+  var settingsFile = 'playerdata/game_settings_kingdom.json';
   var settings = new Object();
   jsonfile.readFile(settingsFile, function (err, settings) {
     if(err) console.error("Read error: " + err);
@@ -205,4 +207,22 @@ exports.NewNation = function(uName) {
 
 exports.NationInfo = function(uName) {
   return nationInfo(uName);
+}
+
+
+// Rogue Like Adventure Game
+function newPlayer(uName) {
+
+}
+
+function playerInfo(uName) {
+
+}
+
+exports.NewPlayer = function(uName) {
+  return newPlayer(uName);
+}
+
+exports.PlayerInfo = function(uName) {
+  return playerInfo(uName);
 }

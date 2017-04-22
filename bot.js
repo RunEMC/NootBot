@@ -56,6 +56,7 @@ bot.on('message', message => {
     const vChan = message.member.voiceChannel;
     vChan.leave();
   }
+  // Kingdom Game
   else if (message.content === 'newNation') {
     var nationinfo = Game.NewNation(message.author.username);
     message.channel.sendMessage(nationinfo);
@@ -64,7 +65,7 @@ bot.on('message', message => {
 
     var nationinfo = Game.NationInfo(message.author.username);
     message.channel.sendMessage(nationinfo);
-    
+
   }
   else if (message.content.startsWith('upgrade')) {
     // Get the infrastructure to upgrade
@@ -81,6 +82,33 @@ bot.on('message', message => {
 
     // Compare and build if player has the resources
     //if ()
+
+  }
+
+  // Rogue like adventure game
+  else if (message.content === 'sendHelp') {
+    var msg =
+    "------Commands------\n" +
+    "newPlayer: Start a new game\n" +
+    "playerInfo: Look at your player's info";
+
+    message.channel.sendMessage(msg)
+  }
+  else if (message.content === 'newPlayer') {
+    // Check gamesettings
+    var settingsFile = 'playerdata/game_settings_rogue.json';
+    var settings = new Object();
+    jsonfile.readFile(settingsFile, function (err, settings) {
+      if(err) console.error("Read error: " + err);
+      settings["playersCount"] += 1;
+      jsonfile.writeFile(settingsFile, settings, function (err) {
+        if (err) console.error("Write error: " + err);
+      });
+    });
+
+    
+  }
+  else if (message.content === 'playerInfo') {
 
   }
 
