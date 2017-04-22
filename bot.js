@@ -3,6 +3,7 @@ const bot = new Discord.Client();
 const token = require('./token.js');
 const NationGame = require('./nationgame.js');
 const RogueGame = require('./rogue.js');
+const Sanitizer = require('sanitizer');
 
 //Debug mode?
 const DEBUG = true;
@@ -29,6 +30,8 @@ bot.on('ready', () => {
 });
 
 bot.on('message', message => {
+  var authUser = Sanitizer.sanitize(message.author.username);
+
   if (message.content === 'ping') {
     if (DEBUG) {
       message.channel.sendMessage('pong');
@@ -97,11 +100,11 @@ bot.on('message', message => {
     message.channel.sendMessage(msg)
   }
   else if (message.content === 'newPlayer') {
-    var msg = RogueGame.NewPlayer(message.author.username);
+    var msg = RogueGame.NewPlayer(authUser);
     message.channel.sendMessage(msg);
   }
   else if (message.content === 'playerInfo') {
-    var msg = RogueGame.PlayerInfo(message.author.username);
+    var msg = RogueGame.PlayerInfo(authUser);
     message.channel.sendMessage(msg);
   }
   /* Template For Player Actions
