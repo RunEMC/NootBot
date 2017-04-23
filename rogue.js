@@ -152,6 +152,8 @@ function explore(uName, location) {
   file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
   var curLoc = locations[location];
+  // Flavor text
+  var returnMsg = "";
 
   // Switch case to determine encounter
   // 1. Spawn mob
@@ -159,39 +161,69 @@ function explore(uName, location) {
   // 3. Trap
   // 4. Special
   // 5. Nothing
+  var alreadyEncountered = false;
+  var encounterChance = curLoc['encounterChance'];
+  var encounter = randomNum(1, 100);
+  if (encounter <= encounterChance['mob']) {
+    // Spawn mob
+    var len = curLoc['mobs'].length;
+    var prevChance = 0;
+    for (var i = 0; i < len; ++i) {
+      var mob = curLoc['mobs'][i];
+      var spawnChance = curLoc['spawnChance'][mob];
+      if (Math.random() <= spawnChance + prevChance) {
+        var encounter = new Object();
+        encounter[uName] = {
+          type: 'mob',
+          mob: {
+            name: mob,
+            hp: mob['hp']
+          }
+        }
 
-  var returnMsg = "";
+        file = 'roguedata/encounters.json';
+        jsonfile.writeFile(file, encounter, function (err) {
+          if (err) console.error("Write error: " + err);
+        });
+
+        returnMsg +=
+        "A " + mob + " appears!\n" +
+        "------Available options (encounter [number])------\n" +
+        "1. Attack\n" +
+        "2. Run away (like the coward you are)\n";
+        break;
+      }
+      prevChance += spawnChance;
+    }
+    alreadyEncountered = true;
+  }
+  encounter -= encounterChance['mob'];
+  if (encounter <= encounterChance['trap'] && !alreadyEncountered) {
+    // Trap
+    alreadyEncountered = true;
+    returnMsg += "It's a trap!\n";
+  }
+  encounter -= encounterChance['trap'];
+  if (encounter < encounterChance['nothing'] && !alreadyEncountered) {
+    // Nothing
+    alreadyEncountered = true;
+    returnMsg += "You find nothing of interest in the place.\n";
+  }
+  encounter -= encounterChance['nothing'];
+  if (encounter <= encounterChance['treasure'] && !alreadyEncountered) {
+    // Treasure
+    alreadyEncountered = true;
+    returnMsg += "You find a treasure chest!\n";
+  }
+  encounter -= encounterChance['treasure'];
+  if (encounter <= encounterChance['special'] && !alreadyEncountered) {
+    // Special
+    alreadyEncountered = true;
+    returnMsg += "ERROR. YOU ARE NULL AND VOID.\n";
+  }
 
   // 1. Spawn a mob
-  var len = curLoc['mobs'].length;
-  var prevChance = 0;
-  for (var i = 0; i < len; ++i) {
-    var mob = curLoc['mobs'][i];
-    var spawnChance = curLoc['spawnChance'][mob];
-    if (Math.random() <= spawnChance + prevChance) {
-      var encounter = new Object();
-      encounter[uName] = {
-        type: 'mob',
-        mob: {
-          name: mob,
-          hp: mob['hp']
-        }
-      }
 
-      file = 'roguedata/encounters.json';
-      jsonfile.writeFile(file, encounter, function (err) {
-        if (err) console.error("Write error: " + err);
-      });
-
-      returnMsg =
-      "A " + mob + " appears!\n" +
-      "------Available options (encounter [number])------\n" +
-      "1. Attack\n" +
-      "2. Run away (like the coward you are)\n";
-      break;
-    }
-    prevChance += spawnChance;
-  }
 
 
   return returnMsg;
