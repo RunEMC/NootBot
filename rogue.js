@@ -14,6 +14,11 @@ function randomNum(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Get random real number, >= min, < max
+function randomRealNum(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 //Check if elelment exists in array
 function isExist(element, arr) {
   var len = arr.length;
@@ -146,10 +151,50 @@ function explore(uName, location) {
   var drops = jsonfile.readFileSync(file);
   file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
-  console.log(mobs, drops, locations);
+  var curLoc = locations[location];
+
+  // Switch case to determine encounter
+  // 1. Spawn mob
+  // 2. Treasure
+  // 3. Trap
+  // 4. Special
+  // 5. Nothing
+
+  var returnMsg = "";
+
+  // 1. Spawn a mob
+  var len = curLoc['mobs'].length;
+  var prevChance = 0;
+  for (var i = 0; i < len; ++i) {
+    var mob = curLoc['mobs'][i];
+    var spawnChance = curLoc['spawnChance'][mob];
+    if (Math.random() <= spawnChance + prevChance) {
+      var encounter = new Object();
+      encounter[uName] = {
+        type: 'mob',
+        mob: {
+          name: mob,
+          hp: mob['hp']
+        }
+      }
+
+      file = 'roguedata/encounters.json';
+      jsonfile.writeFile(file, encounter, function (err) {
+        if (err) console.error("Write error: " + err);
+      });
+
+      returnMsg =
+      "A " + mob + " appears!\n" +
+      "------Available options (encounter [number])------\n" +
+      "1. Attack\n" +
+      "2. Run away (like the coward you are)\n";
+      break;
+    }
+    prevChance += spawnChance;
+  }
 
 
-
+  return returnMsg;
 }
 
 
