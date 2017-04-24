@@ -119,7 +119,7 @@ function newPlayer(uName) {
   }
 
   // Display Player Info
-  msg += playerInfo(uName);
+  //msg += playerInfo(uName);
   return msg;
 }
 
