@@ -142,12 +142,8 @@ function playerInfo(uName) {
   return msg;
 }
 
-function encounter() {
-  
-}
-
-// Adventure
-function explore(uName, location) {
+// Refactor available encounters in explore()
+function encounter(uName, location) {
   // Get info for the location
   var file = 'roguedata/mobs.json';
   var mobs = jsonfile.readFileSync(file);
@@ -226,11 +222,29 @@ function explore(uName, location) {
     returnMsg += "ERROR. YOU ARE NULL AND VOID.\n";
   }
 
+  return returnMsg;
+}
+
+// Adventure
+function explore(uName, location) {
+  // Get info for the location
+  var file = 'roguedata/mobs.json';
+  var mobs = jsonfile.readFileSync(file);
+  file = 'roguedata/mob_drops.json';
+  var drops = jsonfile.readFileSync(file);
+  file = 'roguedata/locations.json';
+  var locations = jsonfile.readFileSync(file);
+  var curLoc = locations[location];
+  // Flavor text
+  var returnMsg = "";
+
+
+
   // 1. Spawn a mob
 
 
 
-  return returnMsg;
+  return encounter(uName, location);
 }
 
 
