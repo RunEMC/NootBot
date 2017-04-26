@@ -142,6 +142,10 @@ function playerInfo(uName) {
   return msg;
 }
 
+function encounter() {
+  
+}
+
 // Adventure
 function explore(uName, location) {
   // Get info for the location
