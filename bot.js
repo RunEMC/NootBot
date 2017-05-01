@@ -56,9 +56,33 @@ bot.on('message', message => {
       return console.log('Connected!').catch(console.error);
     });
   }
+  else if (message.content.startsWith('play')) {
+    var song = message.content.split(" ");
+    song.splice(0, 1);
+
+    const vChan = message.member.voiceChannel;
+
+    var filename = 'audio/' + song[0] + '.mp3';
+
+    vChan.join().then(connection => {
+      const dispatcher = connection.playFile(filename);
+      dispatcher.on('end', () => {
+        if (DEBUG) console.log("Song ended.");
+        vChan.leave();
+      });
+      return console.log('Connected!').catch(console.error);
+    });
+  }
   else if (message.content === 'leave') {
     const vChan = message.member.voiceChannel;
     vChan.leave();
+  }
+  else if (message.content === 'help') {
+    var fs = require('fs');
+    var files = fs.readdirSync('audio/');
+
+    //console.log(files);
+    message.channel.sendMessage(files);
   }
 
   // Kingdom Game
