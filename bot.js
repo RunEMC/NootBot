@@ -56,7 +56,7 @@ bot.on('message', message => {
       return console.log('Connected!').catch(console.error);
     });
   }
-  else if (message.content.startsWith('play')) {
+  else if (message.content.startsWith('play ')) {
     var song = message.content.split(" ");
     song.splice(0, 1);
 

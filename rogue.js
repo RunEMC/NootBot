@@ -178,7 +178,8 @@ function encounter(uName, location) {
           mob: {
             name: mob,
             hp: mob['hp']
-          }
+          },
+          //options: []
         }
 
         file = 'roguedata/encounters.json';
