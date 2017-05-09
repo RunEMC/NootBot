@@ -157,6 +157,33 @@ bot.on('message', message => {
     message.channel.sendMessage(msg);
 
   }
+// Elements Incremental Game
+  else if (message.content.startsWith('!ele ')) {
+    var commands = message.content.split(" ");
+    commands.splice(0, 1);
+
+    switch (commands[0]) {
+      case 'help':
+        //Help Function
+        break;
+      case 'combine':
+        var elements = commands;
+        elements.slice(0, 1);
+        break;
+      default:
+
+    }
+/*
+    if(commands[0] == 'help') {
+      // Help function
+    }
+    else if (commands[0] === )
+    */
+  }
+  else if (message.content === '!ele') {
+    // Help function
+  }
+
   /* Template For Player Actions
   else if (message.content === 'recoverManpower') {
     var jsonfile = require('jsonfile');

@@ -142,8 +142,7 @@ function playerInfo(uName) {
   return msg;
 }
 
-// Refactor available encounters in explore()
-function encounter(uName, location) {
+function encounterNew(uName, location) {
   // Get info for the location
   var file = 'roguedata/mobs.json';
   var mobs = jsonfile.readFileSync(file);
@@ -151,7 +150,6 @@ function encounter(uName, location) {
   var drops = jsonfile.readFileSync(file);
   file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
-  var curLoc = locations[location];
   // Flavor text
   var returnMsg = "";
 
@@ -162,23 +160,22 @@ function encounter(uName, location) {
   // 4. Special
   // 5. Nothing
   var alreadyEncountered = false;
-  var encounterChance = curLoc['encounterChance'];
+  var encounterChance = location['encounterChance'];
   var encounter = randomNum(1, 100);
   if (encounter <= encounterChance['mob']) {
     // Spawn mob
-    var len = curLoc['mobs'].length;
+    var len = location['mobs'].length;
     var prevChance = 0;
     for (var i = 0; i < len; ++i) {
-      var mob = curLoc['mobs'][i];
-      var spawnChance = curLoc['spawnChance'][mob];
+      var mob = location['mobs'][i];
+      var spawnChance = location['spawnChance'][mob];
+      var mobHp = mobs[mob]['hp'];
       if (Math.random() <= spawnChance + prevChance) {
         var encounter = new Object();
         encounter[uName] = {
           type: 'mob',
-          mob: {
-            name: mob,
-            hp: mob['hp']
-          },
+          name: mob,
+          hp: mobHp
           //options: []
         }
 
@@ -226,6 +223,34 @@ function encounter(uName, location) {
   return returnMsg;
 }
 
+// Refactor available encounters in explore()
+function encounter(uName, options) {
+  // Get info for the location
+  var file = 'roguedata/mobs.json';
+  var mobs = jsonfile.readFileSync(file);
+  file = 'roguedata/mob_drops.json';
+  var drops = jsonfile.readFileSync(file);
+  file = 'roguedata/locations.json';
+  var locations = jsonfile.readFileSync(file);
+  file = 'roguedata/encounters.json';
+  var playerEncounter = jsonfile.readFileSync(file)[uName];
+  // Flavor text
+  var returnMsg = "";
+
+  // Create a new encounter if one does not exist
+  if (!playerEncounter || playerEncounter['type'] == 'none') {
+    returnMsg = encounterNew(uName, options);
+  }
+  else {
+    var encountType = playerEncounter['type'];
+    if (encountType == 'mob') {
+
+    }
+  }
+
+  return returnMsg;
+}
+
 // Adventure
 function explore(uName, location) {
   // Get info for the location
@@ -245,7 +270,7 @@ function explore(uName, location) {
 
 
 
-  return encounter(uName, location);
+  return encounter(uName, curLoc);
 }
 
 
