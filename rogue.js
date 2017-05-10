@@ -19,6 +19,11 @@ function randomRealNum(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+// Function to convert strings to title case
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
 //Check if elelment exists in array
 function isExist(element, arr) {
   var len = arr.length;
@@ -34,56 +39,88 @@ function isExist(element, arr) {
 function newPlayerSettings(uName) {
   //PLayerStats
   var statsFile = 'roguedata/player_stats.json';
-  var stats = new Object();
-  jsonfile.readFile(statsFile, function (err, stats) {
-    if (err) console.error("Read error: " + err);
+  var stats = jsonfile.readFileSync(statsFile);
+  var invFile = 'roguedata/player_inventory.json';
+  var inv = jsonfile.readFileSync(invFile);
 
-    // Randomly distribute 5 skill points
-    var str = 0;
-    var dex = 0;
-    var int = 0;
-    var luck = 0;
-    for (var i = 0; i < 5; ++i) {
-      switch (randomNum(1, 4)) {
-        case 1:
-          str++;
-          break;
-        case 2:
-          dex++;
-          break;
-        case 3:
-          int++;
-          break;
-        case 4:
-          luck++;
-          break;
-        default:
-          str++;
-        }
-    }
-    // Create new player stats
-    stats[uName] = {
-      name: uName,
-      level: 1,
-      expCur: 0,
-      expNext: 10,
-      hpCur: 5,
-      hpMax: 5,
-      mpMax: 2,
-      mpCur: 2,
-      atk: 5,
-      def: 5,
-      str: str,
-      dex: dex,
-      int: int,
-      luck: luck,
-      skillpts: 3,
-    };
+  // Randomly distribute 5 skill points
+  var str = 1;
+  var dex = 1;
+  var int = 1;
+  var luck = 1;
+  for (var i = 0; i < 5; ++i) {
+    switch (randomNum(1, 4)) {
+      case 1:
+        str++;
+        break;
+      case 2:
+        dex++;
+        break;
+      case 3:
+        int++;
+        break;
+      case 4:
+        luck++;
+        break;
+      default:
+        str++;
+      }
+  }
+
+  // Create new player stats
+  stats[uName] = {
+    name: uName,
+    level: 1,
+    expCur: 0,
+    expNext: 10,
+    hpCur: 5,
+    hpMax: 5,
+    mpMax: 2,
+    mpCur: 2,
+    atk: 1 + Math.ceil(str / 2),
+    def: 0,
+    str: str,
+    dex: dex,
+    int: int,
+    luck: luck,
+    skillpts: 3,
+  };
+  console.log(stats);
+  if (stats) {
     jsonfile.writeFile(statsFile, stats, function (err) {
       if (err) console.error(err);
-      if (DEBUG) console.log(stats);
+      if (DEBUG) console.log("writing to stats", stats);
     });
-  });
+  }
+  else {
+    console.log("error writing stats, ", stats);
+  }
+
+
+  // Create new player inventory
+  inv[uName] = {
+    equip: {
+      head: 'none',
+      body: 'none',
+      legs: 'none',
+      feet: 'none',
+      // Add more equip slots here
+    },
+    gold: luck + 5,
+    items: {
+      apples: 2
+    }
+  }
+  console.log(inv);
+  if (inv) {
+    jsonfile.writeFile(invFile, inv, function (err) {
+      if (err) console.error(err);
+      if (DEBUG) console.log("Writing to inv, ", inv);
+    });
+  }
+  else {
+    console.log("error writing inv, ", inv);
+  }
 }
 
 // Making a New Player
@@ -98,7 +135,8 @@ function newPlayer(uName) {
   // Check if player exists
   if (isExist(uName, settings['players'])) {
     console.log("Player exists.")
-    msg = "Player already exists\n";
+    msg = "Player already exists\n" +
+    "Type playerInfo to see your stats.\n";
 
     // Make newplayer anyways if in debug
     if (DEBUG) newPlayerSettings(uName);
@@ -111,15 +149,13 @@ function newPlayer(uName) {
       if (err) console.error("Write error: " + err);
     });
 
+    // Update msg
+    msg = "New character created for " + uName + "\n" +
+    "Type playerInfo to see your stats.\n";
+
     // Make newplayer
     newPlayerSettings(uName);
-
-    // Update msg
-    msg = "New character created for " + uName + "\n";
   }
-
-  // Display Player Info
-  //msg += playerInfo(uName);
   return msg;
 }
 
@@ -128,6 +164,8 @@ function playerInfo(uName) {
   // Display Player Stats
   var file = 'roguedata/player_stats.json';
   var data = jsonfile.readFileSync(file);
+  file = 'roguedata/player_inventory.json';
+  var inv = jsonfile.readFileSync(file)[uName];
 
   var msg =
   "------ " + data[uName]['name'] + "'s Stats ------\n" +
@@ -137,8 +175,23 @@ function playerInfo(uName) {
   "Strn: " + data[uName]['str'] + "\t\t" + "Dext: " + data[uName]['dex'] + "\n" +
   "Intl: " + data[uName]['int'] + "\t\t" + "Luck: " + data[uName]['luck'] + "\n";
   if (data[uName]['skillpts'] >= 1) {
-    msg += "You have " + data[uName]['skillpts'] + " unspent stat point(s).";
+    msg += "You have " + data[uName]['skillpts'] + " unspent stat point(s).\n";
   }
+  msg +=
+  "------ " + data[uName]['name'] + "'s Equipment ------\n" +
+  "Head: " + inv['equip']['head'] + "\n" +
+  "Body: " + inv['equip']['body'] + "\n" +
+  "Legs: " + inv['equip']['legs'] + "\n" +
+  "Feet: " + inv['equip']['feet'] + "\n" +
+  "------ " + data[uName]['name'] + "'s Inventory ------\n" +
+  "Coins: $" + inv['gold'] + "\n";
+  // Loop through all the items
+  var items = Object.keys(inv['items']);
+  var len = items.length;
+  for (var i = 0; i < len; ++i) {
+    msg += toTitleCase(items[i]) + ": " + inv['items'][items[i]] + "\n";
+  }
+
   return msg;
 }
 
@@ -189,7 +242,7 @@ function encounterNew(uName, location) {
         "A " + mob + " appears!\n" +
         "------Available options (encounter [number])------\n" +
         "1. Attack\n" +
-        "2. Run away (like the coward you are)\n";
+        "2. Run away\n";
         break;
       }
       prevChance += spawnChance;
@@ -363,7 +416,7 @@ function explore(uName, location) {
   // Check if player is not already in an encounter
   if (!playerEncounter || playerEncounter['type'] == 'none') {
     // Create a new encounter
-    returnMsg += encounterNew(uName, location[0])
+    returnMsg += encounterNew(uName, location)
   }
   // Player is already in an encounter
   else {

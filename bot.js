@@ -146,7 +146,7 @@ bot.on('message', message => {
       // if ()
 
       // Set the message
-      msg = RogueGame.Explore(authUser, location);
+      msg = RogueGame.Explore(authUser, location[0]);
     }
     else {
 
@@ -163,7 +163,12 @@ bot.on('message', message => {
     var options = message.content.split(" ");
     options.splice(0, 1);
 
-    msg += RogueGame.Encounter(authUser, options);
+    if (options.length) {
+      msg += RogueGame.Encounter(authUser, options[0]);
+    }
+    else {
+      msg += RogueGame.Encounter(authUser, 'help');
+    }
     message.channel.sendMessage(msg);
   }
 // Elements Incremental Game
