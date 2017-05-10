@@ -245,14 +245,14 @@ function encounter(uName, options) {
   // Create a new encounter if one does not exist
   if (!playerEncounter || playerEncounter['type'] == 'none') {
     //returnMsg = encounterNew(uName, locations[options[0]]);
-    returnMsg += "You are not in any encounters right now.\n";
+    returnMsg += "You are not in any encounters right now (try explore [location]).\n";
   }
   else {
     var encountType = playerEncounter['type'];
 
     if (encountType == 'mob') {
       // Check player choice
-      if (options[0] == '1') {
+      if (options == '1') {
         var mobStats = mobs[playerEncounter['name']];
         var mobDmg = randomNum(mobStats['atkmin'], mobStats['atkmax']);
         // Add player defense calculations here:
@@ -321,9 +321,20 @@ function encounter(uName, options) {
           });
         }
       }
-      else {
+      else if (options == 'help') {
         returnMsg += "You are currently fighting a(n) " + playerEncounter['name'].toLowerCase() + "\n" +
-        "HP: " + playerEncounter['hp'] + "\n";
+        "It has " + playerEncounter['hp'] + "HP remaining.\n" +
+        "------Available options (encounter [number])------\n" +
+        "1. Attack\n" +
+        "2. Run away (like the coward you are)\n";
+      }
+      else {
+        // Temporary:
+        returnMsg += "You are currently fighting a(n) " + playerEncounter['name'].toLowerCase() + "\n" +
+        "It has " + playerEncounter['hp'] + "HP remaining.\n" +
+        "------Available options (encounter [number])------\n" +
+        "1. Attack\n" +
+        "2. Run away (like the coward you are)\n";
       }
     }
   }
