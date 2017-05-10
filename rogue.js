@@ -150,6 +150,7 @@ function encounterNew(uName, location) {
   var drops = jsonfile.readFileSync(file);
   file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
+  location = locations[location];
   // Flavor text
   var returnMsg = "";
 
@@ -243,7 +244,8 @@ function encounter(uName, options) {
 
   // Create a new encounter if one does not exist
   if (!playerEncounter || playerEncounter['type'] == 'none') {
-    returnMsg = encounterNew(uName, locations[options[0]]);
+    //returnMsg = encounterNew(uName, locations[options[0]]);
+    returnMsg += "You are not in any encounters right now.\n";
   }
   else {
     var encountType = playerEncounter['type'];
@@ -270,12 +272,16 @@ function encounter(uName, options) {
 
         // If mob is still alive
         if (mobHpLeft) {
-          returnMsg += "The angry " + playerEncounter['name'].toLowerCase() + " attacks you for " + mobDmg + " damage.\n" +
-          "Your HP: " + playerStats['hpCur'] + "/" + playerStats['hpMax'] + "\n";
           // Attack back
           var playerHp = Math.max(0, playerStats['hpCur'] - mobDmg);
           playerStats['hpCur'] = playerHp;
           playerStatsList[uName] = playerStats;
+          // Update flavor text
+          returnMsg += "The angry " + playerEncounter['name'].toLowerCase() + " attacks you for " + mobDmg + " damage.\n" +
+          "Your HP: " + playerStats['hpCur'] + "/" + playerStats['hpMax'] + "\n" +
+          "------Available options (encounter [number])------\n" +
+          "1. Attack\n" +
+          "2. Run away (like the coward you are)\n";
 
           file = 'roguedata/encounters.json';
           jsonfile.writeFile(file, encounterList, function (err) {
@@ -293,8 +299,8 @@ function encounter(uName, options) {
           playerStats['expCur'] += mobStats['xpGain'];
 
           // Increase player level if possible
-          if (playerStats['expCur'] >= playerStats['expMax']) {
-            playerStats['expCur'] -= playerStats['expMax'];
+          if (playerStats['expCur'] >= playerStats['expNext']) {
+            playerStats['expCur'] -= playerStats['expNext'];
             playerStats['level']++;
             playerStats['skillpts'] += 3;
             returnMsg += "You have leveled up to lvl" + playerStats['level'] + "!\n";
@@ -332,22 +338,36 @@ function explore(uName, location) {
   var mobs = jsonfile.readFileSync(file);
   file = 'roguedata/mob_drops.json';
   var drops = jsonfile.readFileSync(file);
-  file = 'roguedata/locations.json';
+  file = 'roguedata/encounters.json';
+  var playerEncounter = jsonfile.readFileSync(file)[uName];
   // Potentially not needed
   /*
+  file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
   var curLoc = locations[location];
   */
   // Flavor text
   var returnMsg = "";
 
-
+  // Check if player is not already in an encounter
+  if (!playerEncounter || playerEncounter['type'] == 'none') {
+    // Create a new encounter
+    returnMsg += encounterNew(uName, location[0])
+  }
+  // Player is already in an encounter
+  else {
+    returnMsg +=
+    "Your path is blocked by the " + playerEncounter['name'] + "\n" +
+    "------Available options (encounter [number])------\n" +
+    "1. Attack\n" +
+    "2. Run away (like the coward you are)\n";
+  }
 
   // 1. Spawn a mob
 
 
 
-  return encounter(uName, location);
+  return returnMsg;//encounter(uName, location);
 }
 
 
@@ -360,4 +380,7 @@ exports.PlayerInfo = function(uName) {
 }
 exports.Explore = function(uName, location) {
   return explore(uName, location);
+}
+exports.Encounter = function(uName, options) {
+  return encounter(uName, options);
 }

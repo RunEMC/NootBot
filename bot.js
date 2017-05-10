@@ -131,7 +131,7 @@ bot.on('message', message => {
     var msg = RogueGame.PlayerInfo(authUser);
     message.channel.sendMessage(msg);
   }
-  else if (message.content.startsWith('explore')) {
+  else if (message.content.startsWith('explore ')) {
 
     var msg = "";
 
@@ -156,6 +156,15 @@ bot.on('message', message => {
     }
     message.channel.sendMessage(msg);
 
+  }
+  else if (message.content.startsWith('encounter ')) {
+    var msg = "";
+
+    var options = message.content.split(" ");
+    options.splice(0, 1);
+
+    msg += RogueGame.Encounter(authUser, options);
+    message.channel.sendMessage(msg);
   }
 // Elements Incremental Game
   else if (message.content.startsWith('!ele ')) {
