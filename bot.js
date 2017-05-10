@@ -146,7 +146,7 @@ bot.on('message', message => {
       // if ()
 
       // Set the message
-      msg = RogueGame.Explore(authUser, location[0]);
+      msg = RogueGame.Explore(authUser, location);
     }
     else {
 

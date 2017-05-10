@@ -233,18 +233,92 @@ function encounter(uName, options) {
   file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
   file = 'roguedata/encounters.json';
-  var playerEncounter = jsonfile.readFileSync(file)[uName];
+  var encounterList = jsonfile.readFileSync(file);
+  var playerEncounter = encounterList[uName];
+  file = 'roguedata/player_stats.json';
+  var playerStatsList = jsonfile.readFileSync(file);
+  var playerStats = playerStatsList[uName];
   // Flavor text
   var returnMsg = "";
 
   // Create a new encounter if one does not exist
   if (!playerEncounter || playerEncounter['type'] == 'none') {
-    returnMsg = encounterNew(uName, options);
+    returnMsg = encounterNew(uName, locations[options[0]]);
   }
   else {
     var encountType = playerEncounter['type'];
-    if (encountType == 'mob') {
 
+    if (encountType == 'mob') {
+      // Check player choice
+      if (options[0] == '1') {
+        var mobStats = mobs[playerEncounter['name']];
+        var mobDmg = randomNum(mobStats['atkmin'], mobStats['atkmax']);
+        // Add player defense calculations here:
+
+        var playerDmg = playerStats['atk'];
+        // Add player damage calculations here:
+
+        // Mob hp left
+        var mobHpLeft = Math.max(playerEncounter['hp'] - playerDmg, 0);
+        playerEncounter['hp'] = mobHpLeft;
+        encounterList[uName] = playerEncounter;
+
+        // Flavor text
+        returnMsg +=
+        "You attack the " + playerEncounter['name'].toLowerCase() + " for " + playerDmg + " damage.\n" +
+        "It has " + mobHpLeft + " HP remaining.\n";
+
+        // If mob is still alive
+        if (mobHpLeft) {
+          returnMsg += "The angry " + playerEncounter['name'].toLowerCase() + " attacks you for " + mobDmg + " damage.\n" +
+          "Your HP: " + playerStats['hpCur'] + "/" + playerStats['hpMax'] + "\n";
+          // Attack back
+          var playerHp = Math.max(0, playerStats['hpCur'] - mobDmg);
+          playerStats['hpCur'] = playerHp;
+          playerStatsList[uName] = playerStats;
+
+          file = 'roguedata/encounters.json';
+          jsonfile.writeFile(file, encounterList, function (err) {
+            if (err) console.error("Write error: " + err);
+          });
+          file = 'roguedata/player_stats.json';
+          jsonfile.writeFile(file, playerStatsList, function (err) {
+            if (err) console.error("Write error: " + err);
+          });
+        }
+        // The mob is dead
+        else {
+          returnMsg += "You have vanquished the " + playerEncounter['name'].toLowerCase() + "\n" +
+          "You have earned " + mobStats['xpGain'] + " xp towards your next level.\n";
+          playerStats['expCur'] += mobStats['xpGain'];
+
+          // Increase player level if possible
+          if (playerStats['expCur'] >= playerStats['expMax']) {
+            playerStats['expCur'] -= playerStats['expMax'];
+            playerStats['level']++;
+            playerStats['skillpts'] += 3;
+            returnMsg += "You have leveled up to lvl" + playerStats['level'] + "!\n";
+          }
+          // Update player stats file
+          playerStatsList[uName] = playerStats;
+          file = 'roguedata/player_stats.json';
+          jsonfile.writeFile(file, playerStatsList, function (err) {
+            if (err) console.error("Write error: " + err);
+          });
+
+          // Update encounters file
+          playerEncounter['type'] = 'none';
+          encounterList[uName] = playerEncounter;
+          file = 'roguedata/encounters.json';
+          jsonfile.writeFile(file, encounterList, function (err) {
+            if (err) console.error("Write error: " + err);
+          });
+        }
+      }
+      else {
+        returnMsg += "You are currently fighting a(n) " + playerEncounter['name'].toLowerCase() + "\n" +
+        "HP: " + playerEncounter['hp'] + "\n";
+      }
     }
   }
 
@@ -259,8 +333,11 @@ function explore(uName, location) {
   file = 'roguedata/mob_drops.json';
   var drops = jsonfile.readFileSync(file);
   file = 'roguedata/locations.json';
+  // Potentially not needed
+  /*
   var locations = jsonfile.readFileSync(file);
   var curLoc = locations[location];
+  */
   // Flavor text
   var returnMsg = "";
 
@@ -270,7 +347,7 @@ function explore(uName, location) {
 
 
 
-  return encounter(uName, curLoc);
+  return encounter(uName, location);
 }
 
 
