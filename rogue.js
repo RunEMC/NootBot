@@ -24,6 +24,26 @@ function toTitleCase(str) {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
+// Function to add mob loot to the player's Inventory
+// Returns a string of flavor text
+function addLoot(uName, mob) {
+  var invFile = 'roguedata/player_inventory.json';
+  var inv = jsonfile.readFileSync(invFile);
+  var playerInv = inv[uName];
+  var dropFile = 'roguedata/mob_drops.json';
+  var drops = jsonfile.readFileSync(dropFile)[mob];
+  var msg = "";
+
+  var goldGain = randomNum(drops['coinsmin'], drops['coinsmax']);
+  if (goldGain) {
+      msg += "You have gained " + goldGain + " coins.\n";
+  }
+
+  // Add items by rarity calculations below:
+
+  
+}
+
 //Check if elelment exists in array
 function isExist(element, arr) {
   var len = arr.length;
