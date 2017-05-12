@@ -36,12 +36,16 @@ function addLoot(uName, mob) {
 
   var goldGain = randomNum(drops['coinsmin'], drops['coinsmax']);
   if (goldGain) {
-      msg += "You have gained " + goldGain + " coins.\n";
+      msg += "You find " + goldGain + " coins.\n";
   }
 
   // Add items by rarity calculations below:
+  var itemChance = randomNum(0, 100);
 
-  
+  if (itemChance <= 70) {
+
+  }
+
 }
 
 //Check if elelment exists in array
@@ -224,6 +228,14 @@ function encounterNew(uName, location) {
   file = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(file);
   location = locations[location];
+
+  // Check for errors
+  if (!location) {
+    var msg = "------Explorable Locations (explore [location])------\n" +
+  "Sewers (lvl 1) - [sewers]";
+    return msg;
+}
+
   // Flavor text
   var returnMsg = "";
 
