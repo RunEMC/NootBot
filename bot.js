@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const botToken = require('./botToken.json');
 const botSettings = require('./botSettings.json');
+// const Sanitizer = require('sanitizer');
 //const NationGame = require('./nationgame.js');
 //const RogueGame = require('./rogue.js');
 
@@ -28,31 +29,37 @@ bot.on('ready', async () => {
 });
 
 // Message handler
-bot.on('message', message => {
-  if (DEBUG) {
-    console.log("Message: " + message.content);
-    console.log("Author: " + message.author.username + " (" + message.author.id + ")");
-  }
-});
+// bot.on('message', message => {
+//   if (DEBUG) {
+//     console.log("Message: " + message.content);
+//     console.log("Author: " + message.author.username + " (" + message.author.id + ")");
+//   }
+// });
+var vChan;
 
-/*
 bot.on('message', message => {
-  var authUser = Sanitizer.sanitize(message.author.username);
+  // var authUser = Sanitizer.sanitize(message.author.username);
+  var authUser = message.author.username;
 
   if (message.content === 'ping') {
     if (DEBUG) {
-      message.channel.sendMessage('pong');
+      message.channel.send('pong');
       message.reply(message.author.avatarURL);
 
-      const vChan = message.member.voiceChannel;
-      vChan.join().then(connection => {
-        connection.playFile('audio/rickroll.mp3');
-        return console.log('Connected!').catch(console.error);
-      });
+      vChan = message.member.voiceChannel;
+      if (vChan === undefined) {
+        message.reply("You are not in a voice channel");
+      }
+      else {
+        vChan.join().then(connection => {
+          connection.playFile('audio/rickroll.mp3');
+          console.log('Connected!');
+        }).catch(console.error);
+      }
     }
   }
   else if (message.content === 'rickrollme') {
-    const vChan = message.member.voiceChannel;
+    vChan = message.member.voiceChannel;
 
     vChan.join().then(connection => {
       const dispatcher = connection.playFile('audio/rickroll.mp3');
@@ -81,8 +88,11 @@ bot.on('message', message => {
     });
   }
   else if (message.content === 'leave') {
-    const vChan = message.member.voiceChannel;
-    vChan.leave();
+    leaveChan(vChan);
+  }
+  else if (message.content === 'quit') {
+    leaveChan(vChan);
+    bot.destroy();
   }
   else if (message.content === 'help') {
     var fs = require('fs');
@@ -190,10 +200,12 @@ bot.on('message', message => {
 
     }
 
-    if(commands[0] == 'help') {
+    if (commands[0] == 'help') {
       // Help function
     }
-    else if (commands[0] === )
+    else if (commands[0] === 'test') {
+
+    }
 
   }
   else if (message.content === '!ele') {
@@ -216,7 +228,13 @@ bot.on('message', message => {
   }
 
 });
-*/
+
+
+function leaveChan(voiceChan) {
+  if (vChan !== undefined) {
+    vChan.leave();
+  }
+}
 
 //Get random integer, inclusive
 function randomNum(min, max) {
