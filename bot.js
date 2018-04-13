@@ -1,34 +1,41 @@
 const Discord = require('discord.js');
+const botToken = require('./botToken.json');
+const botSettings = require('./botSettings.json');
+//const NationGame = require('./nationgame.js');
+//const RogueGame = require('./rogue.js');
+
+// Create new bot client
 const bot = new Discord.Client();
-const token = require('./token.js');
-const NationGame = require('./nationgame.js');
-const RogueGame = require('./rogue.js');
-const Sanitizer = require('sanitizer');
+// Login the bot with token
+bot.login(botToken.token);
 
 //Debug mode?
 const DEBUG = true;
 
-//Get random integer, inclusive
-function randomNum(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+// Log bot readiness
+bot.on('ready', async () => {
+  console.log(bot.user.username + ' is ready!');
 
-// Bad implementation of a sleep function
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
+  // Generate bot invite link
+  try {
+    let link = await bot.generateInvite(["ADMINISTRATOR"]);
+    console.log(link);
   }
-}
+  catch (e) {
+    console.log(e.stack);
+  }
 
-bot.on('ready', () => {
-  console.log("I am ready!");
 });
 
+// Message handler
+bot.on('message', message => {
+  if (DEBUG) {
+    console.log("Message: " + message.content);
+    console.log("Author: " + message.author.username + " (" + message.author.id + ")");
+  }
+});
+
+/*
 bot.on('message', message => {
   var authUser = Sanitizer.sanitize(message.author.username);
 
@@ -84,12 +91,10 @@ bot.on('message', message => {
     //console.log(files);
     message.channel.sendMessage(files);
   }
-
-  // Kingdom Game
   else if (message.content === 'newNation') {
     var nationinfo = NationGame.NewNation(message.author.username);
     message.channel.sendMessage(nationinfo);
-  }
+  }// Kingdom Game
   else if (message.content === 'nationInfo') {
 
     var nationinfo = NationGame.NationInfo(message.author.username);
@@ -113,8 +118,6 @@ bot.on('message', message => {
     //if ()
 
   }
-
-  // Rogue like adventure game
   else if (message.content === 'sendHelp') {
     var msg =
     "------Commands------\n" +
@@ -122,7 +125,7 @@ bot.on('message', message => {
     "playerInfo: Look at your player's info";
 
     message.channel.sendMessage(msg)
-  }
+  }// Rogue like adventure game
   else if (message.content === 'newPlayer') {
     var msg = RogueGame.NewPlayer(authUser);
     message.channel.sendMessage(msg);
@@ -171,8 +174,7 @@ bot.on('message', message => {
     }
     message.channel.sendMessage(msg);
   }
-// Elements Incremental Game
-  else if (message.content.startsWith('!ele ')) {
+  else if (message.content.startsWith('!ele ')) { // Elements Incremental Game
     var commands = message.content.split(" ");
     commands.splice(0, 1);
 
@@ -187,18 +189,16 @@ bot.on('message', message => {
       default:
 
     }
-/*
+
     if(commands[0] == 'help') {
       // Help function
     }
     else if (commands[0] === )
-    */
+
   }
   else if (message.content === '!ele') {
     // Help function
   }
-
-  /* Template For Player Actions
   else if (message.content === 'recoverManpower') {
     var jsonfile = require('jsonfile');
     var file = 'playerdata/user_resources.json';
@@ -214,7 +214,23 @@ bot.on('message', message => {
       });
     });
   }
-  */
-});
 
-bot.login(token.gimmietoken());
+});
+*/
+
+//Get random integer, inclusive
+function randomNum(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Bad implementation of a sleep function
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
