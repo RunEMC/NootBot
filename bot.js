@@ -3,7 +3,7 @@ const botToken = require('./botToken.json');
 const botSettings = require('./botSettings.json');
 // const Sanitizer = require('sanitizer');
 //const NationGame = require('./nationgame.js');
-//const RogueGame = require('./rogue.js');
+const RogueGame = require('./rogue.js');
 
 // Create new bot client
 const bot = new Discord.Client();
@@ -28,18 +28,10 @@ bot.on('ready', async () => {
 
 });
 
-// Message handler
-// bot.on('message', message => {
-//   if (DEBUG) {
-//     console.log("Message: " + message.content);
-//     console.log("Author: " + message.author.username + " (" + message.author.id + ")");
-//   }
-// });
-var vChan;
-
 bot.on('message', message => {
   // var authUser = Sanitizer.sanitize(message.author.username);
   var authUser = message.author.username;
+  var vChan;
 
   if (message.content === 'ping') {
     if (DEBUG) {
@@ -73,8 +65,6 @@ bot.on('message', message => {
   else if (message.content.startsWith('play ')) {
     var song = message.content.split(" ");
     song.splice(0, 1);
-
-    const vChan = message.member.voiceChannel;
 
     var filename = 'audio/' + song[0] + '.mp3';
 
@@ -144,31 +134,13 @@ bot.on('message', message => {
     var msg = RogueGame.PlayerInfo(authUser);
     message.channel.sendMessage(msg);
   }
-  else if (message.content.startsWith('explore')) {
-
+  else if (message.content.startsWith('!rg')) {
     var msg = "";
 
-    // Get the location to explore
-    var location = message.content.split(" ");
-    location.splice(0, 1);
-    if (location.length) {
-      // Check if the player is already exploring
-      // if ()
-
-      // Check if the player is already in the location
-      // if ()
-
-      // Set the message
-      msg = RogueGame.Explore(authUser, location[0]);
-    }
-    else {
-
-      msg =
-      "------Explorable Locations (explore [location])------\n" +
-      "Sewers (lvl 1) - [sewers]";
-    }
-    message.channel.sendMessage(msg);
-
+    var cmd = message.content.split(" ");
+    cmd.splice(0, 1);
+    msg = RogueGame.processCommand(cmd);
+    message.channel.send(msg);
   }
   else if (message.content.startsWith('encounter')) {
     var msg = "";

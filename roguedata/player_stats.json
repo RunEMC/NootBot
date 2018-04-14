@@ -1,0 +1,19 @@
+{
+  "RunEMC": {
+    "name":"RunEMC",
+    "level":1,
+    "expCur":0,
+    "expNext":10,
+    "hpCur":0,
+    "hpMax":5,
+    "mpMax":2,
+    "mpCur":2,
+    "atk":2,
+    "def":0,
+    "str":2,
+    "dex":3,
+    "int":1,
+    "luck":3,
+    "skillpts":3
+  }
+}

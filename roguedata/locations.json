@@ -1,0 +1,36 @@
+{
+  "sewers": {
+    "mobs": ["goblin", "giant rat"],
+    "quests": [],
+    "spawnChance": {
+      "goblin": 0.5,
+      "giant rat": 0.5
+    },
+    "encounterChance": {
+      "mob": 40,
+      "trap": 10,
+      "nothing": 39,
+      "treasure": 10,
+      "special": 1
+    }
+  },
+  "grassyfields": {
+    "displayName": "Grassy Fields",
+    "mobs": ["small_slime", "medium_slime", "large_slime"],
+    "mobSpawnChance": {
+      "small_slime": 0.8,
+      "medium_slime": 0.15,
+      "large_slime": 0.05
+    },
+    "items": ["apple", "herb", "log", "copper_ore"],
+    "itemSpawnChance": {
+      "apple": 0.6,
+      "herb": 0.2,
+      "log": 0.15,
+      "copper_ore": 0.05
+    },
+    "time": 60,
+    "stages": 3,
+    "events": []
+  }
+}
