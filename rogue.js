@@ -8,13 +8,13 @@ var jsonfile = require('jsonfile');
 const DEBUG = true;
 
 
-function processCommand(cmdArray) {
+function processCommand(cmdArray, user) {
   var returnMsg;
 
   if (cmdArray.length) {
     if (matchCase(cmdArray[0], "explore")) { // If !rg explore
       if (cmdArray.length > 1) {
-        returnMsg = explore(cmdArray[1]);
+        returnMsg = explore(cmdArray[1], user);
         // console.log(cmdArray[1]);
       }
       else { // If no area chosen
@@ -32,11 +32,13 @@ function processCommand(cmdArray) {
 }
 
 
-function explore(location) {
+function explore(location, user) {
   var returnMsg;
   var locationListFile = 'roguedata/locations.json';
   var locations = jsonfile.readFileSync(locationListFile);
+  var players = jsonfile.readFileSync('roguedata/player_stats.json');
   var locationData = locations[location];
+  var playerData = players[user]
 
   // console.log(locations, location, locationData);
 
@@ -63,6 +65,9 @@ function explore(location) {
     // Spawn mobs/items for each stage
     for (var i = 0; i < locationData.stages; i++) {
       spawnObj(locationData.mobs, locationData.mobSpawnChance, encounters.mobEncounters);
+
+      fightMobs(encounters.mobEncounters, playerData);
+
       spawnObj(locationData.items, locationData.itemSpawnChance, encounters.itemEncounters);
     }
 
@@ -99,6 +104,10 @@ function spawnObj(objs, spawnChance, currentEncounters) {
       currentEncounters[obj] === undefined ? currentEncounters[obj] = 1 : currentEncounters[obj]++;
     }
   }
+}
+
+function fightMobs(mobEncounters, playerData) {
+
 }
 
 // Helper Functions

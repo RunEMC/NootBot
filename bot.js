@@ -139,7 +139,7 @@ bot.on('message', message => {
 
     var cmd = message.content.split(" ");
     cmd.splice(0, 1);
-    msg = RogueGame.processCommand(cmd);
+    msg = RogueGame.processCommand(cmd, authUser);
     message.channel.send(msg);
   }
   else if (message.content.startsWith('encounter')) {

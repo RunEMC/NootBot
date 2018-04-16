@@ -14,6 +14,9 @@
     "dex":3,
     "int":1,
     "luck":3,
-    "skillpts":3
+    "skillpts":3,
+    "inventory": {
+
+    }
   }
 }
