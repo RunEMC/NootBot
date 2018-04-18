@@ -133,7 +133,7 @@ function fightMobs(mobEncounters, mobsDefeated, mobs, playerData) {
       while (mobHp > 0) {
         console.log("Hp: " + playerHp + "\nMob HP: " + mobHp + "\n");
         mobHp -= playerData.atk;
-        playerHp -= mobStats.atk + playerData.def;
+        if (mobHp > 0) playerHp -= mobStats.atk + playerData.def;
         // Check if player is dead
         if (playerHp <= 0) {
           playerData.hpCur = 0;
