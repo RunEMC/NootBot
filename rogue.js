@@ -47,6 +47,9 @@ function explore(location, user) {
       "mobEncounters": {
         //"small_slime": 0,
       },
+      "mobsDefeated": {
+
+      }
       "itemEncounters": {
         //"apple": 0,
       }
@@ -66,7 +69,11 @@ function explore(location, user) {
     for (var i = 0; i < locationData.stages; i++) {
       spawnObj(locationData.mobs, locationData.mobSpawnChance, encounters.mobEncounters);
 
-      fightMobs(encounters.mobEncounters, playerData);
+      if (fightMobs(encounters.mobEncounters, locationData.mobs, playerData)) {
+        // Player is dead;
+        returnMsg += "You Died!\n\n";
+        break;
+      }
 
       spawnObj(locationData.items, locationData.itemSpawnChance, encounters.itemEncounters);
     }
@@ -106,8 +113,41 @@ function spawnObj(objs, spawnChance, currentEncounters) {
   }
 }
 
-function fightMobs(mobEncounters, playerData) {
+function fightMobs(mobEncounters, mobsDefeated, mobs, playerData) {
+  var mobsData = jsonfile.readFileSync('roguedata/mobs.json');
+  var returnObj; // Currently just returns if the player is dead or not
+  for (var i = 0; i < mobs.length; i++) {
+    var mob = mobs[i];
+    var mobStats = mobsData[mob];
+    var mobAmount = mobEncounters[mob];
+    for (var j = 0; j < mobAmount; j++) {
+      var mobHp = mobStats.hp;
+      var playerHp = playerData.hpCur;
+      // Fight mob till mob or player dies
+      while (mobHp > 0) {
+        mobHp -= playerData.atk;
+        playerHp -= mobStats.atk + playerData.def;
+        // Check if player is dead
+        if (playerHp <= 0) {
+          playerData.hpCur = 0;
+          returnObj = true;
+          return returnObj;
+        }
+      }
 
+      // Mob is defeated
+      mobsDefeated[mob] === undefined ? mobsDefeated[mob] = 1 : mobsDefeated[mob]++;
+      playerData.hpCur = playerHp;
+      playerData.expCur += mobStats.xpGain;
+      // Add algorithms for determining xp required for next lvl and pts gain per lvl
+      if (playerData.expCur >= playerData.expNext) {
+        playerData.expCur -= playerData.expNext;
+        playerData.skillpts++;
+      }
+    }
+  }
+  returnObj = false;
+  return returnObj;
 }
 
 // Helper Functions
