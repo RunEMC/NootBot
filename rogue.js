@@ -32,13 +32,13 @@ function processCommand(cmdArray, user) {
 }
 
 
-function explore(location, user) {
+function explore(location, userName) {
   var returnMsg;
-  var locationListFile = 'roguedata/locations.json';
-  var locations = jsonfile.readFileSync(locationListFile);
-  var players = jsonfile.readFileSync('roguedata/player_stats.json');
+  var playersFile = 'roguedata/player_stats.json';
+  var locations = jsonfile.readFileSync('roguedata/locations.json');
+  var players = jsonfile.readFileSync(playersFile);
   var locationData = locations[location];
-  var playerData = players[user]
+  var playerData = players[userName]
 
   // console.log(locations, location, locationData);
 
@@ -49,7 +49,7 @@ function explore(location, user) {
       },
       "mobsDefeated": {
 
-      }
+      },
       "itemEncounters": {
         //"apple": 0,
       }
@@ -69,7 +69,7 @@ function explore(location, user) {
     for (var i = 0; i < locationData.stages; i++) {
       spawnObj(locationData.mobs, locationData.mobSpawnChance, encounters.mobEncounters);
 
-      if (fightMobs(encounters.mobEncounters, locationData.mobs, playerData)) {
+      if (fightMobs(encounters.mobEncounters, encounters.mobsDefeated, locationData.mobs, playerData)) {
         // Player is dead;
         returnMsg += "You Died!\n\n";
         break;
@@ -78,6 +78,12 @@ function explore(location, user) {
       spawnObj(locationData.items, locationData.itemSpawnChance, encounters.itemEncounters);
     }
 
+    players[userName] = playerData;
+    jsonfile.writeFile(playersFile, players, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
+
+    // Create flavor text
     returnMsg = "While exploring " + locationData.displayName + " you defeated:\n"
     for (var i = 0; i < locationData.mobs.length; i++) {
       var mob = locationData.mobs[i]
@@ -125,6 +131,7 @@ function fightMobs(mobEncounters, mobsDefeated, mobs, playerData) {
       var playerHp = playerData.hpCur;
       // Fight mob till mob or player dies
       while (mobHp > 0) {
+        console.log("Hp: " + playerHp + "\nMob HP: " + mobHp + "\n");
         mobHp -= playerData.atk;
         playerHp -= mobStats.atk + playerData.def;
         // Check if player is dead
@@ -631,6 +638,6 @@ exports.Encounter = function(uName, options) {
   return encounter(uName, options);
 }
 
-exports.processCommand = function(cmdArray) {
-  return processCommand(cmdArray);
+exports.processCommand = function(cmdArray, user) {
+  return processCommand(cmdArray, user);
 }
