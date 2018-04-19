@@ -38,7 +38,7 @@ export class RogueGame {
       if (matchCase(this.cmdArray[0], "explore")) { // If !rg explore
         if (this.cmdArray.length > 1) {
           // Set the location once determined
-          this.location = this.cmdArray[1];
+          this.location = this.cmdArray[1].toLowerCase();
           // Check that the location name is valid
           if (this.locations[this.location] === undefined) {
             this.returnMsg +=
@@ -81,7 +81,7 @@ export class RogueGame {
     return "sendMessage";
   }
 
-  public explore() {
+  private explore() {
     // Prepopulate fields
     for (var i = 0; i < this.mobs.length; i++) {
       var mob = this.mobs[i];
@@ -125,7 +125,7 @@ export class RogueGame {
     }
   }
 
-  public spawnMobs() {
+  private spawnMobs() {
     for (var i = 0; i < this.mobs.length; i++) {
       var mob = this.mobs[i];
       var randNum = Math.random();
@@ -136,7 +136,7 @@ export class RogueGame {
     }
   }
 
-  public spawnItems() {
+  private spawnItems() {
     for (var i = 0; i < this.items.length; i++) {
       var item = this.items[i];
       var randNum = Math.random();
@@ -148,7 +148,7 @@ export class RogueGame {
   }
 
   // Simulate a fight between the player and the mobs
-  public fightMobs() {
+  private fightMobs() {
     for (var i = 0; i < this.mobs.length; i++) {
       var mob = this.mobs[i];
       var mobStats = this.mobsData[mob];
