@@ -62,5 +62,39 @@
       "log": 0.15,
       "copper_ore": 0.15
     }
+  },
+  "goblin_scout": {
+    "displayName": "Goblin Scout",
+    "hp": 12,
+    "atk": 4,
+    "atkmin": 0,
+    "atkmax": 4,
+    "xpGain": 6,
+    "goldGain": 7,
+    "drops": ["apple", "herb", "log", "copper_ore", "tin_ore"],
+    "dropChance": {
+      "apple": 0.3,
+      "herb": 0.1,
+      "log": 0.1,
+      "copper_ore": 0.3,
+      "tin_ore": 0.2
+    }
+  },
+  "goblin_worker": {
+    "displayName": "Goblin Worker",
+    "hp": 16,
+    "atk": 3,
+    "atkmin": 0,
+    "atkmax": 4,
+    "xpGain": 6,
+    "goldGain": 10,
+    "drops": ["apple", "herb", "log", "copper_ore", "tin_ore"],
+    "dropChance": {
+      "apple": 0.3,
+      "herb": 0.1,
+      "log": 0.1,
+      "copper_ore": 0.2,
+      "tin_ore": 0.3
+    }
   }
 }
