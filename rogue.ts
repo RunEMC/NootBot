@@ -148,7 +148,7 @@ export class RogueGame {
 
       if (this.isPlayerDead) break;
 
-      this.spawnItems();
+      this.spawnItems(this.locationData.itemSpawnChance);
     }
 
     // Write to file
@@ -182,13 +182,12 @@ export class RogueGame {
     }
   }
 
-  private spawnItems() {
-    for (var i = 0; i < this.items.length; i++) {
-      var item = this.items[i];
+  private spawnItems(spawnchance) {
+    for (var item in spawnchance) {
       var randNum = Math.random();
 
-      if (this.locationData.itemSpawnChance[item] >= randNum) {
-        this.itemEncounters[item] === undefined ? this.itemEncounters[item] = 1 : this.itemEncounters[item]++;
+      if (item >= randNum) {
+        // this.itemEncounters[item] === undefined ? this.itemEncounters[item] = 1 : this.itemEncounters[item]++;
         // Add the acquired items to the player's inventory
         this.playerData.inventory[item] === undefined ? this.playerData.inventory[item] = 1 : this.playerData.inventory[item]++;
       }
@@ -224,6 +223,8 @@ export class RogueGame {
             }
             // Gain Items & Coins
             this.playerData.coins += mobStats.coinGain;
+            this.spawnItems(mobStats.dropChance);
+            // Stop fighting mob (this will mean mobs that are 1 shot won't deal dmg to player)
             break;
           }
           // Mob attacks player
