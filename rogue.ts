@@ -18,6 +18,8 @@ export class RogueGame {
   items = [];
   // Mobs' Data
   mobsData = jsonfile.readFileSync('roguedata/mobs.json');
+  // Items' Data
+  itemsData = jsonfile.readFileSync('roguedata/items.json');
   // Encounter Data
   mobEncounters = {};
   newMobEncounters ={};
@@ -107,7 +109,7 @@ export class RogueGame {
     this.returnMsg += "\nYou acquired:\n"
     for (var i = 0; i < this.locationData.items.length; i++) {
       var item = this.locationData.items[i]
-      this.returnMsg += " - " + item + ": " + this.itemEncounters[item] + "\n";
+      this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
     }
   }
 
