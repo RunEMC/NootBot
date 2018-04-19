@@ -1,18 +1,25 @@
 {
-  "sewers": {
-    "mobs": ["goblin", "giant rat"],
-    "quests": [],
-    "spawnChance": {
-      "goblin": 0.5,
-      "giant rat": 0.5
+  "saffronhills": {
+    "displayName": "Saffron Hills",
+    "mobs": ["small_slime", "medium_slime", "large_slime", "goblin_scout", "goblin_worker"],
+    "mobSpawnChance": {
+      "small_slime": 0.4,
+      "medium_slime": 0.1,
+      "large_slime": 0.05,
+      "goblin_scout": 0.4,
+      "goblin_worker": 0.2
     },
-    "encounterChance": {
-      "mob": 40,
-      "trap": 10,
-      "nothing": 39,
-      "treasure": 10,
-      "special": 1
-    }
+    "items": ["apple", "herb", "log", "copper_ore", "tin_ore"],
+    "itemSpawnChance": {
+      "apple": 0.1,
+      "herb": 0.1,
+      "log": 0.1,
+      "copper_ore": 0.3,
+      "tin_ore": 0.3
+    },
+    "time": 15,
+    "stages": 3,
+    "events": []
   },
   "grassyfields": {
     "displayName": "Grassy Fields",
