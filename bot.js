@@ -1,9 +1,11 @@
+// import * as RogueGamet from './roguetest.js';
+
 const Discord = require('discord.js');
 const botToken = require('./botToken.json');
 const botSettings = require('./botSettings.json');
 // const Sanitizer = require('sanitizer');
 //const NationGame = require('./nationgame.js');
-const RogueGame = require('./rogue.js');
+const RogueGame = require('./rogue.js').RogueGame;
 
 // Create new bot client
 const bot = new Discord.Client();
@@ -139,7 +141,9 @@ bot.on('message', message => {
 
     var cmd = message.content.split(" ");
     cmd.splice(0, 1);
-    msg = RogueGame.processCommand(cmd, authUser);
+    // msg = RogueGame.processCommand(cmd, authUser);
+    var rogueGame = new RogueGame(cmd, authUser);
+    msg = rogueGame.runGame();
     message.channel.send(msg);
   }
   else if (message.content.startsWith('encounter')) {
