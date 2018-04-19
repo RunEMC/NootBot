@@ -37,22 +37,30 @@ export class RogueGame {
     if (this.cmdArray.length) {
       if (matchCase(this.cmdArray[0], "explore")) { // If !rg explore
         if (this.cmdArray.length > 1) {
-          // Set the location once determined
-          this.location = this.cmdArray[1].toLowerCase();
-          // Check that the location name is valid
-          if (this.locations[this.location] === undefined) {
-            this.returnMsg +=
-            "Invalid location, use example: !rg explore grassyfields\n" +
-            "------Explorable Locations (!rg explore [location])------\n"+
-            "Grassy Fields (lvl 1) - [grassyfields]";
+          // Get the time left from the previous exploration
+          var timeLeft = Math.floor(this.playerData.exploreEndTime - this.playerData.exploreStartTime);
+          if (timeLeft <= 0) { // Allow new exploration only if time is passed
+            // Set the location once determined
+            this.location = this.cmdArray[1].toLowerCase();
+            // Check that the location name is valid
+            if (this.locations[this.location] === undefined) {
+              this.returnMsg +=
+              "Invalid location, use example: !rg explore grassyfields\n" +
+              "------Explorable Locations (!rg explore [location])------\n"+
+              "Grassy Fields (lvl 1) - [grassyfields]";
+            }
+            else { // Location name is valid
+              this.locationData = this.locations[this.location];
+              this.mobs = this.locationData.mobs;
+              this.items = this.locationData.items;
+              // Begin exploring the location
+              this.exploreLog += "--------------------"+this.locationData.displayName+"--------------------\n"
+              this.explore();
+            }
           }
-          else { // Location name is valid
-            this.locationData = this.locations[this.location];
-            this.mobs = this.locationData.mobs;
-            this.items = this.locationData.items;
-            // Begin exploring the location
-            this.exploreLog += "--------------------"+this.locationData.displayName+"--------------------\n"
-            this.explore();
+          else {
+            this.returnMsg +=
+            "Exploration in progress, time remaining: "+timeLeft+" seconds\n";
           }
         }
         else { // If no area chosen
@@ -113,6 +121,11 @@ export class RogueGame {
   }
 
   private explore() {
+    // Set exploration start time
+    var startTime = playerData.exploreStartTime = Date.now();
+    const millisecondsInSecond = 1000;
+    playerData.exploreEndTime = startTime + (millisecondsInSecond * this.locationData.time);
+
     // Prepopulate fields
     for (var i = 0; i < this.mobs.length; i++) {
       var mob = this.mobs[i];

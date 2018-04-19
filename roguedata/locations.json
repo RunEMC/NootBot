@@ -29,7 +29,7 @@
       "log": 0.15,
       "copper_ore": 0.05
     },
-    "time": 60,
+    "time": 10,
     "stages": 3,
     "events": []
   }
