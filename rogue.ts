@@ -67,11 +67,33 @@ export class RogueGame {
         this.returnMsg += "--------------------Commands--------------------\n"+
                     " - !rg explore [area]: Explore an area.\n"+
                     " - !rg help: Info on the game.\n"+
-                    " - !rg stats [allocate] [str/dex/int/luck] [amount]: Check your stats and allocate new stat points."
+                    " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
       }
       else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
         if (this.cmdArray > 1) {
-
+          if (matchCase(this.cmdArray[1], "allocate")) { // Assign skillpoints
+            if (this.cmdArray > 2) { // If !rg stats allocate
+              if (this.playerData[this.cmdArray[2]] !== undefined) {
+                if (this.cmdArray > 3) {
+                  if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0) {
+                    this.playerData[this.cmdArray[2]]+=this.cmdArray[3];
+                  }
+                  else {
+                    this.returnMsg += "Invalid number, example usage: !rg stats allocate str 2";
+                  }
+                }
+                else {
+                  this.returnMsg += "Please enter the amount to allocate, example usage: !rg stats allocate str 2";
+                }
+              }
+              else {
+                this.returnMsg += "Invalid stat, example usage: !rg stats allocate str 2";
+              }
+            }
+            else { // nothing after !rg stats allocate
+              this.returnMsg += "Invalid stats, example usage: !rg stats allocate str 2";
+            }
+          }
         }
         else {
           // Update returnMsg with the player's stats
@@ -83,7 +105,7 @@ export class RogueGame {
       this.returnMsg += "--------------------Commands--------------------\n"+
                   " - !rg explore [area]: Explore an area.\n"+
                   " - !rg help: Info on the game.\n"+
-                  " - !rg stats [allocate] [str/dex/int/luck] [amount]: Check your stats and allocate new stat points."
+                  " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
     }
     this.returnMsg += "```";
     this.exploreLog+= "```";
