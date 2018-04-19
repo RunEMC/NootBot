@@ -18,7 +18,16 @@
     "atk": 1,
     "atkmin": 0,
     "atkmax": 4,
-    "xpGain": 1
+    "xpGain": 1,
+    "goldGain": 1,
+    "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
+    "dropChance": {
+      "slime_chunk": 0.7,
+      "apple": 0.1,
+      "herb": 0.05,
+      "log": 0.05,
+      "copper_ore": 0.05
+    }
   },
   "medium_slime": {
     "displayName": "Regular Slime",
@@ -26,7 +35,16 @@
     "atk": 1,
     "atkmin": 0,
     "atkmax": 4,
-    "xpGain": 3
+    "xpGain": 3,
+    "goldGain": 3,
+    "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
+    "dropChance": {
+      "slime_chunk": 0.8,
+      "apple": 0.2,
+      "herb": 0.05,
+      "log": 0.1,
+      "copper_ore": 0.1
+    }
   },
   "large_slime": {
     "displayName": "Large Slime",
@@ -34,6 +52,15 @@
     "atk": 2,
     "atkmin": 0,
     "atkmax": 4,
-    "xpGain": 5
+    "xpGain": 5,
+    "goldGain": 5,
+    "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
+    "dropChance": {
+      "slime_chunk": 0.9,
+      "apple": 0.3,
+      "herb": 0.1,
+      "log": 0.15,
+      "copper_ore": 0.15
+    }
   }
 }
