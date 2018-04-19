@@ -63,11 +63,18 @@ export class RogueGame {
       else if (matchCase(this.cmdArray[0], "log")) { // If !rg log
         return "sendLog";
       }
+      else if (matchCase(this.cmdArray[0], "help")) { // If !rg help
+        this.returnMsg += "--------------------Commands--------------------\n"+
+                    " - !rg explore [area]: Explore an area.\n"+
+                    " - !rg help: Info on the game.\n"+
+                    " - !rg stats [allocate] [str/dex/int/luck] [amount]: Check your stats and allocate new stat points."
+      }
     }
     else { // Handles no parameters (just !rg)
       this.returnMsg += "--------------------Commands--------------------\n"+
                   " - !rg explore [area]: Explore an area.\n"+
-                  " - !rg stats [allocate]: Check your stats and allocate new stat points."
+                  " - !rg help: Info on the game.\n"+
+                  " - !rg stats [allocate] [str/dex/int/luck] [amount]: Check your stats and allocate new stat points."
     }
     this.returnMsg += "```";
     this.exploreLog+= "```";
