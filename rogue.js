@@ -3,6 +3,8 @@ exports.__esModule = true;
 var jsonfile = require("jsonfile");
 var RogueGame = /** @class */ (function () {
     function RogueGame(cmdArray, username) {
+        // Return Msg
+        this.returnMsg = "```";
         // Players' Data
         this.playersFile = 'roguedata/player_stats.json';
         this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
@@ -16,7 +18,7 @@ var RogueGame = /** @class */ (function () {
         this.mobsData = jsonfile.readFileSync('roguedata/mobs.json');
         // Encounter Data
         this.mobEncounters = {};
-        this.mobsDefeated = {};
+        this.newMobEncounters = {};
         this.itemEncounters = {};
         this.isPlayerDead = false;
         this.cmdArray = cmdArray;
@@ -41,6 +43,7 @@ var RogueGame = /** @class */ (function () {
                         this.mobs = this.locationData.mobs;
                         this.items = this.locationData.items;
                         // Begin exploring the location
+                        this.returnMsg += "--------------------" + this.locationData.displayName + "--------------------\n";
                         this.explore();
                     }
                 }
@@ -55,6 +58,7 @@ var RogueGame = /** @class */ (function () {
                 " - !rg explore [area]: Explore an area.\n" +
                 " - !rg stats [allocate]: Check your stats and allocate new stat points.";
         }
+        this.returnMsg += "```";
         return this.returnMsg;
     };
     RogueGame.prototype.explore = function () {
@@ -69,8 +73,11 @@ var RogueGame = /** @class */ (function () {
         }
         // Spawn mobs/items for each stage
         for (var i = 0; i < this.locationData.stages; i++) {
+            this.returnMsg += "--------------------Stage " + (i + 1) + "--------------------\n";
             this.spawnMobs();
             this.fightMobs();
+            if (this.isPlayerDead)
+                break;
             this.spawnItems();
         }
         // Write to file
@@ -80,10 +87,10 @@ var RogueGame = /** @class */ (function () {
                 console.error("Write error: " + err);
         });
         // Create flavor text
-        this.returnMsg += "While exploring " + this.locationData.displayName + " you defeated:\n";
+        this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n";
         for (var i = 0; i < this.locationData.mobs.length; i++) {
             var mob = this.locationData.mobs[i];
-            this.returnMsg += " - " + mob + ": " + this.mobEncounters[mob] + "\n";
+            this.returnMsg += " - " + this.mobsData[mob].displayName + ": " + this.mobEncounters[mob] + "\n";
         }
         this.returnMsg += "\nYou acquired:\n";
         for (var i = 0; i < this.locationData.items.length; i++) {
@@ -96,7 +103,7 @@ var RogueGame = /** @class */ (function () {
             var mob = this.mobs[i];
             var randNum = Math.random();
             if (this.locationData.mobSpawnChance[mob] >= randNum) {
-                this.mobEncounters[mob] === undefined ? this.mobEncounters[mob] = 1 : this.mobEncounters[mob]++;
+                this.newMobEncounters[mob] = 1;
             }
         }
     };
@@ -114,7 +121,7 @@ var RogueGame = /** @class */ (function () {
         for (var i = 0; i < this.mobs.length; i++) {
             var mob = this.mobs[i];
             var mobStats = this.mobsData[mob];
-            var mobAmount = this.mobEncounters[mob];
+            var mobAmount = this.newMobEncounters[mob];
             for (var j = 0; j < mobAmount; j++) {
                 var mobHp = mobStats.hp;
                 var playerHp = this.playerData.hpCur;
@@ -122,25 +129,31 @@ var RogueGame = /** @class */ (function () {
                 while (mobHp > 0) {
                     mobHp -= this.playerData.atk;
                     this.returnMsg += "You attack the " + mobStats.displayName + " for " + this.playerData.atk + " damage (" + Math.max(0, mobHp) + "/" + mobStats.hp + ")\n";
-                    if (mobHp > 0) {
-                        playerHp -= mobStats.atk + this.playerData.def;
-                        this.returnMsg += "The " + mobStats.displayName + " attacks you for " + mobStats.atk + " damage (" + Math.max(0, playerHp) + "/" + this.playerData.hpMax + ")\n";
+                    // Check if mob is dead
+                    if (mobHp <= 0) {
+                        // Mob is defeated
+                        this.mobEncounters[mob] === undefined ? this.mobEncounters[mob] = 1 : this.mobEncounters[mob]++;
+                        this.playerData.hpCur = playerHp;
+                        this.playerData.expCur += mobStats.xpGain;
+                        // Add algorithms for determining xp required for next lvl and pts gain per lvl
+                        if (this.playerData.expCur >= this.playerData.expNext) {
+                            this.playerData.expCur -= this.playerData.expNext;
+                            this.playerData.skillpts++;
+                            this.playerData.level++;
+                            this.returnMsg += "\nYou leveled up!\n";
+                        }
+                        break;
                     }
+                    // Mob attacks player
+                    playerHp -= mobStats.atk + this.playerData.def;
+                    this.returnMsg += "The " + mobStats.displayName + " attacks you for " + mobStats.atk + " damage (" + Math.max(0, playerHp) + "/" + this.playerData.hpMax + ")\n";
                     // Check if player is dead
                     if (playerHp <= 0) {
                         this.playerData.hpCur = 0;
                         this.isPlayerDead = true;
+                        this.returnMsg += "\nYou died!\n";
                         break;
                     }
-                }
-                // Mob is defeated
-                this.mobsDefeated[mob] === undefined ? this.mobsDefeated[mob] = 1 : this.mobsDefeated[mob]++;
-                this.playerData.hpCur = playerHp;
-                this.playerData.expCur += mobStats.xpGain;
-                // Add algorithms for determining xp required for next lvl and pts gain per lvl
-                if (this.playerData.expCur >= this.playerData.expNext) {
-                    this.playerData.expCur -= this.playerData.expNext;
-                    this.playerData.skillpts++;
                 }
             }
         }
