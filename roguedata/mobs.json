@@ -1,5 +1,4 @@
 {
-  "mob_list": ["goblin", "giant rat"],
   "goblin": {
     "hp": 10,
     "atkmin": 0,
@@ -19,7 +18,7 @@
     "atkmin": 0,
     "atkmax": 4,
     "xpGain": 1,
-    "goldGain": 1,
+    "coinGain": 1,
     "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
     "dropChance": {
       "slime_chunk": 0.7,
@@ -36,7 +35,7 @@
     "atkmin": 0,
     "atkmax": 4,
     "xpGain": 3,
-    "goldGain": 3,
+    "coinGain": 3,
     "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
     "dropChance": {
       "slime_chunk": 0.8,
@@ -53,7 +52,7 @@
     "atkmin": 0,
     "atkmax": 4,
     "xpGain": 5,
-    "goldGain": 5,
+    "coinGain": 5,
     "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
     "dropChance": {
       "slime_chunk": 0.9,
@@ -70,7 +69,7 @@
     "atkmin": 0,
     "atkmax": 4,
     "xpGain": 6,
-    "goldGain": 7,
+    "coinGain": 7,
     "drops": ["apple", "herb", "log", "copper_ore", "tin_ore"],
     "dropChance": {
       "apple": 0.3,
@@ -87,7 +86,7 @@
     "atkmin": 0,
     "atkmax": 4,
     "xpGain": 6,
-    "goldGain": 10,
+    "coinGain": 10,
     "drops": ["apple", "herb", "log", "copper_ore", "tin_ore"],
     "dropChance": {
       "apple": 0.3,

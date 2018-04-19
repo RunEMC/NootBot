@@ -213,6 +213,7 @@ export class RogueGame {
             // Mob is defeated
             this.mobEncounters[mob] === undefined ? this.mobEncounters[mob] = 1 : this.mobEncounters[mob]++;
             this.playerData.hpCur = playerHp;
+            // Gain experience
             this.playerData.expCur += mobStats.xpGain;
             // Add algorithms for determining xp required for next lvl and pts gain per lvl
             if (this.playerData.expCur >= this.playerData.expNext) {
@@ -221,6 +222,8 @@ export class RogueGame {
               this.playerData.level++;
               this.exploreLog += "\nYou leveled up!\n";
             }
+            // Gain Items & Coins
+            this.playerData.coins += mobStats.coinGain;
             break;
           }
           // Mob attacks player
@@ -251,6 +254,7 @@ export class RogueGame {
     "Intelligence: "+stats.int+"\tFortitude: "+stats.fort+"\n"+
     "Stat Points Available: "+stats.skillpts+"\n"+
     "\n--------------------"+this.username+"\'s Inventory--------------------\n";
+    "Coins: "+stats.coins+"\n";
     for (item in stats.inventory) {
       this.returnMsg += "- "+this.itemsData[item].displayName+": "+this.itemsData[item].description+"\n";
     }

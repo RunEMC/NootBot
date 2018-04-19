@@ -1,7 +1,9 @@
 {"RunEMC":{
   "name":"RunEMC",
   "level":4,
-  "expCur":0,"expNext":10,"hpCur":6,"hpMax":10,"hpRec":1,"hpRecTime":15,"mpMax":0,"mpCur":0,"mpRec":0,"mpRecTime":0,"atk":5,"def":0,"str":2,"dex":3,"int":1,"fort":2,"luck":3,"skillpts":16,
+  "expCur":0,"expNext":10,"hpCur":6,"hpMax":10,"hpRec":1,"hpRecTime":15,"mpMax":0,"mpCur":0,"mpRec":0,"mpRecTime":0,"atk":5,"def":0,"str":2,"dex":3,"int":1,"fort":2,"luck":3,
+  "skillpts":16,
+  "coins":0,
   "inventory":{},
   "exploreEndTime":50000,
   "exploreStartTime":10000,
