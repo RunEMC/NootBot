@@ -74,7 +74,8 @@ export class RogueGame {
 
         }
         else {
-
+          // Update returnMsg with the player's stats
+          this.getPlayerStats();
         }
       }
     }
@@ -151,6 +152,8 @@ export class RogueGame {
 
       if (this.locationData.itemSpawnChance[item] >= randNum) {
         this.itemEncounters[item] === undefined ? this.itemEncounters[item] = 1 : this.itemEncounters[item]++;
+        // Add the acquired items to the player's inventory
+        this.playerData.inventory[item] === undefined ? this.playerData.inventory[item] = 1 : this.playerData.inventory[item]++;
       }
     }
   }
