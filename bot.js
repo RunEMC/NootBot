@@ -34,6 +34,7 @@ bot.on('message', message => {
   // var authUser = Sanitizer.sanitize(message.author.username);
   var authUser = message.author.username;
   var vChan;
+  var prevRogueGame;
 
   if (message.content === 'ping') {
     if (DEBUG) {
@@ -141,9 +142,16 @@ bot.on('message', message => {
 
     var cmd = message.content.split(" ");
     cmd.splice(0, 1);
-    // msg = RogueGame.processCommand(cmd, authUser);
+
     var rogueGame = new RogueGame(cmd, authUser);
-    msg = rogueGame.runGame();
+    rogueGame.runGame((response) => {
+      if (response === "sendLog") {
+        msg = prevRogueGame.exploreLog;
+      }
+      else {
+        msg = rogueGame.returnMsg;
+      }
+    });
     message.channel.send(msg);
   }
   else if (message.content.startsWith('encounter')) {

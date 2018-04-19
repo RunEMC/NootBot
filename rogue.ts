@@ -6,6 +6,7 @@ export class RogueGame {
   username:string;
   // Return Msg
   returnMsg:string = "```";
+  exploreLog:string = "```";
   // Players' Data
   playersFile = 'roguedata/player_stats.json';
   players = jsonfile.readFileSync(this.playersFile); //Read/Write
@@ -17,9 +18,9 @@ export class RogueGame {
   mobs = [];
   items = [];
   // Mobs' Data
-  mobsData = jsonfile.readFileSync('roguedata/mobs.json');
+  mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
   // Items' Data
-  itemsData = jsonfile.readFileSync('roguedata/items.json');
+  itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
   // Encounter Data
   mobEncounters = {};
   newMobEncounters ={};
@@ -50,7 +51,7 @@ export class RogueGame {
             this.mobs = this.locationData.mobs;
             this.items = this.locationData.items;
             // Begin exploring the location
-            this.returnMsg += "--------------------"+this.locationData.displayName+"--------------------\n"
+            this.exploreLog += "--------------------"+this.locationData.displayName+"--------------------\n"
             this.explore();
           }
         }
@@ -59,6 +60,9 @@ export class RogueGame {
                       "Grassy Fields (lvl 1) - [grassyfields]";
         }
       }
+      else if (matchCase(this.cmdArray[0], "log")) { // If !rg log
+        return "sendLog";
+      }
     }
     else { // Handles no parameters (just !rg)
       this.returnMsg += "--------------------Commands--------------------\n"+
@@ -66,7 +70,8 @@ export class RogueGame {
                   " - !rg stats [allocate]: Check your stats and allocate new stat points."
     }
     this.returnMsg += "```";
-    return this.returnMsg;
+    this.exploreLog+= "```";
+    return "sendMessage";
   }
 
   public explore() {
@@ -82,7 +87,7 @@ export class RogueGame {
 
     // Spawn mobs/items for each stage
     for (var i = 0; i < this.locationData.stages; i++) {
-      this.returnMsg += "--------------------Stage "+(i+1)+"--------------------\n"
+      this.exploreLog += "--------------------Stage "+(i+1)+"--------------------\n"
 
       this.spawnMobs();
 
@@ -147,7 +152,7 @@ export class RogueGame {
         // Fight mob till mob or player dies
         while (mobHp > 0) {
           mobHp -= this.playerData.atk;
-          this.returnMsg += "You attack the " + mobStats.displayName + " for " + this.playerData.atk + " damage (" + Math.max(0, mobHp) + "/" + mobStats.hp + ")\n";
+          this.exploreLog += "You attack the " + mobStats.displayName + " for " + this.playerData.atk + " damage (" + Math.max(0, mobHp) + "/" + mobStats.hp + ")\n";
           // Check if mob is dead
           if (mobHp <= 0) {
             // Mob is defeated
@@ -159,17 +164,18 @@ export class RogueGame {
               this.playerData.expCur -= this.playerData.expNext;
               this.playerData.skillpts++;
               this.playerData.level++;
-              this.returnMsg += "\nYou leveled up!\n";
+              this.exploreLog += "\nYou leveled up!\n";
             }
             break;
           }
           // Mob attacks player
           playerHp -= mobStats.atk + this.playerData.def;
-          this.returnMsg += "The " + mobStats.displayName + " attacks you for " + mobStats.atk + " damage (" + Math.max(0, playerHp) + "/" + this.playerData.hpMax + ")\n";
+          this.exploreLog += "The " + mobStats.displayName + " attacks you for " + mobStats.atk + " damage (" + Math.max(0, playerHp) + "/" + this.playerData.hpMax + ")\n";
           // Check if player is dead
           if (playerHp <= 0) {
             this.playerData.hpCur = 0;
             this.isPlayerDead = true;
+            this.exploreLog += "\nYou died!\n";
             this.returnMsg += "\nYou died!\n";
             break;
           }
