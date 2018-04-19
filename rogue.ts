@@ -1,5 +1,7 @@
 import * as jsonfile from 'jsonfile';
 
+const millisecondsInSecond = 1000;
+
 export class RogueGame {
   // Message Info
   cmdArray:Array<string>;
@@ -34,11 +36,12 @@ export class RogueGame {
 
   public runGame() {
     this.playerData = this.players[this.username];
+    this.playerRecover(); // Recover some player hp based on time passed
     if (this.cmdArray.length) {
       if (matchCase(this.cmdArray[0], "explore")) { // If !rg explore
         if (this.cmdArray.length > 1) {
           // Get the time left from the previous exploration
-          var timeLeft = Math.floor(this.playerData.exploreEndTime - this.playerData.exploreStartTime);
+          var timeLeft = Math.floor((this.playerData.exploreEndTime - this.playerData.exploreStartTime)/millisecondsInSecond);
           if (timeLeft <= 0) { // Allow new exploration only if time is passed
             // Set the location once determined
             this.location = this.cmdArray[1].toLowerCase();
@@ -123,7 +126,6 @@ export class RogueGame {
   private explore() {
     // Set exploration start time
     var startTime = playerData.exploreStartTime = Date.now();
-    const millisecondsInSecond = 1000;
     playerData.exploreEndTime = startTime + (millisecondsInSecond * this.locationData.time);
 
     // Prepopulate fields
@@ -243,13 +245,32 @@ export class RogueGame {
     "\n--------------------"+this.username+"\'s Stats--------------------\n"+
     "Level: "+stats.level+"\tExp: "+stats.expCur+"/"+stats.expNext+"\n"+
     "HP: "+stats.hpCur+"/"+stats.hpMax+"\tMP: "+stats.mpCur+"/"+stats.mpMax+"\n"+
+    "HP Recovery: "+stats.hpRec+"/"+stats.hpRecTime+"sec\tMP Recovery: "+stats.mpRec+"/"+stats.mpRecTime+"sec\n";
     "Atk: "+stats.atk+"\tDef: "+stats.def+"\n"+
     "Strength: "+stats.str+"\tDexterity: "+stats.dex+"\n"+
     "Intelligence: "+stats.int+"\tFortitude: "+stats.fort+"\n"+
+    "Stat Points Available: "+stats.skillpts+"\n"+
     "\n--------------------"+this.username+"\'s Inventory--------------------\n";
     for (item in stats.inventory) {
       this.returnMsg += "- "+this.itemsData[item].displayName+": "+this.itemsData[item].description+"\n";
     }
+  }
+
+  private playerRecover() {
+    // Make sure player is missing health
+    if (this.playerData.hpCur < this.playerData.hpMax) {
+      var timePassed = Date.now() - (this.playerData.lastRecoveryTime + this.playerData.hpRecTime);
+      if (timePassed >= 0) {
+        var hpMuliplier = Math.floor((timePassed/millisecondsInSecond)/this.playerData.hpRecTime);
+        var recovery = this.playerData.hpCur+(this.playerData.hpRec*hpMuliplier);
+        this.playerData.hpCur = Math.min(this.playerData.hpMax, recovery);
+
+        // Update recoverytime
+        var leftOverTime = timePassed-(this.playerData.hpRecTime*hpMuliplier);
+        this.playerData.lastRecoveryTime = Date.now() - leftOverTime;
+      }
+    }
+    // Do the same thing for mp
   }
 }
 
