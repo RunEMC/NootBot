@@ -1,0 +1,22 @@
+{
+  "apple": {
+    "displayName": "Apple",
+    "description": "A big juicy apple"
+  },
+  "herb": {
+    "displayName": "Herb",
+    "description": "A big juicy apple"
+  },
+  "log": {
+    "displayName": "Log",
+    "description": "A big juicy apple"
+  },
+  "copper_ore": {
+    "displayName": "Copper Ore",
+    "description": "A big juicy apple"
+  },
+  "slime_chunk": {
+    "displayName": "Slime Chunk",
+    "description": "A big juicy apple"
+  }
+}
