@@ -69,6 +69,14 @@ export class RogueGame {
                     " - !rg help: Info on the game.\n"+
                     " - !rg stats [allocate] [str/dex/int/luck] [amount]: Check your stats and allocate new stat points."
       }
+      else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
+        if (this.cmdArray > 1) {
+
+        }
+        else {
+
+        }
+      }
     }
     else { // Handles no parameters (just !rg)
       this.returnMsg += "--------------------Commands--------------------\n"+
@@ -188,6 +196,21 @@ export class RogueGame {
           }
         }
       }
+    }
+  }
+
+  private getPlayerStats() {
+    var stats = this.playerData;
+    this.returnMsg +=
+    "\n--------------------"+this.username+"\'s Stats--------------------\n"+
+    "Level: "+stats.level+"\tExp: "+stats.expCur+"/"+stats.expNext+"\n"+
+    "HP: "+stats.hpCur+"/"+stats.hpMax+"\tMP: "+stats.mpCur+"/"+stats.mpMax+"\n"+
+    "Atk: "+stats.atk+"\tDef: "+stats.def+"\n"+
+    "Strength: "+stats.str+"\tDexterity: "+stats.dex+"\n"+
+    "Intelligence: "+stats.int+"\tFortitude: "+stats.fort+"\n"+
+    "\n--------------------"+this.username+"\'s Inventory--------------------\n";
+    for (item in stats.inventory) {
+      this.returnMsg += "- "+this.itemsData[item].displayName+": "+this.itemsData[item].description+"\n";
     }
   }
 }
