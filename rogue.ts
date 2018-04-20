@@ -46,7 +46,14 @@ export class RogueGame {
 
   public runGame() {
     this.playerData = this.players[this.username];
-    this.playerRecover(); // Recover some player hp based on time passed
+    // Check if player exists in json, if not, make new player character
+    if (this.playerData !== undefined) {
+      this.createNewChar();
+    }
+    else {
+      this.playerRecover(); // Recover some player hp based on time passed
+    }
+    // Process command
     if (this.cmdArray.length) {
       if (matchCase(this.cmdArray[0], "explore")) { // If !rg explore
         if (this.cmdArray.length > 1) {
@@ -295,6 +302,41 @@ export class RogueGame {
       }
     }
     // Do the same thing for mp
+  }
+
+  private createNewChar() {
+    var playerStats = {
+      "name": this.username,
+      "level":1,
+      "expCur":0,
+      "expNext":10,
+      "hpCur":10,
+      "hpMax":10,
+      "hpRec":1,
+      "hpRecTime":15,
+      "mpMax":0,
+      "mpCur":0,
+      "mpRec":0,
+      "mpRecTime":0,
+      "atk":3,
+      "def":0,
+      "str":0,
+      "dex":0,
+      "int":0,
+      "fort":0,
+      "skillpts":5,
+      "coins":0,
+      "inventory":{},
+      "exploreEndTime":Date.now(),
+      "exploreStartTime":Date.now(),
+      "lastRecoveryTime":Date.now()
+    }
+    this.playerData = playerStats;
+    // Write to file
+    this.players[this.username] = this.playerData;
+    jsonfile.writeFile(this.playersFile, this.players, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
   }
 }
 
