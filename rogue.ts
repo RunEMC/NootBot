@@ -312,7 +312,7 @@ export class RogueGame {
     "Coins: "+stats.coins+"\n"+
     "\n--------------------"+this.username+"\'s Inventory--------------------\n";
     for (var item in stats.inventory) {
-      this.returnMsg += "- "+this.itemsData[item].displayName+": "+this.playerData.inventory[item]+" ("+this.itemsData[item].description+")\n";
+      this.returnMsg += "- "+this.itemsData[item].displayName+" x"+this.playerData.inventory[item]+": ("+this.itemsData[item].description+")\n";
     }
   }
 

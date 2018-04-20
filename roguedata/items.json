@@ -1,26 +1,26 @@
 {
   "apple": {
-    "displayName": "Apple",
-    "description": "A big juicy apple"
+    "displayName": "Apples",
+    "description": "A big juicy apple, heals for 2HP"
   },
   "herb": {
-    "displayName": "Herb",
-    "description": "A big juicy apple"
+    "displayName": "Herbs",
+    "description": "Various medicinal plants, heals for 5HP"
   },
   "log": {
-    "displayName": "Log",
-    "description": "A big juicy apple"
+    "displayName": "Logs",
+    "description": "Some lumber, usable for trading"
   },
   "copper_ore": {
-    "displayName": "Copper Ore",
-    "description": "A big juicy apple"
+    "displayName": "Copper Ores",
+    "description": "A soft metal with a reddish-orange color"
   },
   "tin_ore": {
-    "displayName": "Tin Ore",
-    "description": "Used to make tin bars"
+    "displayName": "Tin Ores",
+    "description": "An ore commonly used to make bronze"
   },
   "slime_chunk": {
-    "displayName": "Slime Chunk",
-    "description": "A big juicy apple"
+    "displayName": "Slime Chunks",
+    "description": "Some sludge leftover from slimes"
   }
 }
