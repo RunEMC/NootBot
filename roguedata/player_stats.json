@@ -1,10 +1,1 @@
-{"RunEMC":{
-  "name":"RunEMC",
-  "level":4,
-  "expCur":0,"expNext":10,"hpCur":6,"hpMax":10,"hpRec":1,"hpRecTime":15,"mpMax":0,"mpCur":0,"mpRec":0,"mpRecTime":0,"atk":5,"def":0,"str":2,"dex":3,"int":1,"fort":2,"luck":3,
-  "skillpts":16,
-  "coins":0,
-  "inventory":{},
-  "exploreEndTime":50000,
-  "exploreStartTime":10000,
-  "lastRecoveryTime":0}}
+{"RunEMC":{"name":"RunEMC","level":13,"expCur":6,"expNext":10,"hpCur":10,"hpMax":10,"hpRec":1,"hpRecTime":15,"mpMax":0,"mpCur":0,"mpRec":0,"mpRecTime":0,"atk":3,"def":0,"str":2,"dex":3,"int":1,"fort":2,"luck":3,"skillpts":25,"coins":100,"inventory":{"slime_chunk":42,"apple":31,"copper_ore":6,"log":8,"herb":9,"tin_ore":3},"exploreEndTime":1524182763754,"exploreStartTime":1524182753754,"lastRecoveryTime":1524182993962}}

@@ -30,11 +30,13 @@ bot.on('ready', async () => {
 
 });
 
+// Store the log for roguegame
+var rogueGameLog;
+
 bot.on('message', message => {
   // var authUser = Sanitizer.sanitize(message.author.username);
   var authUser = message.author.username;
   var vChan;
-  var prevRogueGame;
 
   if (message.content === 'ping') {
     if (DEBUG) {
@@ -144,14 +146,16 @@ bot.on('message', message => {
     cmd.splice(0, 1);
 
     var rogueGame = new RogueGame(cmd, authUser);
-    rogueGame.runGame((response) => {
-      if (response === "sendLog") {
-        msg = prevRogueGame.exploreLog;
-      }
-      else {
-        msg = rogueGame.returnMsg;
-      }
-    });
+    var response = rogueGame.runGame();
+    // Check response
+    if (response === "sendLog") {
+      msg = rogueGameLog;
+    }
+    else {
+      msg = rogueGame.getReturnMsg();
+      rogueGameLog = rogueGame.getExploreLog();
+    }
+    // Send message
     message.channel.send(msg);
   }
   else if (message.content.startsWith('encounter')) {

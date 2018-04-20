@@ -15,6 +15,10 @@
     "displayName": "Copper Ore",
     "description": "A big juicy apple"
   },
+  "tin_ore": {
+    "displayName": "Tin Ore",
+    "description": "Used to make tin bars"
+  },
   "slime_chunk": {
     "displayName": "Slime Chunk",
     "description": "A big juicy apple"

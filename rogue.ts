@@ -34,6 +34,16 @@ export class RogueGame {
     this.username = username;
   }
 
+  public getReturnMsg():string {
+    // console.log(this.returnMsg);
+    return this.returnMsg;
+  }
+
+  public getExploreLog():string {
+    // console.log(this.exploreLog);
+    return this.exploreLog;
+  }
+
   public runGame() {
     this.playerData = this.players[this.username];
     this.playerRecover(); // Recover some player hp based on time passed
@@ -41,29 +51,34 @@ export class RogueGame {
       if (matchCase(this.cmdArray[0], "explore")) { // If !rg explore
         if (this.cmdArray.length > 1) {
           // Get the time left from the previous exploration
-          var timeLeft = Math.floor((this.playerData.exploreEndTime - this.playerData.exploreStartTime)/millisecondsInSecond);
+          var timeLeft = Math.floor((this.playerData.exploreEndTime - Date.now())/millisecondsInSecond);
           if (timeLeft <= 0) { // Allow new exploration only if time is passed
-            // Set the location once determined
-            this.location = this.cmdArray[1].toLowerCase();
-            // Check that the location name is valid
-            if (this.locations[this.location] === undefined) {
-              this.returnMsg +=
-              "Invalid location, use example: !rg explore grassyfields\n" +
-              "------Explorable Locations (!rg explore [location])------\n"+
-              "Grassy Fields (lvl 1) - [grassyfields]";
+            if (this.playerData.hpCur > 0) { // Allow new exploration only if player hp > 0
+              // Set the location once determined
+              this.location = this.cmdArray[1].toLowerCase();
+              // Check that the location name is valid
+              if (this.locations[this.location] === undefined) {
+                this.returnMsg +=
+                "Invalid location, use example: !rg explore grassyfields\n" +
+                "------Explorable Locations (!rg explore [location])------\n"+
+                "Grassy Fields (lvl 1) - [grassyfields]";
+              }
+              else { // Location name is valid
+                this.locationData = this.locations[this.location];
+                this.mobs = this.locationData.mobs;
+                this.items = this.locationData.items;
+                // Begin exploring the location
+                this.exploreLog += "--------------------"+this.locationData.displayName+"--------------------\n"
+                this.explore();
+              }
             }
-            else { // Location name is valid
-              this.locationData = this.locations[this.location];
-              this.mobs = this.locationData.mobs;
-              this.items = this.locationData.items;
-              // Begin exploring the location
-              this.exploreLog += "--------------------"+this.locationData.displayName+"--------------------\n"
-              this.explore();
+            else {
+              this.returnMsg += "You can't explore at 0 hp!\nTry again when your health has recovered";
             }
           }
           else {
             this.returnMsg +=
-            "Exploration in progress, time remaining: "+timeLeft+" seconds\n";
+            "Resting, time remaining: "+timeLeft+" seconds\n";
           }
         }
         else { // If no area chosen
@@ -81,11 +96,11 @@ export class RogueGame {
                     " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
       }
       else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
-        if (this.cmdArray > 1) {
+        if (this.cmdArray.length > 1) {
           if (matchCase(this.cmdArray[1], "allocate")) { // Assign skillpoints
-            if (this.cmdArray > 2) { // If !rg stats allocate
+            if (this.cmdArray.length > 2) { // If !rg stats allocate
               if (this.playerData[this.cmdArray[2]] !== undefined) {
-                if (this.cmdArray > 3) {
+                if (this.cmdArray.length > 3) {
                   if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0) {
                     this.playerData[this.cmdArray[2]]+=this.cmdArray[3];
                   }
@@ -119,14 +134,14 @@ export class RogueGame {
                   " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
     }
     this.returnMsg += "```";
-    this.exploreLog+= "```";
+    this.exploreLog += "```";
     return "sendMessage";
   }
 
   private explore() {
     // Set exploration start time
-    var startTime = playerData.exploreStartTime = Date.now();
-    playerData.exploreEndTime = startTime + (millisecondsInSecond * this.locationData.time);
+    var startTime = this.playerData.exploreStartTime = Date.now();
+    this.playerData.exploreEndTime = startTime + (millisecondsInSecond * this.locationData.time);
 
     // Prepopulate fields
     for (var i = 0; i < this.mobs.length; i++) {
@@ -186,7 +201,7 @@ export class RogueGame {
     for (var item in spawnchance) {
       var randNum = Math.random();
 
-      if (item >= randNum) {
+      if (spawnchance[item] >= randNum) {
         // this.itemEncounters[item] === undefined ? this.itemEncounters[item] = 1 : this.itemEncounters[item]++;
         // Add the acquired items to the player's inventory
         this.playerData.inventory[item] === undefined ? this.playerData.inventory[item] = 1 : this.playerData.inventory[item]++;
@@ -249,30 +264,34 @@ export class RogueGame {
     "\n--------------------"+this.username+"\'s Stats--------------------\n"+
     "Level: "+stats.level+"\tExp: "+stats.expCur+"/"+stats.expNext+"\n"+
     "HP: "+stats.hpCur+"/"+stats.hpMax+"\tMP: "+stats.mpCur+"/"+stats.mpMax+"\n"+
-    "HP Recovery: "+stats.hpRec+"/"+stats.hpRecTime+"sec\tMP Recovery: "+stats.mpRec+"/"+stats.mpRecTime+"sec\n";
+    "HP Recovery: "+stats.hpRec+"/"+stats.hpRecTime+"sec\tMP Recovery: "+stats.mpRec+"/"+stats.mpRecTime+"sec\n"+
     "Atk: "+stats.atk+"\tDef: "+stats.def+"\n"+
     "Strength: "+stats.str+"\tDexterity: "+stats.dex+"\n"+
     "Intelligence: "+stats.int+"\tFortitude: "+stats.fort+"\n"+
     "Stat Points Available: "+stats.skillpts+"\n"+
+    "Coins: "+stats.coins+"\n"+
     "\n--------------------"+this.username+"\'s Inventory--------------------\n";
-    "Coins: "+stats.coins+"\n";
-    for (item in stats.inventory) {
-      this.returnMsg += "- "+this.itemsData[item].displayName+": "+this.itemsData[item].description+"\n";
+    for (var item in stats.inventory) {
+      this.returnMsg += "- "+this.itemsData[item].displayName+": "+this.playerData.inventory[item]+" ("+this.itemsData[item].description+")\n";
     }
   }
 
   private playerRecover() {
     // Make sure player is missing health
     if (this.playerData.hpCur < this.playerData.hpMax) {
-      var timePassed = Date.now() - (this.playerData.lastRecoveryTime + this.playerData.hpRecTime);
+      var timePassed = Date.now() - (this.playerData.lastRecoveryTime + this.playerData.hpRecTime * millisecondsInSecond);
       if (timePassed >= 0) {
-        var hpMuliplier = Math.floor((timePassed/millisecondsInSecond)/this.playerData.hpRecTime);
+        var hpMuliplier = Math.floor((timePassed/millisecondsInSecond)/this.playerData.hpRecTime) + 1;
         var recovery = this.playerData.hpCur+(this.playerData.hpRec*hpMuliplier);
         this.playerData.hpCur = Math.min(this.playerData.hpMax, recovery);
-
         // Update recoverytime
-        var leftOverTime = timePassed-(this.playerData.hpRecTime*hpMuliplier);
+        var leftOverTime = timePassed-(this.playerData.hpRecTime*(hpMuliplier-1)*millisecondsInSecond);
         this.playerData.lastRecoveryTime = Date.now() - leftOverTime;
+        // Write to file
+        this.players[this.username] = this.playerData;
+        jsonfile.writeFile(this.playersFile, this.players, function (err) {
+          if (err) console.error("Write error: " + err);
+        });
       }
     }
     // Do the same thing for mp
