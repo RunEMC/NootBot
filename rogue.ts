@@ -29,6 +29,7 @@ export class RogueGame {
   itemEncounters = {};
   isPlayerDead:boolean = false;
   // Base Stats, constants, only modify if base stats needs to be changed
+  baseXpNeeded = 10;
   baseAtk = 3;
   baseDef = 1;
   baseHp = 10;
@@ -256,10 +257,24 @@ export class RogueGame {
             this.playerData.expCur += mobStats.xpGain;
             // Add algorithms for determining xp required for next lvl and pts gain per lvl
             if (this.playerData.expCur >= this.playerData.expNext) {
-              this.playerData.expCur -= this.playerData.expNext;
-              this.playerData.statpts++;
+              // Increase player level and reset current exp
               this.playerData.level++;
-              this.exploreLog += "\nYou leveled up!\n";
+              this.playerData.expCur -= this.playerData.expNext;
+              // Gain 1 skill points each level, 3 every 5 levels and 5 every 10 levels
+              if (this.playerData.level % 10 === 0) {
+                this.playerData.statpts+=5;
+              }
+              else if (this.playerData.level % 5 === 0) {
+                this.playerData.statpts+=3;
+              }
+              else {
+                this.playerData.statpts++;
+              }
+              // Increase exp needed for next level by 5% per level
+              this.playerData.expNext = this.baseXpNeeded * (1 + (0.05 * (this.playerData.level - 1)))
+              this.exploreLog +=
+              "\nYou leveled up!\n"+
+              "You have "+this.playerData.statpts+" stat point(s) available.\n";
             }
             // Gain Items & Coins
             this.playerData.coins += mobStats.coinGain;
@@ -322,7 +337,7 @@ export class RogueGame {
       "name": this.username,
       "level":1,
       "expCur":0,
-      "expNext":10,
+      "expNext":this.baseXpNeeded,
       "hpCur":this.baseHp,
       "hpMax":this.baseHp,
       "hpRec":this.baseHpRec,
