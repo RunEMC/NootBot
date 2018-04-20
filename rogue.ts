@@ -96,44 +96,52 @@ export class RogueGame {
           }
         }
         else { // If no area chosen
-          this.returnMsg += "------Explorable Locations (!rg explore [location])------\n" +
-                      "Grassy Fields (lvl 1) - [grassyfields]";
+          this.returnMsg +=
+          "------Explorable Locations (!rg explore [location])------\n" +
+          "Grassy Fields (lvl 1) - [grassyfields]";
         }
       }
       else if (matchCase(this.cmdArray[0], "log")) { // If !rg log
         return "sendLog";
       }
       else if (matchCase(this.cmdArray[0], "help")) { // If !rg help
-        this.returnMsg += "--------------------Commands--------------------\n"+
-                    " - !rg explore [area]: Explore an area.\n"+
-                    " - !rg help: Info on the game.\n"+
-                    " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
+        this.returnMsg +=
+        "--------------------Commands--------------------\n"+
+        " - !rg explore [area]: Explore an area.\n"+
+        " - !rg log: Check the explore log.\n"+
+        " - !rg help: Info on the game.\n"+
+        " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
       }
       else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
         if (this.cmdArray.length > 1) {
           if (matchCase(this.cmdArray[1], "allocate")) { // Assign skillpoints
             if (this.cmdArray.length > 2) { // If !rg stats allocate
-              if (this.playerData[this.cmdArray[2]] !== undefined) {
+              if (["str", "dex", "int", "fort"].indexof(this.cmdArray[2]) !== -1) {
                 if (this.cmdArray.length > 3) {
-                  if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0) {
+                  if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0 && this.cmdArray[3] <= this.playerData.statpts) {
                     this.playerData[this.cmdArray[2]]+=this.cmdArray[3];
+                    this.playerData.statpts-=this.cmdArray[3];
                     // Increase atk/def/hp/etc. based on stat points
                     this.updatePlayerStats();
+                    this.getPlayerStats();
+                  }
+                  else if (this.cmdArray[3] <= this.playerData.statpts) {
+                    this.returnMsg += "You do not have that many points to use!\n";
                   }
                   else {
-                    this.returnMsg += "Invalid number, example usage: !rg stats allocate str 2";
+                    this.returnMsg += "Invalid number, example usage: !rg stats allocate str 2\n";
                   }
                 }
                 else {
-                  this.returnMsg += "Please enter the amount to allocate, example usage: !rg stats allocate str 2";
+                  this.returnMsg += "Please enter the amount to allocate, example usage: !rg stats allocate str 2\n";
                 }
               }
               else {
-                this.returnMsg += "Invalid stat, example usage: !rg stats allocate str 2";
+                this.returnMsg += "Invalid stat, example usage: !rg stats allocate str 2\n";
               }
             }
             else { // nothing after !rg stats allocate
-              this.returnMsg += "Invalid stats, example usage: !rg stats allocate str 2";
+              this.returnMsg += "Please enter a stat and the amount, example usage: !rg stats allocate str 2\n";
             }
           }
         }
@@ -249,7 +257,7 @@ export class RogueGame {
             // Add algorithms for determining xp required for next lvl and pts gain per lvl
             if (this.playerData.expCur >= this.playerData.expNext) {
               this.playerData.expCur -= this.playerData.expNext;
-              this.playerData.skillpts++;
+              this.playerData.statpts++;
               this.playerData.level++;
               this.exploreLog += "\nYou leveled up!\n";
             }
@@ -285,7 +293,7 @@ export class RogueGame {
     "Atk: "+stats.atk+"\tDef: "+stats.def+"\n"+
     "Strength: "+stats.str+"\tDexterity: "+stats.dex+"\n"+
     "Intelligence: "+stats.int+"\tFortitude: "+stats.fort+"\n"+
-    "Stat Points Available: "+stats.skillpts+"\n"+
+    "Stat Points Available: "+stats.statpts+"\n"+
     "Coins: "+stats.coins+"\n"+
     "\n--------------------"+this.username+"\'s Inventory--------------------\n";
     for (var item in stats.inventory) {
@@ -329,7 +337,7 @@ export class RogueGame {
       "dex":0,
       "int":0,
       "fort":0,
-      "skillpts":5,
+      "statpts":5,
       "coins":0,
       "inventory":{},
       "exploreEndTime":Date.now(),
