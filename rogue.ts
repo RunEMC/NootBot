@@ -28,6 +28,14 @@ export class RogueGame {
   newMobEncounters ={};
   itemEncounters = {};
   isPlayerDead:boolean = false;
+  // Base Stats, constants, only modify if base stats needs to be changed
+  baseAtk = 3;
+  baseDef = 1;
+  baseHp = 10;
+  baseHpRec = 1;
+  baseHpRecTime = 15;
+  baseMp = 0;
+
 
   constructor(cmdArray, username) {
     this.cmdArray = cmdArray;
@@ -109,6 +117,8 @@ export class RogueGame {
                 if (this.cmdArray.length > 3) {
                   if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0) {
                     this.playerData[this.cmdArray[2]]+=this.cmdArray[3];
+                    // Increase atk/def/hp/etc. based on stat points
+                    this.updatePlayerStats();
                   }
                   else {
                     this.returnMsg += "Invalid number, example usage: !rg stats allocate str 2";
@@ -305,16 +315,16 @@ export class RogueGame {
       "level":1,
       "expCur":0,
       "expNext":10,
-      "hpCur":10,
-      "hpMax":10,
-      "hpRec":1,
-      "hpRecTime":15,
-      "mpMax":0,
-      "mpCur":0,
+      "hpCur":this.baseHp,
+      "hpMax":this.baseHp,
+      "hpRec":this.baseHpRec,
+      "hpRecTime":this.baseHpRecTime,
+      "mpCur":this.baseMp,
+      "mpMax":this.baseMp,
       "mpRec":0,
       "mpRecTime":0,
-      "atk":3,
-      "def":0,
+      "atk":this.baseAtk,
+      "def":this.baseDef,
       "str":0,
       "dex":0,
       "int":0,
@@ -327,6 +337,21 @@ export class RogueGame {
       "lastRecoveryTime":Date.now()
     }
     this.playerData = playerStats;
+  }
+
+  private updatePlayerStats() {
+    // Increase max hp by 1 for every point in fort, and 1 extra for every 5 points in fort and  10 points in str
+    this.playerData.hpMax = this.baseHp + this.playerData.fort + Math.floor(this.playerData.fort / 5) + Math.floor(this.playerData.str / 10);
+    // Increase hpRec by 1 for every 5 points in fort and 1 extra for every 10 points
+    this.playerData.hpRec = this.baseHpRec + Math.floor(this.playerData.fort / 5) + Math.floor(this.playerData.fort / 10);
+    // Reduce rec time by 10% for every 5 poins in dex and every 10 points in int up to 5 second, increases by 5% for every 1 point over base hprec
+    this.playerData.hpRecTime = this.baseHpRecTime * (1 - (Math.floor(this.playerData.dex / 5) * 0.1) - (Math.floor(this.playerData.int / 10) * 0.1) + ((playerData.hpRec - playerData.baseHpRec) * 0.05));
+    // Add logic for mp:
+
+    // Increase attack by 10% for each point in strength
+    this.playerData.atk = this.baseAtk * ((this.playerData.str * 0.1) + 1);
+    // Increase defence by 10% for each point in fortitude
+    this.playerData.def = this.baseDef * ((this.playerData.fort * 0.1) + 1);
   }
 }
 
