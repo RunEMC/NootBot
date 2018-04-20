@@ -45,7 +45,6 @@ export class RogueGame {
   }
 
   public runGame() {
-    this.playerData = this.players[this.username];
     // Check if player exists in json, if not, make new player character
     if (this.playerData !== undefined) {
       this.createNewChar();
@@ -140,6 +139,13 @@ export class RogueGame {
                   " - !rg help: Info on the game.\n"+
                   " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
     }
+
+    // Write to file
+    this.players[this.username] = this.playerData;
+    jsonfile.writeFile(this.playersFile, this.players, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
+    // Append return messages
     this.returnMsg += "```";
     this.exploreLog += "```";
     return "sendMessage";
@@ -172,12 +178,6 @@ export class RogueGame {
 
       this.spawnItems(this.locationData.itemSpawnChance);
     }
-
-    // Write to file
-    this.players[this.username] = this.playerData;
-    jsonfile.writeFile(this.playersFile, this.players, function (err) {
-      if (err) console.error("Write error: " + err);
-    });
 
     // Create flavor text
     this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n"
@@ -294,11 +294,6 @@ export class RogueGame {
         // Update recoverytime
         var leftOverTime = timePassed-(this.playerData.hpRecTime*(hpMuliplier-1)*millisecondsInSecond);
         this.playerData.lastRecoveryTime = Date.now() - leftOverTime;
-        // Write to file
-        this.players[this.username] = this.playerData;
-        jsonfile.writeFile(this.playersFile, this.players, function (err) {
-          if (err) console.error("Write error: " + err);
-        });
       }
     }
     // Do the same thing for mp
@@ -332,11 +327,6 @@ export class RogueGame {
       "lastRecoveryTime":Date.now()
     }
     this.playerData = playerStats;
-    // Write to file
-    this.players[this.username] = this.playerData;
-    jsonfile.writeFile(this.playersFile, this.players, function (err) {
-      if (err) console.error("Write error: " + err);
-    });
   }
 }
 
