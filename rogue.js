@@ -25,6 +25,14 @@ var RogueGame = /** @class */ (function () {
         this.newMobEncounters = {};
         this.itemEncounters = {};
         this.isPlayerDead = false;
+        // Base Stats, constants, only modify if base stats needs to be changed
+        this.baseXpNeeded = 10;
+        this.baseAtk = 3;
+        this.baseDef = 1;
+        this.baseHp = 10;
+        this.baseHpRec = 1;
+        this.baseHpRecTime = 15;
+        this.baseMp = 0;
         this.cmdArray = cmdArray;
         this.username = username;
     }
@@ -37,8 +45,16 @@ var RogueGame = /** @class */ (function () {
         return this.exploreLog;
     };
     RogueGame.prototype.runGame = function () {
+        // Init playerData
         this.playerData = this.players[this.username];
-        this.playerRecover(); // Recover some player hp based on time passed
+        // Check if player exists in json, if not, make new player character
+        if (this.playerData === undefined) {
+            this.createNewChar();
+        }
+        else {
+            this.playerRecover(); // Recover some player hp based on time passed
+        }
+        // Process command
         if (this.cmdArray.length) {
             if (matchCase(this.cmdArray[0], "explore")) {
                 if (this.cmdArray.length > 1) {
@@ -74,43 +90,57 @@ var RogueGame = /** @class */ (function () {
                     }
                 }
                 else {
-                    this.returnMsg += "------Explorable Locations (!rg explore [location])------\n" +
-                        "Grassy Fields (lvl 1) - [grassyfields]";
+                    this.returnMsg +=
+                        "------Explorable Locations (!rg explore [location])------\n" +
+                            "Grassy Fields (lvl 1) - [grassyfields]";
                 }
             }
             else if (matchCase(this.cmdArray[0], "log")) {
                 return "sendLog";
             }
             else if (matchCase(this.cmdArray[0], "help")) {
-                this.returnMsg += "--------------------Commands--------------------\n" +
-                    " - !rg explore [area]: Explore an area.\n" +
-                    " - !rg help: Info on the game.\n" +
-                    " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.";
+                this.returnMsg +=
+                    "--------------------Commands--------------------\n" +
+                        " - !rg explore [area]: Explore an area.\n" +
+                        " - !rg log: Check the explore log.\n" +
+                        " - !rg help: Info on the game.\n" +
+                        " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.";
             }
             else if (matchCase(this.cmdArray[0], "stats")) {
                 if (this.cmdArray.length > 1) {
                     if (matchCase(this.cmdArray[1], "allocate")) {
                         if (this.cmdArray.length > 2) {
-                            if (this.playerData[this.cmdArray[2]] !== undefined) {
+                            if (["str", "dex", "int", "fort"].indexOf(this.cmdArray[2]) !== -1) {
                                 if (this.cmdArray.length > 3) {
-                                    if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0) {
-                                        this.playerData[this.cmdArray[2]] += this.cmdArray[3];
+                                    var amnt = parseInt(this.cmdArray[3]);
+                                    if (amnt > 0 && amnt <= this.playerData.statpts) {
+                                        this.playerData[this.cmdArray[2]] += amnt;
+                                        this.playerData.statpts -= amnt;
+                                        // Increase atk/def/hp/etc. based on stat points
+                                        this.updatePlayerStats();
+                                        this.getPlayerStats();
+                                    }
+                                    else if (amnt > this.playerData.statpts) {
+                                        this.returnMsg += "You do not have that many points to use!\n";
                                     }
                                     else {
-                                        this.returnMsg += "Invalid number, example usage: !rg stats allocate str 2";
+                                        this.returnMsg += "Invalid number, example usage: !rg stats allocate str 2\n";
                                     }
                                 }
                                 else {
-                                    this.returnMsg += "Please enter the amount to allocate, example usage: !rg stats allocate str 2";
+                                    this.returnMsg += "Please enter the amount to allocate, example usage: !rg stats allocate str 2\n";
                                 }
                             }
                             else {
-                                this.returnMsg += "Invalid stat, example usage: !rg stats allocate str 2";
+                                this.returnMsg += "Invalid stat, example usage: !rg stats allocate str 2\n";
                             }
                         }
                         else {
-                            this.returnMsg += "Invalid stats, example usage: !rg stats allocate str 2";
+                            this.returnMsg += "Please enter a stat and the amount, example usage: !rg stats allocate str 2\n";
                         }
+                    }
+                    else {
+                        this.returnMsg += "Invalid command, usage: !rg stats [allocate] [str/dex/int/fort] [amount]\n";
                     }
                 }
                 else {
@@ -125,6 +155,13 @@ var RogueGame = /** @class */ (function () {
                 " - !rg help: Info on the game.\n" +
                 " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.";
         }
+        // Write to file
+        this.players[this.username] = this.playerData;
+        jsonfile.writeFile(this.playersFile, this.players, function (err) {
+            if (err)
+                console.error("Write error: " + err);
+        });
+        // Append return messages
         this.returnMsg += "```";
         this.exploreLog += "```";
         return "sendMessage";
@@ -151,12 +188,6 @@ var RogueGame = /** @class */ (function () {
                 break;
             this.spawnItems(this.locationData.itemSpawnChance);
         }
-        // Write to file
-        this.players[this.username] = this.playerData;
-        jsonfile.writeFile(this.playersFile, this.players, function (err) {
-            if (err)
-                console.error("Write error: " + err);
-        });
         // Create flavor text
         this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n";
         for (var i = 0; i < this.locationData.mobs.length; i++) {
@@ -210,10 +241,24 @@ var RogueGame = /** @class */ (function () {
                         this.playerData.expCur += mobStats.xpGain;
                         // Add algorithms for determining xp required for next lvl and pts gain per lvl
                         if (this.playerData.expCur >= this.playerData.expNext) {
-                            this.playerData.expCur -= this.playerData.expNext;
-                            this.playerData.skillpts++;
+                            // Increase player level and reset current exp
                             this.playerData.level++;
-                            this.exploreLog += "\nYou leveled up!\n";
+                            this.playerData.expCur -= this.playerData.expNext;
+                            // Gain 1 skill points each level, 3 every 5 levels and 5 every 10 levels
+                            if (this.playerData.level % 10 === 0) {
+                                this.playerData.statpts += 5;
+                            }
+                            else if (this.playerData.level % 5 === 0) {
+                                this.playerData.statpts += 3;
+                            }
+                            else {
+                                this.playerData.statpts++;
+                            }
+                            // Increase exp needed for next level by 5% per level
+                            this.playerData.expNext = this.baseXpNeeded * (1 + (0.05 * (this.playerData.level - 1)));
+                            this.exploreLog +=
+                                "\nYou leveled up!\n" +
+                                    "You have " + this.playerData.statpts + " stat point(s) available.\n";
                         }
                         // Gain Items & Coins
                         this.playerData.coins += mobStats.coinGain;
@@ -246,11 +291,11 @@ var RogueGame = /** @class */ (function () {
                 "Atk: " + stats.atk + "\tDef: " + stats.def + "\n" +
                 "Strength: " + stats.str + "\tDexterity: " + stats.dex + "\n" +
                 "Intelligence: " + stats.int + "\tFortitude: " + stats.fort + "\n" +
-                "Stat Points Available: " + stats.skillpts + "\n" +
+                "Stat Points Available: " + stats.statpts + "\n" +
                 "Coins: " + stats.coins + "\n" +
                 "\n--------------------" + this.username + "\'s Inventory--------------------\n";
         for (var item in stats.inventory) {
-            this.returnMsg += "- " + this.itemsData[item].displayName + ": " + this.playerData.inventory[item] + " (" + this.itemsData[item].description + ")\n";
+            this.returnMsg += "- " + this.itemsData[item].displayName + " x" + this.playerData.inventory[item] + ": (" + this.itemsData[item].description + ")\n";
         }
     };
     RogueGame.prototype.playerRecover = function () {
@@ -264,15 +309,53 @@ var RogueGame = /** @class */ (function () {
                 // Update recoverytime
                 var leftOverTime = timePassed - (this.playerData.hpRecTime * (hpMuliplier - 1) * millisecondsInSecond);
                 this.playerData.lastRecoveryTime = Date.now() - leftOverTime;
-                // Write to file
-                this.players[this.username] = this.playerData;
-                jsonfile.writeFile(this.playersFile, this.players, function (err) {
-                    if (err)
-                        console.error("Write error: " + err);
-                });
             }
         }
         // Do the same thing for mp
+    };
+    RogueGame.prototype.createNewChar = function () {
+        var playerStats = {
+            "name": this.username,
+            "level": 1,
+            "expCur": 0,
+            "expNext": this.baseXpNeeded,
+            "hpCur": this.baseHp,
+            "hpMax": this.baseHp,
+            "hpRec": this.baseHpRec,
+            "hpRecTime": this.baseHpRecTime,
+            "mpCur": this.baseMp,
+            "mpMax": this.baseMp,
+            "mpRec": 0,
+            "mpRecTime": 0,
+            "atk": this.baseAtk,
+            "def": this.baseDef,
+            "str": 0,
+            "dex": 0,
+            "int": 0,
+            "fort": 0,
+            "statpts": 5,
+            "coins": 0,
+            "inventory": {},
+            "exploreEndTime": Date.now(),
+            "exploreStartTime": Date.now(),
+            "lastRecoveryTime": Date.now()
+        };
+        this.playerData = playerStats;
+    };
+    RogueGame.prototype.updatePlayerStats = function () {
+        // Increase max hp by 1 for every point in fort, and 1 extra for every 5 points in fort and  10 points in str
+        this.playerData.hpMax = this.baseHp + this.playerData.fort + Math.floor(this.playerData.fort / 5) + Math.floor(this.playerData.str / 10);
+        // Increase hpRec by 1 for every 5 points in fort and 1 extra for every 10 points
+        this.playerData.hpRec = this.baseHpRec + Math.floor(this.playerData.fort / 5) + Math.floor(this.playerData.fort / 10);
+        // Reduce rec time by 10% for every 5 poins in dex and every 10 points in int up to 5 second, increases by 5% for every 1 point over base hprec
+        this.playerData.hpRecTime = Math.round(this.baseHpRecTime *
+            (1 - (Math.floor(this.playerData.dex / 5) * 0.1) - (Math.floor(this.playerData.int / 10) * 0.1) + ((this.playerData.hpRec - this.baseHpRec) * 0.05)));
+        console.log((Math.floor(this.playerData.dex / 5) * 0.1), (Math.floor(this.playerData.int / 10) * 0.1), ((this.playerData.hpRec - this.baseHpRec) * 0.05));
+        // Add logic for mp:
+        // Increase attack by 10% for each point in strength
+        this.playerData.atk = Math.round(this.baseAtk * ((this.playerData.str * 0.1) + 1));
+        // Increase defence by 10% for each point in fortitude
+        this.playerData.def = Math.round(this.baseDef * ((this.playerData.fort * 0.1) + 1));
     };
     return RogueGame;
 }());

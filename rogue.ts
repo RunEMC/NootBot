@@ -54,8 +54,10 @@ export class RogueGame {
   }
 
   public runGame() {
+    // Init playerData
+    this.playerData = this.players[this.username];
     // Check if player exists in json, if not, make new player character
-    if (this.playerData !== undefined) {
+    if (this.playerData === undefined) {
       this.createNewChar();
     }
     else {
@@ -117,16 +119,17 @@ export class RogueGame {
         if (this.cmdArray.length > 1) {
           if (matchCase(this.cmdArray[1], "allocate")) { // Assign skillpoints
             if (this.cmdArray.length > 2) { // If !rg stats allocate
-              if (["str", "dex", "int", "fort"].indexof(this.cmdArray[2]) !== -1) {
+              if (["str", "dex", "int", "fort"].indexOf(this.cmdArray[2]) !== -1) {
                 if (this.cmdArray.length > 3) {
-                  if (typeof this.cmdArray[3] === "number" && this.cmdArray[3] > 0 && this.cmdArray[3] <= this.playerData.statpts) {
-                    this.playerData[this.cmdArray[2]]+=this.cmdArray[3];
-                    this.playerData.statpts-=this.cmdArray[3];
+                  var amnt = parseInt(this.cmdArray[3])
+                  if (amnt > 0 && amnt <= this.playerData.statpts) {
+                    this.playerData[this.cmdArray[2]]+=amnt;
+                    this.playerData.statpts-=amnt;
                     // Increase atk/def/hp/etc. based on stat points
                     this.updatePlayerStats();
                     this.getPlayerStats();
                   }
-                  else if (this.cmdArray[3] <= this.playerData.statpts) {
+                  else if (amnt > this.playerData.statpts) {
                     this.returnMsg += "You do not have that many points to use!\n";
                   }
                   else {
@@ -144,6 +147,9 @@ export class RogueGame {
             else { // nothing after !rg stats allocate
               this.returnMsg += "Please enter a stat and the amount, example usage: !rg stats allocate str 2\n";
             }
+          }
+          else {
+            this.returnMsg += "Invalid command, usage: !rg stats [allocate] [str/dex/int/fort] [amount]\n";
           }
         }
         else {
@@ -368,13 +374,15 @@ export class RogueGame {
     // Increase hpRec by 1 for every 5 points in fort and 1 extra for every 10 points
     this.playerData.hpRec = this.baseHpRec + Math.floor(this.playerData.fort / 5) + Math.floor(this.playerData.fort / 10);
     // Reduce rec time by 10% for every 5 poins in dex and every 10 points in int up to 5 second, increases by 5% for every 1 point over base hprec
-    this.playerData.hpRecTime = this.baseHpRecTime * (1 - (Math.floor(this.playerData.dex / 5) * 0.1) - (Math.floor(this.playerData.int / 10) * 0.1) + ((playerData.hpRec - playerData.baseHpRec) * 0.05));
+    this.playerData.hpRecTime = Math.round(this.baseHpRecTime *
+    (1 - (Math.floor(this.playerData.dex / 5) * 0.1) - (Math.floor(this.playerData.int / 10) * 0.1) + ((this.playerData.hpRec - this.baseHpRec) * 0.05)));
+    console.log((Math.floor(this.playerData.dex / 5) * 0.1),(Math.floor(this.playerData.int / 10) * 0.1),((this.playerData.hpRec - this.baseHpRec) * 0.05));
     // Add logic for mp:
 
     // Increase attack by 10% for each point in strength
-    this.playerData.atk = this.baseAtk * ((this.playerData.str * 0.1) + 1);
+    this.playerData.atk = Math.round(this.baseAtk * ((this.playerData.str * 0.1) + 1));
     // Increase defence by 10% for each point in fortitude
-    this.playerData.def = this.baseDef * ((this.playerData.fort * 0.1) + 1);
+    this.playerData.def = Math.round(this.baseDef * ((this.playerData.fort * 0.1) + 1));
   }
 }
 
