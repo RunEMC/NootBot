@@ -5,8 +5,8 @@ var millisecondsInSecond = 1000;
 var RogueGame = /** @class */ (function () {
     function RogueGame(cmdArray, username) {
         // Return Msg
-        this.returnMsg = "```";
-        this.exploreLog = "```";
+        this.returnMsg = "```\n";
+        this.exploreLog = "";
         // Players' Data
         this.playersFile = 'roguedata/player_stats.json';
         this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
@@ -72,12 +72,16 @@ var RogueGame = /** @class */ (function () {
                                         "Grassy Fields (lvl 1) - [grassyfields]";
                             }
                             else {
+                                // Init fields
+                                this.exploreLog = "```";
                                 this.locationData = this.locations[this.location];
                                 this.mobs = this.locationData.mobs;
                                 this.items = this.locationData.items;
                                 // Begin exploring the location
                                 this.exploreLog += "--------------------" + this.locationData.displayName + "--------------------\n";
                                 this.explore();
+                                // Finish explorelog block
+                                this.exploreLog += "```";
                             }
                         }
                         else {
@@ -163,7 +167,6 @@ var RogueGame = /** @class */ (function () {
         });
         // Append return messages
         this.returnMsg += "```";
-        this.exploreLog += "```";
         return "sendMessage";
     };
     RogueGame.prototype.explore = function () {

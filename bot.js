@@ -153,7 +153,8 @@ bot.on('message', message => {
     }
     else {
       msg = rogueGame.getReturnMsg();
-      rogueGameLog = rogueGame.getExploreLog();
+      // Set the explore log if it is not nothing
+      if (rogueGame.getExploreLog() != "") rogueGameLog = rogueGame.getExploreLog();
     }
     // Send message
     message.channel.send(msg);

@@ -7,8 +7,8 @@ export class RogueGame {
   cmdArray:Array<string>;
   username:string;
   // Return Msg
-  returnMsg:string = "```";
-  exploreLog:string = "```";
+  returnMsg:string = "```\n";
+  exploreLog:string = "";
   // Players' Data
   playersFile = 'roguedata/player_stats.json';
   players = jsonfile.readFileSync(this.playersFile); //Read/Write
@@ -81,12 +81,16 @@ export class RogueGame {
                 "Grassy Fields (lvl 1) - [grassyfields]";
               }
               else { // Location name is valid
+                // Init fields
+                this.exploreLog = "```";
                 this.locationData = this.locations[this.location];
                 this.mobs = this.locationData.mobs;
                 this.items = this.locationData.items;
                 // Begin exploring the location
                 this.exploreLog += "--------------------"+this.locationData.displayName+"--------------------\n"
                 this.explore();
+                // Finish explorelog block
+                this.exploreLog += "```";
               }
             }
             else {
@@ -172,7 +176,6 @@ export class RogueGame {
     });
     // Append return messages
     this.returnMsg += "```";
-    this.exploreLog += "```";
     return "sendMessage";
   }
 
