@@ -54,7 +54,7 @@ export class SHGame {
 
       }
       else if (firstWord === "stats") {
-
+        this.returnMsg += this.getPlayerStats();
       }
       else {
         if (this.playerData.inLobby) { // Make sure the player is in a lobby
@@ -93,7 +93,16 @@ export class SHGame {
   }
 
   private getPlayerStats() {
-    this.returnMsg +=
-    "--------------------"+playerData.name+"'s Stats--------------------\n";
+    stats =
+    "--------------------"+playerData.name+"'s Stats--------------------\n"+
+    "Games Played: "+playerData.gamesPlayed+"\n"+
+    "Wins: "+playerData.wins+"\n"+
+    "Loses: "+playerData.loses+"\n"+
+    "Times Liberal: "+playerData.liberalTimes+"\n";
+    if (playerData.inLobby) {
+      msg+="Current Lobby: "+playerData.lobbyName+"\n";
+    }
+
+    return stats;
   }
 }
