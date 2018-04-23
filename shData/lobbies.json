@@ -3,8 +3,20 @@
     "name":"testLobby",
     "displayName":"Test Lobby",
     "players": [
-      102843741234,
-      102843741235
+      {
+        "0": {
+          "name":"RunEMC",
+          "id":"102843741234",
+          "affil":"liberal",
+          "sh?":false
+        },
+        "1": {
+          "name":"Test",
+          "id":"102843741235",
+          "affil":"fas",
+          "sh?":true
+        }
+      }
     ],
     "started": "false"
   },
