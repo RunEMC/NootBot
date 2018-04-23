@@ -105,7 +105,8 @@ export class RogueGame {
         else { // If no area chosen
           this.returnMsg +=
           "------Explorable Locations (!rg explore [location])------\n" +
-          "Grassy Fields (lvl 1) - [grassyfields]";
+          "Grassy Fields (lvl 1) - [grassyfields]\n"+
+          "Saffron Hills (lvl 6) - [saffronhills]\n";
         }
       }
       else if (matchCase(this.cmdArray[0], "log")) { // If !rg log
@@ -163,10 +164,12 @@ export class RogueGame {
       }
     }
     else { // Handles no parameters (just !rg)
-      this.returnMsg += "--------------------Commands--------------------\n"+
-                  " - !rg explore [area]: Explore an area.\n"+
-                  " - !rg help: Info on the game.\n"+
-                  " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
+      this.returnMsg +=
+      "--------------------Commands--------------------\n"+
+      " - !rg explore [area]: Explore an area.\n"+
+      " - !rg log: Check the explore log.\n"+
+      " - !rg help: Info on the game.\n"+
+      " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
     }
 
     // Write to file
