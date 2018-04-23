@@ -72,7 +72,7 @@ export class SHGame {
               this.returnMsg += "Invalid lobby name, usage ex: !sh lobby create My_Lobby\n";
             }
           }
-          if (secondWord === "join") {
+          else if (secondWord === "join") {
             if (thirdWord !== undefined) {
               this.joinLobby(thirdWord);
             }
@@ -80,13 +80,16 @@ export class SHGame {
               this.returnMsg += "Invalid lobby name, usage ex: !sh lobby join My_Lobby\n";
             }
           }
+          else if (secondWord === "leave") {
+            this.leaveLobby();
+          }
         }
         else { // Display the list of lobbies
           this.returnMsg +=
           "--------------------Lobbies--------------------\n";
           for (var lobbyID in this.lobbies) {
             var lobby = this.lobbies[lobbyID];
-            this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":"Not Started")+") {"+lobby.players.length+"/"+_maxPlayers+"}: \n";
+            this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":lobby.players.length+"/"+_maxPlayers)+"): \n";
             for (var playerID = 0; playerID < lobby.players.length; playerID++) {
               this.returnMsg += "\t- "+lobby.players[playerID].name+"\n";
             }
@@ -143,7 +146,7 @@ export class SHGame {
   }
 
   private createNewLobby(lobbyName) {
-    if (lobbyData !== undefined) {
+    if (this.playerData.inLobby === true) {
       this.returnMsg += "Lobby "+lobbyName+" already exists!\n";
     }
     else {
@@ -164,7 +167,7 @@ export class SHGame {
   }
 
   private joinLobby(lobbyName) {
-    if (this.lobbyData !== undefined) {
+    if (this.playerData.inLobby === true) {
       if (this.lobbyData.players.length <= _maxPlayers) {
         var player = {
           "name":this.playerData.name,
@@ -182,6 +185,24 @@ export class SHGame {
     }
     else {
       this.createNewLobby(lobbyName);
+    }
+  }
+
+  private leaveLobby() {
+    if (this.playerData.inLobby === true) {
+      if (this.playerData.inGame === false) {
+        var playerPos = findObjInArray(this.playerData.id, "id", this.lobbyData.players);
+        this.lobbyData.players.splice(playerPos, 1);
+
+        this.playerData.inLobby = false;
+        this.playerData.lobbyName = "";
+      }
+      else {
+        returnMsg += "You are currently in a game\n";
+      }
+    }
+    else {
+      returnMsg += "You are not currently in a lobby\n";
     }
   }
 
