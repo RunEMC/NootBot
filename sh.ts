@@ -1,5 +1,7 @@
 import * as jsonfile from 'jsonfile';
 
+const _maxPlayers = 8;
+
 export class SHGame {
   // Message Info
   cmdArray:Array<string>;
@@ -27,15 +29,16 @@ export class SHGame {
     // Init lobby info
     this.lobbiesFile = 'shData/lobbies.json';
     this.lobbies = jsonfile.readFileSync(this.lobbiesFile);
-    this.lobbyData = this.lobbies[this.playerData.lobbyID];
+    this.lobbyData = this.lobbies[this.playerData.lobbyName];
     // Init game info
     this.returnMsg = "```\n";
     this.cmdsList =
     "--------------------General Commands--------------------\n"+
     "!sh help: Check the game info\n"+
     "!sh stats: Check your stats\n"+
-    "!sh lobby join [Lobby ID]: Joins a game lobby\n"+
+    "!sh lobby join [Lobby Name]: Joins a game lobby, creates a new one if it doesn't exist\n"+
     "!sh lobby create [Lobby Name]: Create a new game lobby, make sure that the lobby name is one word\n"+
+    "!sh lobby leave: Leave your current lobby\n"+
     "!sh lobby: View a list of existing lobbies\n"+
     "!sh start: Starts a new game of sh (must be in a lobby with min. 5 people)\n"+
     "--------------------In-Game Commands--------------------\n"+
@@ -60,8 +63,8 @@ export class SHGame {
       else if (firstWord === "lobby") {
         var secondWord = this.cmdArray[1];
         if (secondWord !== undefined) {
+          var thirdWord = this.cmdArray[2];
           if (secondWord === "create") {
-            var thirdWord = this.cmdArray[2];
             if (thirdWord !== undefined) {
               this.createNewLobby(thirdWord);
             }
@@ -70,7 +73,12 @@ export class SHGame {
             }
           }
           if (secondWord === "join") {
-
+            if (thirdWord !== undefined) {
+              this.joinLobby(thirdWord);
+            }
+            else {
+              this.returnMsg += "Invalid lobby name, usage ex: !sh lobby join My_Lobby\n";
+            }
           }
         }
         else { // Display the list of lobbies
@@ -78,7 +86,7 @@ export class SHGame {
           "--------------------Lobbies--------------------\n";
           for (var lobbyID in this.lobbies) {
             var lobby = this.lobbies[lobbyID];
-            this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":"Not Started")+"): \n";
+            this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":"Not Started")+") {"+lobby.players.length+"/"+_maxPlayers+"}: \n";
             for (var playerID = 0; playerID < lobby.players.length; playerID++) {
               this.returnMsg += "\t- "+lobby.players[playerID].name+"\n";
             }
@@ -88,7 +96,7 @@ export class SHGame {
       else {
         if (this.playerData.inLobby) { // Make sure the player is in a lobby
           if (firstWord === "start") {
-            var lobbyID = this.playerData.lobbyID;
+            var lobbyName = this.playerData.lobbyName;
             var players = this.lobbyData.players;
             if (players.length >= 5) {
               this.lobbyData.started = true;
@@ -115,7 +123,7 @@ export class SHGame {
     jsonfile.writeFile(this.playersFile, this.players, function (err) {
       if (err) console.error("Write error: " + err);
     });
-    this.lobbies[this.playerData.lobbyID] = this.lobbyData;
+    this.lobbies[this.playerData.lobbyName] = this.lobbyData;
     jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
       if (err) console.error("Write error: " + err);
     });
@@ -135,7 +143,7 @@ export class SHGame {
   }
 
   private createNewLobby(lobbyName) {
-    if (lobbie[lobbyName] !== undefined) {
+    if (lobbyData !== undefined) {
       this.returnMsg += "Lobby "+lobbyName+" already exists!\n";
     }
     else {
@@ -144,15 +152,37 @@ export class SHGame {
         "started":false,
         "players": [
           {
-              "name":this.playerData.name,
-              "id":this.playerData.id,
-              "affil":"unassigned",
-              "sh":false
+            "name":this.playerData.name,
+            "id":this.playerData.id,
+            "affil":"unassigned",
+            "sh":false
           }
         ]
       }
+      this.lobbies[lobbyName] = lobby;
     }
   }
 
+  private joinLobby(lobbyName) {
+    if (this.lobbyData !== undefined) {
+      if (this.lobbyData.players.length <= _maxPlayers) {
+        var player = {
+          "name":this.playerData.name,
+          "id":this.playerData.id,
+          "affil":"unassigned",
+          "sh":false
+        }
+        this.lobbyData.players.push(player);
+        this.playerData.inLobby = true;
+        this.playerData.lobbyName = lobbyName;
+      }
+      else {
+        this.returnMsg+="This lobby is full\n";
+      }
+    }
+    else {
+      this.createNewLobby(lobbyName);
+    }
+  }
 
 }
