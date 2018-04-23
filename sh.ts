@@ -34,16 +34,17 @@ export class SHGame {
     "--------------------General Commands--------------------\n"+
     "!sh help: Check the game info\n"+
     "!sh stats: Check your stats\n"+
-    "!sh lobby join [Lobby Name]: Joins a game lobby\n"+
-    "!sh lobby create [Lobby Name]: Create a new game lobby\n"+
+    "!sh lobby join [Lobby ID]: Joins a game lobby\n"+
+    "!sh lobby create [Lobby Name]: Create a new game lobby, make sure that the lobby name is one word\n"+
     "!sh lobby: View a list of existing lobbies\n"+
     "!sh start: Starts a new game of sh (must be in a lobby with min. 5 people)\n"+
     "--------------------In-Game Commands--------------------\n"+
     "!sh info: Check your role and affiliation\n"+
-    "!sh choose [chancellor/president] [user ID]: Choose your chancellor or president\n"+
+    "!sh choose [chancellor/president] [User ID]: Choose your chancellor or president\n"+
     "!sh vote [yes/no]: Vote on the chancellor (please PM this to the bot)\n"+
     "!sh discard [policy number]: Discard the coresponding policy (If you are the chancellor, the non-discarded policy will be played)\n"+
     "!sh accuse: \n"+
+    "!sh log: Displays the events that have occured until now\n"+
     "!sh endturn: Find out who we are still waiting on\n";
   }
 
@@ -59,16 +60,29 @@ export class SHGame {
       else if (firstWord === "lobby") {
         var secondWord = this.cmdArray[1];
         if (secondWord !== undefined) {
-          // Add logic to join/create lobbies
+          if (secondWord === "create") {
+            var thirdWord = this.cmdArray[2];
+            if (thirdWord !== undefined) {
+              this.createNewLobby(thirdWord);
+            }
+            else {
+              this.returnMsg += "Invalid lobby name, usage ex: !sh lobby create My_Lobby\n";
+            }
+          }
+          if (secondWord === "join") {
+
+          }
         }
         else { // Display the list of lobbies
           this.returnMsg +=
           "--------------------Lobbies--------------------\n";
           for (var lobbyID in this.lobbies) {
             var lobby = this.lobbies[lobbyID];
-            this.returnMsg += lobby.name+" ("+(lobby.started?"Started":"Not Started")+"): "
+            this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":"Not Started")+"): \n";
+            for (var playerID = 0; playerID < lobby.players.length; playerID++) {
+              this.returnMsg += "\t- "+lobby.players[playerID].name+"\n";
+            }
           }
-
         }
       }
       else {
@@ -117,7 +131,28 @@ export class SHGame {
     if (playerData.inLobby) {
       msg+="Current Lobby: "+playerData.lobbyName+"\n";
     }
-
     return stats;
   }
+
+  private createNewLobby(lobbyName) {
+    if (lobbie[lobbyName] !== undefined) {
+      this.returnMsg += "Lobby "+lobbyName+" already exists!\n";
+    }
+    else {
+      var lobby = {
+        "name":lobbyName,
+        "started":false,
+        "players": [
+          {
+              "name":this.playerData.name,
+              "id":this.playerData.id,
+              "affil":"unassigned",
+              "sh":false
+          }
+        ]
+      }
+    }
+  }
+
+
 }
