@@ -186,3 +186,14 @@ export class SHGame {
   }
 
 }
+
+
+// Finds the position of an object containing val as it's value for a certain field
+function findObjInArray(val, field, arr) {
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i][field] === val) {
+      return i;
+    }
+  }
+  return -1;
+}
