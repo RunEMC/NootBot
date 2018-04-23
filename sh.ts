@@ -40,7 +40,7 @@ export class SHGame {
     "!sh start: Starts a new game of sh (must be in a lobby with min. 5 people)\n"+
     "--------------------In-Game Commands--------------------\n"+
     "!sh info: Check your role and affiliation\n"+
-    "!sh choose [chancellor/president] [username]: Choose your chancellor or president\n"+
+    "!sh choose [chancellor/president] [user ID]: Choose your chancellor or president\n"+
     "!sh vote [yes/no]: Vote on the chancellor (please PM this to the bot)\n"+
     "!sh discard [policy number]: Discard the coresponding policy (If you are the chancellor, the non-discarded policy will be played)\n"+
     "!sh accuse: \n"+
@@ -50,11 +50,26 @@ export class SHGame {
   public processCommand() {
     var firstWord = this.cmdArray[0];
     if (firstWord !== undefined) {
-      if (firstWord === "lobby") {
-
-      }
-      else if (firstWord === "stats") {
+      if (firstWord === "stats") {
         this.returnMsg += this.getPlayerStats();
+      }
+      else if (firstWord === "help") {
+        this.returnMsg = this.gameInfo + "\n" + this.cmdsList;
+      }
+      else if (firstWord === "lobby") {
+        var secondWord = this.cmdArray[1];
+        if (secondWord !== undefined) {
+          // Add logic to join/create lobbies
+        }
+        else { // Display the list of lobbies
+          this.returnMsg +=
+          "--------------------Lobbies--------------------\n";
+          for (var lobbyID in this.lobbies) {
+            var lobby = this.lobbies[lobbyID];
+            this.returnMsg += lobby.name+" ("+(lobby.started?"Started":"Not Started")+"): "
+          }
+
+        }
       }
       else {
         if (this.playerData.inLobby) { // Make sure the player is in a lobby
