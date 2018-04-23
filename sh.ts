@@ -3,7 +3,7 @@ import * as jsonfile from 'jsonfile';
 export class SHGame {
   // Message Info
   cmdArray:Array<string>;
-  username:string;
+  author:Object;
   // Game Info
   cmdsList:string;
   gameInfo:string;
@@ -17,13 +17,13 @@ export class SHGame {
   lobbies:Object; //Read/Write
   lobbyData:Object;
 
-  constructor(cmdArray, username) {
+  constructor(cmdArray, author) {
     this.cmdArray = cmdArray;
-    this.username = username;
+    this.author = author;
     // Init player info
     this.playersFile = 'shData/players.json';
     this.players = jsonfile.readFileSync(this.playersFile);
-    this.playerData = this.players[username];
+    this.playerData = this.players[author.id];
     // Init lobby info
     this.lobbiesFile = 'shData/lobbies.json';
     this.lobbies = jsonfile.readFileSync(this.lobbiesFile);
@@ -63,9 +63,10 @@ export class SHGame {
             var players = this.lobbyData.players;
             if (players.length >= 5) {
               this.lobbyData.started = true;
+              this.playerData.inGame = true;
             }
             else {
-              this.returnMsg += "Not enough players to start the game (currently: "+players.length+")";
+              this.returnMsg += "Not enough players to start the game (currently: "+players.length+")\n";
             }
           }
         }
@@ -81,13 +82,18 @@ export class SHGame {
     // Finish msg block
     this.returnMsg += "```\n";
     // Update player/lobby json files
-    this.players[this.username] = this.playerData;
+    this.players[this.author.id] = this.playerData;
     jsonfile.writeFile(this.playersFile, this.players, function (err) {
       if (err) console.error("Write error: " + err);
     });
-    this.lobbies[this.username] = this.lobbyData;
+    this.lobbies[this.playerData.lobbyID] = this.lobbyData;
     jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
       if (err) console.error("Write error: " + err);
     });
+  }
+
+  private getPlayerStats() {
+    this.returnMsg +=
+    "--------------------"+playerData.name+"'s Stats--------------------\n";
   }
 }

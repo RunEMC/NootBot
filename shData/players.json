@@ -8,6 +8,7 @@
     "liberalTimes":0,
     "inLobby":true,
     "lobbyName":"testLobby",
-    "lobbyID":"0"
+    "lobbyID":"0",
+    "inGame":false
   }
 }

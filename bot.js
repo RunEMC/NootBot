@@ -36,6 +36,7 @@ var rogueGameLog;
 bot.on('message', message => {
   // var authUser = Sanitizer.sanitize(message.author.username);
   var authUser = message.author.username;
+  var msgAuthor = message.author;
   var vChan;
 
   if (message.content === 'ping') {
@@ -165,7 +166,7 @@ bot.on('message', message => {
     var cmd = message.content.split(" ");
     cmd.splice(0, 1);
 
-    var sHGame = new SHGame(cmd, authUser);
+    var sHGame = new SHGame(cmd, msgAuthor);
     var response = sHGame.processCommand();
     // // Check response
     // if (response === "sendLog") {
