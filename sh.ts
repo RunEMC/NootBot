@@ -9,19 +9,26 @@ export class SHGame {
   gameInfo:string;
   returnMsg:string;
   // Players' Data
-  playersFile:string = 'shData/players.json';
-  players:Object = jsonfile.readFileSync(this.playersFile); //Read/Write
+  playersFile:string;
+  players:Object; //Read/Write
   playerData:Object;
   // Lobbies' Data
-  lobbiesFile:string = 'shData/lobbies.json';
-  lobbies:Object = jsonfile.readFileSync(this.lobbiesFile); //Read/Write
+  lobbiesFile:string;
+  lobbies:Object; //Read/Write
   lobbyData:Object;
 
   constructor(cmdArray, username) {
     this.cmdArray = cmdArray;
     this.username = username;
-    // Init game info
+    // Init player info
+    this.playersFile = 'shData/players.json';
+    this.players = jsonfile.readFileSync(this.playersFile);
     this.playerData = this.players[username];
+    // Init lobby info
+    this.lobbiesFile = 'shData/lobbies.json';
+    this.lobbies = jsonfile.readFileSync(this.lobbiesFile);
+    this.lobbyData = this.lobbies[this.playerData.lobbyID];
+    // Init game info
     this.returnMsg = "```\n";
     this.cmdsList =
     "--------------------General Commands--------------------\n"+
@@ -52,12 +59,18 @@ export class SHGame {
       else {
         if (this.playerData.inLobby) { // Make sure the player is in a lobby
           if (firstWord === "start") {
-            var lobby = this.playerData.lobbyID;
-            if ()
+            var lobbyID = this.playerData.lobbyID;
+            var players = this.lobbyData.players;
+            if (players.length >= 5) {
+              this.lobbyData.started = true;
+            }
+            else {
+              this.returnMsg += "Not enough players to start the game (currently: "+players.length+")";
+            }
           }
         }
         else {
-          this.returnMsg += "Invalid command, or you are currently not in a lobby. Use !sh help for game info and the commands list\n";
+          this.returnMsg += "Invalid command or you are currently not in a lobby. Use !sh help for game info and the commands list\n";
         }
       }
     }
@@ -65,6 +78,16 @@ export class SHGame {
       this.returnMsg += this.cmdsList;
     }
 
+    // Finish msg block
     this.returnMsg += "```\n";
+    // Update player/lobby json files
+    this.players[this.username] = this.playerData;
+    jsonfile.writeFile(this.playersFile, this.players, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
+    this.lobbies[this.username] = this.lobbyData;
+    jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
   }
 }
