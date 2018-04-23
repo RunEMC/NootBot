@@ -1,0 +1,13 @@
+{
+  "lobbies": [
+    {
+      "name":"testLobby",
+      "displayName":"Test Lobby",
+      "players": [
+        102843741234,
+        102843741235
+      ],
+      "started": "false"
+    },
+  ]
+}

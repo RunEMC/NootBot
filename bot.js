@@ -159,6 +159,26 @@ bot.on('message', message => {
     // Send message
     message.channel.send(msg);
   }
+  else if (message.content.startsWith('!sh')) {
+    var msg = "";
+
+    var cmd = message.content.split(" ");
+    cmd.splice(0, 1);
+
+    var sHGame = new SHGame(cmd, authUser);
+    var response = sHGame.processCommand();
+    // // Check response
+    // if (response === "sendLog") {
+    //   msg = rogueGameLog;
+    // }
+    // else {
+    //   msg = rogueGame.getReturnMsg();
+    //   // Set the explore log if it is not nothing
+    //   if (rogueGame.getExploreLog() != "") rogueGameLog = rogueGame.getExploreLog();
+    // }
+    // // Send message
+    message.channel.send(msg);
+  }
   else if (message.content.startsWith('encounter')) {
     var msg = "";
 

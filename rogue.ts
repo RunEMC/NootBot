@@ -272,7 +272,7 @@ export class RogueGame {
               // Increase player level and reset current exp
               this.playerData.level++;
               this.playerData.expCur -= this.playerData.expNext;
-              // Gain 1 skill points each level, 3 every 5 levels and 5 every 10 levels
+              // Gain 1 stats points each level, 3 every 5 levels and 5 every 10 levels
               if (this.playerData.level % 10 === 0) {
                 this.playerData.statpts+=5;
               }
