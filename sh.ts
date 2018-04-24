@@ -108,8 +108,7 @@ export class SHGame {
             var lobbyName = this.playerData.lobbyName;
             var players = this.lobbyData.players;
             if (players.length >= 5) {
-              this.lobbyData.started = true;
-              this.playerData.inGame = true;
+              this.startGame();
             }
             else {
               this.returnMsg += "Not enough players to start the game (currently: "+players.length+")\n";
@@ -148,7 +147,11 @@ export class SHGame {
       "liberalTimes":0,
       "inLobby":false,
       "lobbyName":"",
-      "inGame":false
+      "inGame":false,
+      "gameData": {
+        "affiliation":"unassigned",
+        "sh":false
+      }
     }
     this.playerData = player;
   }
@@ -174,14 +177,7 @@ export class SHGame {
       var lobby = {
         "name":lobbyName,
         "started":false,
-        "players": [
-          {
-            "name":this.playerData.name,
-            "id":this.playerData.id,
-            "affil":"unassigned",
-            "sh":false
-          }
-        ]
+        "players": [this.playerData]
       }
       this.lobbies[lobbyName] = lobby;
 
@@ -192,13 +188,7 @@ export class SHGame {
   private joinLobby(lobbyName) {
     if (this.playerData.inLobby === true) {
       if (this.lobbyData.players.length <= _maxPlayers) {
-        var player = {
-          "name":this.playerData.name,
-          "id":this.playerData.id,
-          "affil":"unassigned",
-          "sh":false
-        }
-        this.lobbyData.players.push(player);
+        this.lobbyData.players.push(this.playerData);
         this.playerData.inLobby = true;
         this.playerData.lobbyName = lobbyName;
 
@@ -232,6 +222,10 @@ export class SHGame {
     else {
       this.returnMsg += "You are not currently in a lobby\n";
     }
+  }
+
+  private startGame() {
+
   }
 
 }

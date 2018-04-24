@@ -1,1 +1,13 @@
-{"171429655008509954":{"name":"RunEMC","id":"171429655008509954","gamesPlayed":0,"wins":0,"loses":0,"liberalTimes":0,"inLobby":false,"lobbyName":"","inGame":false}}
+{
+  "171429655008509954":{
+    "name":"RunEMC",
+    "id":"171429655008509954",
+    "gamesPlayed":0,
+    "wins":0,
+    "loses":0,
+    "liberalTimes":0,
+    "inLobby":false,
+    "lobbyName":"",
+    "inGame":false
+    }
+  }
