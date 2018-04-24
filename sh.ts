@@ -54,6 +54,7 @@ export class SHGame {
   public getReturnMsg() {
     return this.returnMsg;
   }
+  
 
   public processCommand() {
     var firstWord = this.cmdArray[0];
