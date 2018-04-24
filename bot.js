@@ -1,4 +1,4 @@
-// import * as RogueGamet from './roguetest.js';
+// import * as RogueGamet from './roguetest';
 
 const Discord = require('discord.js');
 const botToken = require('./botToken.json');
@@ -38,6 +38,7 @@ bot.on('message', message => {
   // var authUser = Sanitizer.sanitize(message.author.username);
   var authUser = message.author.username;
   var msgAuthor = message.author;
+  var serverGuild = message.channel.guild;
   var vChan = message.member.voiceChannel;;
 
   if (message.content === 'ping') {
@@ -167,7 +168,7 @@ bot.on('message', message => {
     var cmd = message.content.split(" ");
     cmd.splice(0, 1);
 
-    var sHGame = new SHGame(cmd, msgAuthor);
+    var sHGame = new SHGame(cmd, msgAuthor, serverGuild);
     var response = sHGame.processCommand();
     msg = sHGame.getReturnMsg();
     // // Check response

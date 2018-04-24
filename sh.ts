@@ -1,4 +1,5 @@
 import * as jsonfile from 'jsonfile';
+import * as Discord from 'discord';
 
 const _maxPlayers = 10;
 
@@ -6,6 +7,7 @@ export class SHGame {
   // Message Info
   cmdArray:Array<string>;
   author;
+  server;
   // Game Info
   cmdsList:string;
   gameInfo:string;
@@ -19,9 +21,10 @@ export class SHGame {
   lobbies; //Read/Write
   lobbyData;
 
-  constructor(cmdArray, author) {
+  constructor(cmdArray, author, server) {
     this.cmdArray = cmdArray;
     this.author = author;
+    this.server = server;
     // Init player info
     this.playersFile = 'shData/players.json';
     this.players = jsonfile.readFileSync(this.playersFile);
@@ -225,6 +228,7 @@ export class SHGame {
   }
 
   private startGame() {
+    this.lobbyData.started = true;
     // Assign affiliation
     // Lib-to-players: floor((players + 2) / 2 )
     // Players: 5   6   7   8   9   10
