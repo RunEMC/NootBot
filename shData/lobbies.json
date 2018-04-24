@@ -4,6 +4,11 @@
   "president":"",
   "chancellor":"",
   "sh":"",
+  "fasPol":0,
+  "libPol":0,
+  "stage":"",
+  "policies":[],
+  "policiesDrawn":[],
   "players":[{
     "name":"RunEMC",
     "id":"171429655008509954",

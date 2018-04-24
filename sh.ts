@@ -2,6 +2,11 @@ import * as jsonfile from 'jsonfile';
 import * as Discord from 'discord';
 
 const _maxPlayers = 10;
+const _defaultPolicies = [
+  "f","f","f","f","f","f","f","f","f","f","f",
+  "l","l","l","l","l","l"
+] // Default: 6 Lib, 11 Fas
+const _policyDraws = 3;
 
 export class SHGame {
   // Message Info
@@ -47,7 +52,7 @@ export class SHGame {
     "!sh start: Starts a new game of sh (must be in a lobby with min. 5 people)\n"+
     "--------------------In-Game Commands--------------------\n"+
     "!sh info: Check your role and affiliation\n"+
-    "!sh choose [chancellor/president] [User ID]: Choose your chancellor or president\n"+
+    "!sh choose [chancellor/president] [User name]: Choose your chancellor or president\n"+
     "!sh vote [yes/no]: Vote on the chancellor (please PM this to the bot)\n"+
     "!sh discard [policy number]: Discard the coresponding policy (If you are the chancellor, the non-discarded policy will be played)\n"+
     "!sh accuse: \n"+
@@ -118,6 +123,28 @@ export class SHGame {
             }
             else {
               this.returnMsg += "Not enough players to start the game (currently: "+players.length+")\n";
+            }
+          }
+          else if (firstWord === "choose") {
+            var secondWord = this.cmdArray[1];
+            if (secondWord === "chancellor" && this.playerData.id === this.lobbyData.president && this.lobbyData.stage === "chooseChan") {
+              var username = this.cmdArray.splice(0,2);
+              var pos = findObjInArray(username, "name", this.lobbyData.players);
+              if (pos != -1) {
+                var playerID = this.lobbyData.players[pos].id;
+                this.lobbyData.chancellor = playerID;
+                this.lobbyData.stage = "discard1";
+                this.pickPolicies();
+              }
+              else {
+                this.returnMsg += "Invalid username\n";
+              }
+            }
+            else if (secondWord === "president") {
+
+            }
+            else {
+              this.returnMsg += "Invalid use of command\n";
             }
           }
         }
@@ -228,7 +255,10 @@ export class SHGame {
   }
 
   private startGame() {
+    // Init lobbydata
     this.lobbyData.started = true;
+    this.lobbyData.policies = _defaultPolicies.slice();
+    randomizeArray(this.lobbyData.policies); // Shuffle the array
     // Assign affiliation
     // Lib-to-players: floor((players + 2) / 2 )
     // Players: 5   6   7   8   9   10
@@ -318,6 +348,20 @@ export class SHGame {
     for (var i = 1; i < this.playerData.players) {
       this.returnMsg+=(i+1)+": "+this.playerData.players[i].name+"\n";
     }
+    this.lobbyData.stage = "chooseChan";
+  }
+
+  private pickPolicies() {
+    for (var i = 0; i < _policyDraws; i++) {
+      var policy = this.lobbyData.policies[i];
+      // Reset the draw deck if empty
+      if (policy === undefined) {
+        this.lobbyData.policies = _defaultPolicies.slice();
+        randomizeArray(this.lobbyData.policies);
+      }
+      this.lobbyData.policiesDrawn.push();
+    }
+    this.lobbyData.policies.splice(0,_policyDraws);
   }
 
 }
