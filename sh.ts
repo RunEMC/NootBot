@@ -5,19 +5,19 @@ const _maxPlayers = 8;
 export class SHGame {
   // Message Info
   cmdArray:Array<string>;
-  author:Object;
+  author;
   // Game Info
   cmdsList:string;
   gameInfo:string;
   returnMsg:string;
   // Players' Data
   playersFile:string;
-  players:Object; //Read/Write
-  playerData:Object;
+  players; //Read/Write
+  playerData;
   // Lobbies' Data
   lobbiesFile:string;
-  lobbies:Object; //Read/Write
-  lobbyData:Object;
+  lobbies; //Read/Write
+  lobbyData;
 
   constructor(cmdArray, author) {
     this.cmdArray = cmdArray;
@@ -51,6 +51,10 @@ export class SHGame {
     "!sh endturn: Find out who we are still waiting on\n";
   }
 
+  public getReturnMsg() {
+    return this.returnMsg;
+  }
+
   public processCommand() {
     var firstWord = this.cmdArray[0];
     if (firstWord !== undefined) {
@@ -58,7 +62,7 @@ export class SHGame {
         this.returnMsg += this.getPlayerStats();
       }
       else if (firstWord === "help") {
-        this.returnMsg = this.gameInfo + "\n" + this.cmdsList;
+        this.returnMsg += (this.gameInfo === undefined?"":this.gameInfo) + "\n" + this.cmdsList;
       }
       else if (firstWord === "lobby") {
         var secondWord = this.cmdArray[1];
@@ -133,14 +137,14 @@ export class SHGame {
   }
 
   private getPlayerStats() {
-    stats =
-    "--------------------"+playerData.name+"'s Stats--------------------\n"+
-    "Games Played: "+playerData.gamesPlayed+"\n"+
-    "Wins: "+playerData.wins+"\n"+
-    "Loses: "+playerData.loses+"\n"+
-    "Times Liberal: "+playerData.liberalTimes+"\n";
-    if (playerData.inLobby) {
-      msg+="Current Lobby: "+playerData.lobbyName+"\n";
+    var stats =
+    "--------------------"+this.playerData.name+"'s Stats--------------------\n"+
+    "Games Played: "+this.playerData.gamesPlayed+"\n"+
+    "Wins: "+this.playerData.wins+"\n"+
+    "Loses: "+this.playerData.loses+"\n"+
+    "Times Liberal: "+this.playerData.liberalTimes+"\n";
+    if (this.playerData.inLobby) {
+      stats+="Current Lobby: "+this.playerData.lobbyName+"\n";
     }
     return stats;
   }
@@ -198,11 +202,11 @@ export class SHGame {
         this.playerData.lobbyName = "";
       }
       else {
-        returnMsg += "You are currently in a game\n";
+        this.returnMsg += "You are currently in a game\n";
       }
     }
     else {
-      returnMsg += "You are not currently in a lobby\n";
+      this.returnMsg += "You are not currently in a lobby\n";
     }
   }
 

@@ -6,6 +6,7 @@ const botSettings = require('./botSettings.json');
 // const Sanitizer = require('sanitizer');
 //const NationGame = require('./nationgame.js');
 const RogueGame = require('./rogue.js').RogueGame;
+const SHGame = require('./sh.js').SHGame;
 
 // Create new bot client
 const bot = new Discord.Client();
@@ -37,7 +38,7 @@ bot.on('message', message => {
   // var authUser = Sanitizer.sanitize(message.author.username);
   var authUser = message.author.username;
   var msgAuthor = message.author;
-  var vChan;
+  var vChan = message.member.voiceChannel;;
 
   if (message.content === 'ping') {
     if (DEBUG) {
@@ -168,6 +169,7 @@ bot.on('message', message => {
 
     var sHGame = new SHGame(cmd, msgAuthor);
     var response = sHGame.processCommand();
+    msg = sHGame.getReturnMsg();
     // // Check response
     // if (response === "sendLog") {
     //   msg = rogueGameLog;
@@ -236,13 +238,16 @@ bot.on('message', message => {
       });
     });
   }
+  else if (message.content === 'getid') {
+    message.channel.send(msgAuthor.id);
+  }
 
 });
 
 
 function leaveChan(voiceChan) {
-  if (vChan !== undefined) {
-    vChan.leave();
+  if (voiceChan !== undefined) {
+    voiceChan.leave();
   }
 }
 
