@@ -1,5 +1,5 @@
 import * as jsonfile from 'jsonfile';
-import * as Discord from 'discord';
+import * as Discord from 'discord.js';
 
 const _maxPlayers = 10;
 const _defaultPolicies = [
@@ -131,7 +131,7 @@ export class SHGame {
               var username = this.cmdArray.splice(0,2);
               var pos = findObjInArray(username, "name", this.lobbyData.players);
               if (pos != -1) {
-                var playerID = this.lobbyData.players[pos].id;
+                var playerID:number = this.lobbyData.players[pos].id;
                 this.lobbyData.chancellor = playerID;
                 this.lobbyData.stage = "discard1";
                 this.pickPolicies();
@@ -164,10 +164,12 @@ export class SHGame {
     jsonfile.writeFile(this.playersFile, this.players, function (err) {
       if (err) console.error("Write error: " + err);
     });
-    this.lobbies[this.playerData.lobbyName] = this.lobbyData;
-    jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
-      if (err) console.error("Write error: " + err);
-    });
+    if (this.lobbyData !== undefined) {
+      this.lobbies[this.playerData.lobbyName] = this.lobbyData;
+      jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
+        if (err) console.error("Write error: " + err);
+      });
+    }
   }
 
   private createNewPlayer() {
@@ -200,7 +202,7 @@ export class SHGame {
   }
 
   private createNewLobby(lobbyName) {
-    if (this.playerData.inLobby === true) {
+    if (this.lobbies[lobbyName] !== undefined) {
       this.returnMsg += "Lobby "+lobbyName+" already exists!\n";
     }
     else {
@@ -209,14 +211,21 @@ export class SHGame {
         "started":false,
         "players": [this.playerData]
       }
+      this.lobbyData = lobby;
       this.lobbies[lobbyName] = lobby;
 
       this.returnMsg += "Lobby "+lobbyName+" created!\n";
+
+      this.joinLobby(lobbyName);
     }
   }
 
   private joinLobby(lobbyName) {
-    if (this.playerData.inLobby === true) {
+    // Leave lobby if currently in one
+    if (this.playerData.inLobby) this.leaveLobby();
+    // Set lobby data to that of new lobby if it exists
+    this.lobbyData = this.lobbies[lobbyName];
+    if (this.lobbyData !== undefined) {
       if (this.lobbyData.players.length <= _maxPlayers) {
         this.lobbyData.players.push(this.playerData);
         this.playerData.inLobby = true;
@@ -277,7 +286,7 @@ export class SHGame {
       "shID":"",
     };
 
-    for (var i = 0; i < this.lobbyData.players) {
+    for (var i = 0; i < this.lobbyData.players; i++) {
       if (libsAmt > 0) {
         this.lobbyData.players[i].affiliation = "lib";
         libsAmt--;
@@ -345,7 +354,7 @@ export class SHGame {
     // Assign president
     this.lobbyData.chancellor = this.playerData.players[0].id;
     this.returnMsg+="1: "+this.playerData.players[0].name+" (Chancellor)\n";
-    for (var i = 1; i < this.playerData.players) {
+    for (var i = 1; i < this.playerData.players; i++) {
       this.returnMsg+=(i+1)+": "+this.playerData.players[i].name+"\n";
     }
     this.lobbyData.stage = "chooseChan";

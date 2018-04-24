@@ -4,22 +4,8 @@ var jsonfile = require("jsonfile");
 var millisecondsInSecond = 1000;
 var RogueGame = /** @class */ (function () {
     function RogueGame(cmdArray, username) {
-        // Return Msg
-        this.returnMsg = "```\n";
-        this.exploreLog = "";
-        // Players' Data
-        this.playersFile = 'roguedata/player_stats.json';
-        this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
-        this.playerData = this.players[this.username];
-        // Locations' Data
-        this.locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
-        this.locationData = this.locations.grassyfields; // Tempdata, will get populated
         this.mobs = [];
         this.items = [];
-        // Mobs' Data
-        this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
-        // Items' Data
-        this.itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
         // Encounter Data
         this.mobEncounters = {};
         this.newMobEncounters = {};
@@ -35,6 +21,36 @@ var RogueGame = /** @class */ (function () {
         this.baseMp = 0;
         this.cmdArray = cmdArray;
         this.username = username;
+        // Return val
+        this.returnMsg = "```\n";
+        this.exploreLog = "";
+        // Player Data
+        this.playersFile = 'roguedata/player_stats.json';
+        this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
+        this.playerData = this.players[this.username];
+        // Various Game Data
+        this.locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
+        this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
+        this.itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
+        // Game Info
+        this.gameInfo =
+            "--------------------A rogue-like game made by RunEMC--------------------\n" +
+                "Explore, fight and gain loot. Use !rg explore [location] to explore a place.\n" +
+                "The events of the encounter can be seen with !rg log.\n" +
+                "After exploring a location, you will need to rest, the harder the location, the longer it takes\n" +
+                "Use !rg stats to see your inventory and allocate your stat points\n" +
+                "More features to come! Feel free to help contribute: https://github.com/RunEMC/NootBot \n";
+        this.cmdsList =
+            "--------------------Commands--------------------\n" +
+                " - !rg explore [area]: Explore an area.\n" +
+                " - !rg log: Check the explore log.\n" +
+                " - !rg help: Info on the game.\n" +
+                " - !rg use [item]: Use item.\n" +
+                " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.\n";
+        this.locationsList =
+            "------Explorable Locations (!rg explore [location])------\n" +
+                "Grassy Fields (lvl 1) - [grassyfields]\n" +
+                "Saffron Hills (lvl 6) - [saffronhills]\n";
     }
     RogueGame.prototype.getReturnMsg = function () {
         // console.log(this.returnMsg);
@@ -66,10 +82,7 @@ var RogueGame = /** @class */ (function () {
                             this.location = this.cmdArray[1].toLowerCase();
                             // Check that the location name is valid
                             if (this.locations[this.location] === undefined) {
-                                this.returnMsg +=
-                                    "Invalid location, use example: !rg explore grassyfields\n" +
-                                        "------Explorable Locations (!rg explore [location])------\n" +
-                                        "Grassy Fields (lvl 1) - [grassyfields]";
+                                this.returnMsg += this.locationsList;
                             }
                             else {
                                 // Init fields
@@ -94,22 +107,14 @@ var RogueGame = /** @class */ (function () {
                     }
                 }
                 else {
-                    this.returnMsg +=
-                        "------Explorable Locations (!rg explore [location])------\n" +
-                            "Grassy Fields (lvl 1) - [grassyfields]\n" +
-                            "Saffron Hills (lvl 6) - [saffronhills]\n";
+                    this.returnMsg += this.locationsList;
                 }
             }
             else if (matchCase(this.cmdArray[0], "log")) {
                 return "sendLog";
             }
             else if (matchCase(this.cmdArray[0], "help")) {
-                this.returnMsg +=
-                    "--------------------Commands--------------------\n" +
-                        " - !rg explore [area]: Explore an area.\n" +
-                        " - !rg log: Check the explore log.\n" +
-                        " - !rg help: Info on the game.\n" +
-                        " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.";
+                this.returnMsg += this.gameInfo + this.cmdsList;
             }
             else if (matchCase(this.cmdArray[0], "stats")) {
                 if (this.cmdArray.length > 1) {
@@ -155,12 +160,7 @@ var RogueGame = /** @class */ (function () {
             }
         }
         else {
-            this.returnMsg +=
-                "--------------------Commands--------------------\n" +
-                    " - !rg explore [area]: Explore an area.\n" +
-                    " - !rg log: Check the explore log.\n" +
-                    " - !rg help: Info on the game.\n" +
-                    " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.";
+            this.returnMsg += this.cmdsList;
         }
         // Write to file
         this.players[this.username] = this.playerData;
@@ -250,7 +250,7 @@ var RogueGame = /** @class */ (function () {
                             // Increase player level and reset current exp
                             this.playerData.level++;
                             this.playerData.expCur -= this.playerData.expNext;
-                            // Gain 1 skill points each level, 3 every 5 levels and 5 every 10 levels
+                            // Gain 1 stats points each level, 3 every 5 levels and 5 every 10 levels
                             if (this.playerData.level % 10 === 0) {
                                 this.playerData.statpts += 5;
                             }

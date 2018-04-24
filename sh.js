@@ -1,15 +1,23 @@
 "use strict";
 exports.__esModule = true;
 var jsonfile = require("jsonfile");
-var _maxPlayers = 8;
+var _maxPlayers = 10;
+var _defaultPolicies = [
+    "f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f",
+    "l", "l", "l", "l", "l", "l"
+]; // Default: 6 Lib, 11 Fas
+var _policyDraws = 3;
 var SHGame = /** @class */ (function () {
-    function SHGame(cmdArray, author) {
+    function SHGame(cmdArray, author, server) {
         this.cmdArray = cmdArray;
         this.author = author;
+        this.server = server;
         // Init player info
         this.playersFile = 'shData/players.json';
         this.players = jsonfile.readFileSync(this.playersFile);
         this.playerData = this.players[author.id];
+        if (this.playerData === undefined)
+            this.createNewPlayer();
         // Init lobby info
         this.lobbiesFile = 'shData/lobbies.json';
         this.lobbies = jsonfile.readFileSync(this.lobbiesFile);
@@ -27,7 +35,7 @@ var SHGame = /** @class */ (function () {
                 "!sh start: Starts a new game of sh (must be in a lobby with min. 5 people)\n" +
                 "--------------------In-Game Commands--------------------\n" +
                 "!sh info: Check your role and affiliation\n" +
-                "!sh choose [chancellor/president] [User ID]: Choose your chancellor or president\n" +
+                "!sh choose [chancellor/president] [User name]: Choose your chancellor or president\n" +
                 "!sh vote [yes/no]: Vote on the chancellor (please PM this to the bot)\n" +
                 "!sh discard [policy number]: Discard the coresponding policy (If you are the chancellor, the non-discarded policy will be played)\n" +
                 "!sh accuse: \n" +
@@ -87,12 +95,35 @@ var SHGame = /** @class */ (function () {
                     if (firstWord === "start") {
                         var lobbyName = this.playerData.lobbyName;
                         var players = this.lobbyData.players;
-                        if (players.length >= 5) {
-                            this.lobbyData.started = true;
-                            this.playerData.inGame = true;
+                        if (players.length >= 5 && !this.playerData.inGame) {
+                            this.startGame();
+                        }
+                        else if (this.playerData.inGame) {
+                            this.returnMsg += "The game has already started\n";
                         }
                         else {
                             this.returnMsg += "Not enough players to start the game (currently: " + players.length + ")\n";
+                        }
+                    }
+                    else if (firstWord === "choose") {
+                        var secondWord = this.cmdArray[1];
+                        if (secondWord === "chancellor" && this.playerData.id === this.lobbyData.president && this.lobbyData.stage === "chooseChan") {
+                            var username = this.cmdArray.splice(0, 2);
+                            var pos = findObjInArray(username, "name", this.lobbyData.players);
+                            if (pos != -1) {
+                                var playerID = this.lobbyData.players[pos].id;
+                                this.lobbyData.chancellor = playerID;
+                                this.lobbyData.stage = "discard1";
+                                this.pickPolicies();
+                            }
+                            else {
+                                this.returnMsg += "Invalid username\n";
+                            }
+                        }
+                        else if (secondWord === "president") {
+                        }
+                        else {
+                            this.returnMsg += "Invalid use of command\n";
                         }
                     }
                 }
@@ -112,11 +143,28 @@ var SHGame = /** @class */ (function () {
             if (err)
                 console.error("Write error: " + err);
         });
-        this.lobbies[this.playerData.lobbyName] = this.lobbyData;
-        jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
-            if (err)
-                console.error("Write error: " + err);
-        });
+        if (this.lobbyData !== undefined) {
+            this.lobbies[this.playerData.lobbyName] = this.lobbyData;
+            jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
+                if (err)
+                    console.error("Write error: " + err);
+            });
+        }
+    };
+    SHGame.prototype.createNewPlayer = function () {
+        var player = {
+            "name": this.author.username,
+            "id": this.author.id,
+            "gamesPlayed": 0,
+            "wins": 0,
+            "loses": 0,
+            "liberalTimes": 0,
+            "inLobby": false,
+            "lobbyName": "",
+            "inGame": false,
+            "affiliation": "unassigned"
+        };
+        this.playerData = player;
     };
     SHGame.prototype.getPlayerStats = function () {
         var stats = "--------------------" + this.playerData.name + "'s Stats--------------------\n" +
@@ -130,37 +178,33 @@ var SHGame = /** @class */ (function () {
         return stats;
     };
     SHGame.prototype.createNewLobby = function (lobbyName) {
-        if (this.playerData.inLobby === true) {
+        if (this.lobbies[lobbyName] !== undefined) {
             this.returnMsg += "Lobby " + lobbyName + " already exists!\n";
         }
         else {
             var lobby = {
                 "name": lobbyName,
                 "started": false,
-                "players": [
-                    {
-                        "name": this.playerData.name,
-                        "id": this.playerData.id,
-                        "affil": "unassigned",
-                        "sh": false
-                    }
-                ]
+                "players": [this.playerData]
             };
+            this.lobbyData = lobby;
             this.lobbies[lobbyName] = lobby;
+            this.returnMsg += "Lobby " + lobbyName + " created!\n";
+            this.joinLobby(lobbyName);
         }
     };
     SHGame.prototype.joinLobby = function (lobbyName) {
-        if (this.playerData.inLobby === true) {
+        // Leave lobby if currently in one
+        if (this.playerData.inLobby)
+            this.leaveLobby();
+        // Set lobby data to that of new lobby if it exists
+        this.lobbyData = this.lobbies[lobbyName];
+        if (this.lobbyData !== undefined) {
             if (this.lobbyData.players.length <= _maxPlayers) {
-                var player = {
-                    "name": this.playerData.name,
-                    "id": this.playerData.id,
-                    "affil": "unassigned",
-                    "sh": false
-                };
-                this.lobbyData.players.push(player);
+                this.lobbyData.players.push(this.playerData);
                 this.playerData.inLobby = true;
                 this.playerData.lobbyName = lobbyName;
+                this.returnMsg += "Joined lobby " + lobbyName + "\n";
             }
             else {
                 this.returnMsg += "This lobby is full\n";
@@ -175,8 +219,10 @@ var SHGame = /** @class */ (function () {
             if (this.playerData.inGame === false) {
                 var playerPos = findObjInArray(this.playerData.id, "id", this.lobbyData.players);
                 this.lobbyData.players.splice(playerPos, 1);
+                var lobbyName = this.playerData.lobbyName;
                 this.playerData.inLobby = false;
                 this.playerData.lobbyName = "";
+                this.returnMsg += "Left lobby " + lobbyName + "\n";
             }
             else {
                 this.returnMsg += "You are currently in a game\n";
@@ -186,9 +232,124 @@ var SHGame = /** @class */ (function () {
             this.returnMsg += "You are not currently in a lobby\n";
         }
     };
+    SHGame.prototype.startGame = function () {
+        // Init lobbydata
+        this.lobbyData.started = true;
+        this.lobbyData.policies = _defaultPolicies.slice();
+        randomizeArray(this.lobbyData.policies); // Shuffle the array
+        // Assign affiliation
+        // Lib-to-players: floor((players + 2) / 2 )
+        // Players: 5   6   7   8   9   10
+        // Libs:    3   4   4   5   5   6
+        // Fascs:   2   2   3   3   4   4
+        var playersAmt = this.lobbyData.players.length;
+        var libsAmt = Math.floor((playersAmt + 2) / 2);
+        var fasAmt = playersAmt - libsAmt;
+        randomizeArray(this.lobbyData.players);
+        var shChance = 1 / fasAmt;
+        var randNum = Math.random();
+        var fas = {
+            "players": [],
+            "playerNames": [],
+            "sh": "",
+            "shID": ""
+        };
+        for (var i = 0; i < this.lobbyData.players; i++) {
+            if (libsAmt > 0) {
+                this.lobbyData.players[i].affiliation = "lib";
+                libsAmt--;
+                // Send out PM to players
+                var affil = this.lobbyData.players[i].affiliation;
+                this.server.fetchMember(this.lobbyData.players[i].id).then(function (member) {
+                    var msg = "```\n" +
+                        "You have been assigned liberal\n" +
+                        "Work with your fellow liberals to win\n" +
+                        "```\n";
+                    member.send(msg);
+                });
+            }
+            else {
+                this.lobbyData.players[i].affiliation = "fas";
+                fasAmt--;
+                // Possibly assign sh
+                if (randNum <= shChance) {
+                    this.lobbyData.sh = this.lobbyData.players[i].id;
+                    shChance = -1;
+                    fas.shID = this.lobbyData.players[i].id;
+                    fas.sh = this.lobbyData.players[i].name;
+                    this.server.fetchMember(this.lobbyData.players[i].id).then(function (member) {
+                        var msg = "```\n" +
+                            "You are the SH!\n" +
+                            "```\n";
+                        member.send(msg);
+                    });
+                }
+                else {
+                    randNum -= shChance;
+                }
+                fas.players.push(this.lobbyData.players[i].id);
+                fas.playerNames.push(this.lobbyData.players[i].name);
+            }
+            // Update playerdata
+            this.lobbyData.players[i].inGame = true;
+            this.lobbyData.players[i].gamesPlayed = true;
+            this.players[i] = this.lobbyData.players[i];
+        }
+        // Send PM to fas of team mates
+        for (var i = 0; i < fas.players.length; i++) {
+            this.server.fetchMember(this.lobbyData.players[i].id).then(function (member) {
+                var msg = "```\n" +
+                    "You have been assigned fasc\n" +
+                    "The fascs are: \n";
+                for (var j = 0; j < fas.playerNames.length; j++) {
+                    msg += " - " + fas.playerNames[j] + "\n";
+                }
+                msg += "SH is " + fas.sh + "\n```";
+                member.send(msg);
+            });
+        }
+        // Randomize player order
+        randomizeArray(this.lobbyData.players);
+        this.returnMsg += "The order of play will be:\n";
+        // Assign president
+        this.lobbyData.chancellor = this.playerData.players[0].id;
+        this.returnMsg += "1: " + this.playerData.players[0].name + " (Chancellor)\n";
+        for (var i = 1; i < this.playerData.players; i++) {
+            this.returnMsg += (i + 1) + ": " + this.playerData.players[i].name + "\n";
+        }
+        this.lobbyData.stage = "chooseChan";
+    };
+    SHGame.prototype.pickPolicies = function () {
+        for (var i = 0; i < _policyDraws; i++) {
+            var policy = this.lobbyData.policies[i];
+            // Reset the draw deck if empty
+            if (policy === undefined) {
+                this.lobbyData.policies = _defaultPolicies.slice();
+                randomizeArray(this.lobbyData.policies);
+            }
+            this.lobbyData.policiesDrawn.push();
+        }
+        this.lobbyData.policies.splice(0, _policyDraws);
+    };
     return SHGame;
 }());
 exports.SHGame = SHGame;
+// Performs the Fisher-Yates shuffle to randomize an array in O(n) time
+function randomizeArray(arr) {
+    var m = arr.length;
+    var t;
+    var i;
+    // Go through the array
+    while (m) {
+        // Pick a random element to swap
+        i = Math.floor(Math.random() * m--);
+        // Swap the two elements
+        t = arr[m];
+        arr[m] = arr[i];
+        arr[i] = t;
+    }
+    return arr;
+}
 // Finds the position of an object containing val as it's value for a certain field
 function findObjInArray(val, field, arr) {
     for (var i = 0; i < arr.length; i++) {
