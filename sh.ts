@@ -258,6 +258,13 @@ export class SHGame {
           randNum -= shChance;
         }
       }
+      // Send out PM to players
+      this.server.fetchMember(this.lobbyData.players[i].id).then(
+        (member) => {
+          member.send("You have been assigned "+this.lobbyData.players[i].affiliation);
+        }
+      );
+
       // Update playerdata
       this.lobbyData.players[i].inGame = true;
       this.lobbyData.players[i].gamesPlayed = true;
