@@ -4,7 +4,6 @@
   "president":"",
   "chancellor":"",
   "sh":"",
-  "playerOrder":[],
   "players":[{
     "name":"RunEMC",
     "id":"171429655008509954",
@@ -14,7 +13,8 @@
     "liberalTimes":0,
     "inLobby":false,
     "lobbyName":"",
-    "inGame":false
+    "inGame":false,
+    "affiliation":"unassigned"
     }]
   }
 }

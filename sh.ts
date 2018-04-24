@@ -1,6 +1,6 @@
 import * as jsonfile from 'jsonfile';
 
-const _maxPlayers = 8;
+const _maxPlayers = 10;
 
 export class SHGame {
   // Message Info
@@ -107,8 +107,11 @@ export class SHGame {
           if (firstWord === "start") {
             var lobbyName = this.playerData.lobbyName;
             var players = this.lobbyData.players;
-            if (players.length >= 5) {
+            if (players.length >= 5 && !this.playerData.inGame) {
               this.startGame();
+            }
+            else if (this.playerData.inGame) {
+              this.returnMsg += "The game has already started\n";
             }
             else {
               this.returnMsg += "Not enough players to start the game (currently: "+players.length+")\n";
@@ -148,10 +151,7 @@ export class SHGame {
       "inLobby":false,
       "lobbyName":"",
       "inGame":false,
-      "gameData": {
-        "affiliation":"unassigned",
-        "sh":false
-      }
+      "affiliation":"unassigned"
     }
     this.playerData = player;
   }
@@ -225,14 +225,56 @@ export class SHGame {
   }
 
   private startGame() {
+    // Assign affiliation
+    // Lib-to-players: floor((players + 2) / 2 )
+    // Players: 5   6   7   8   9   10
+    // Libs:    3   4   4   5   5   6
+    // Fascs:   2   2   3   3   4   4
+    var playersAmt = this.lobbyData.players.length;
+    var libsAmt = Math.floor((playersAmt + 2)/2);
+    var fasAmt = playersAmt - libsAmt;
+    randomizeArray(this.lobbyData.players);
+    var shChance = 1/fasAmt;
+    var randNum = Math.random();
 
+    for (var i = 0; i < this.lobbyData.players) {
+      if (libsAmt > 0) {
+        this.lobbyData.players[i].affiliation = "lib";
+        libsAmt--;
+      }
+      else {
+        this.lobbyData.players[i].affiliation = "fas";
+        fasAmt--;
+        // Possibly assign sh
+        if (randNum <= shChance) {
+          this.lobbyData.sh = this.lobbyData.players[i].id;
+          shChance = -1;
+        }
+        else {
+          randNum -= shChance;
+        }
+      }
+      // Update playerdata
+      this.lobbyData.players[i].inGame = true;
+      this.lobbyData.players[i].gamesPlayed = true;
+      this.players[i] = this.lobbyData.players[i];
+    }
+    // Randomize player order
+    randomizeArray(this.lobbyData.players);
+    this.returnMsg += "The order of play will be:\n";
+    // Assign president
+    this.lobbyData.chancellor = this.playerData.players[0].id;
+    this.returnMsg+="1: "+this.playerData.players[0].name+" (Chancellor)\n";
+    for (var i = 1; i < this.playerData.players) {
+      this.returnMsg+=(i+1)+": "+this.playerData.players[i].name+"\n";
+    }
   }
 
 }
 
 
 // Performs the Fisher-Yates shuffle to randomize an array in O(n) time
-function radnomizeArray(arr) {
+function randomizeArray(arr) {
   var m = arr.length;
   var t;
   var i;
