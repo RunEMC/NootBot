@@ -26,6 +26,7 @@ export class SHGame {
     this.playersFile = 'shData/players.json';
     this.players = jsonfile.readFileSync(this.playersFile);
     this.playerData = this.players[author.id];
+    if (this.playerData === undefined) this.createNewPlayer();
     // Init lobby info
     this.lobbiesFile = 'shData/lobbies.json';
     this.lobbies = jsonfile.readFileSync(this.lobbiesFile);
@@ -54,7 +55,7 @@ export class SHGame {
   public getReturnMsg() {
     return this.returnMsg;
   }
-  
+
 
   public processCommand() {
     var firstWord = this.cmdArray[0];
@@ -135,6 +136,21 @@ export class SHGame {
     jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
       if (err) console.error("Write error: " + err);
     });
+  }
+
+  private createNewPlayer() {
+    var player = {
+      "name":this.author.username,
+      "id":this.author.id,
+      "gamesPlayed":0,
+      "wins":0,
+      "loses":0,
+      "liberalTimes":0,
+      "inLobby":false,
+      "lobbyName":"",
+      "inGame":false
+    }
+    this.playerData = player;
   }
 
   private getPlayerStats() {
