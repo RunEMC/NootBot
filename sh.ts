@@ -231,6 +231,26 @@ export class SHGame {
 }
 
 
+// Performs the Fisher-Yates shuffle to randomize an array in O(n) time
+function radnomizeArray(arr) {
+  var m = arr.length;
+  var t;
+  var i;
+
+  // Go through the array
+  while (m) {
+    // Pick a random element to swap
+    i = Math.floor(Math.random() * m--);
+
+    // Swap the two elements
+    t = arr[m];
+    arr[m] = arr[i];
+    arr[i] = t;
+  }
+
+  return arr;
+}
+
 // Finds the position of an object containing val as it's value for a certain field
 function findObjInArray(val, field, arr) {
   for (var i = 0; i < arr.length; i++) {
