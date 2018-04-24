@@ -184,6 +184,8 @@ export class SHGame {
         ]
       }
       this.lobbies[lobbyName] = lobby;
+
+      this.returnMsg += "Lobby "+lobbyName+" created!\n";
     }
   }
 
@@ -199,6 +201,8 @@ export class SHGame {
         this.lobbyData.players.push(player);
         this.playerData.inLobby = true;
         this.playerData.lobbyName = lobbyName;
+
+        this.returnMsg += "Joined lobby "+lobbyName+"\n";
       }
       else {
         this.returnMsg+="This lobby is full\n";
@@ -215,8 +219,11 @@ export class SHGame {
         var playerPos = findObjInArray(this.playerData.id, "id", this.lobbyData.players);
         this.lobbyData.players.splice(playerPos, 1);
 
+        var lobbyName = this.playerData.lobbyName;
         this.playerData.inLobby = false;
         this.playerData.lobbyName = "";
+
+        this.returnMsg += "Left lobby "+lobbyName+"\n";
       }
       else {
         this.returnMsg += "You are currently in a game\n";
