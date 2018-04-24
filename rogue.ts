@@ -6,6 +6,9 @@ export class RogueGame {
   // Message Info
   cmdArray:Array<string>;
   username:string;
+  // Game Info
+  cmdsList:string;
+  locationsList:string;
   // Return Msg
   returnMsg:string;
   exploreLog:string;
@@ -52,6 +55,18 @@ export class RogueGame {
     this.locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
     this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
     this.itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
+    // Game Info
+    this.cmdsList =
+    "--------------------Commands--------------------\n"+
+    " - !rg explore [area]: Explore an area.\n"+
+    " - !rg log: Check the explore log.\n"+
+    " - !rg help: Info on the game.\n"+
+    " - !rg use [item]: Use item.\n"+
+    " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.\n";
+    this.locationsList =
+    "------Explorable Locations (!rg explore [location])------\n" +
+    "Grassy Fields (lvl 1) - [grassyfields]\n"+
+    "Saffron Hills (lvl 6) - [saffronhills]\n";
   }
 
   public getReturnMsg():string {
@@ -86,10 +101,7 @@ export class RogueGame {
               this.location = this.cmdArray[1].toLowerCase();
               // Check that the location name is valid
               if (this.locations[this.location] === undefined) {
-                this.returnMsg +=
-                "Invalid location, use example: !rg explore grassyfields\n" +
-                "------Explorable Locations (!rg explore [location])------\n"+
-                "Grassy Fields (lvl 1) - [grassyfields]";
+                this.returnMsg += this.locationsList;
               }
               else { // Location name is valid
                 // Init fields
@@ -114,22 +126,14 @@ export class RogueGame {
           }
         }
         else { // If no area chosen
-          this.returnMsg +=
-          "------Explorable Locations (!rg explore [location])------\n" +
-          "Grassy Fields (lvl 1) - [grassyfields]\n"+
-          "Saffron Hills (lvl 6) - [saffronhills]\n";
+          this.returnMsg += this.locationsList;
         }
       }
       else if (matchCase(this.cmdArray[0], "log")) { // If !rg log
         return "sendLog";
       }
       else if (matchCase(this.cmdArray[0], "help")) { // If !rg help
-        this.returnMsg +=
-        "--------------------Commands--------------------\n"+
-        " - !rg explore [area]: Explore an area.\n"+
-        " - !rg log: Check the explore log.\n"+
-        " - !rg help: Info on the game.\n"+
-        " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
+        this.returnMsg += this.cmdsList;
       }
       else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
         if (this.cmdArray.length > 1) {
@@ -175,12 +179,7 @@ export class RogueGame {
       }
     }
     else { // Handles no parameters (just !rg)
-      this.returnMsg +=
-      "--------------------Commands--------------------\n"+
-      " - !rg explore [area]: Explore an area.\n"+
-      " - !rg log: Check the explore log.\n"+
-      " - !rg help: Info on the game.\n"+
-      " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points."
+      this.returnMsg += this.cmdsList;
     }
 
     // Write to file
