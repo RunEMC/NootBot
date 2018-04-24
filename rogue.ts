@@ -7,6 +7,7 @@ export class RogueGame {
   cmdArray:Array<string>;
   username:string;
   // Game Info
+  gameInfo:string;
   cmdsList:string;
   locationsList:string;
   // Return Msg
@@ -56,6 +57,13 @@ export class RogueGame {
     this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
     this.itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
     // Game Info
+    this.gameInfo =
+    "--------------------A rogue-like game made by RunEMC--------------------\n"+
+    "Explore, fight and gain loot. Use !rg explore [location] to explore a place.\n"+
+    "The events of the encounter can be seen with !rg log.\n"+
+    "After exploring a location, you will need to rest, the harder the location, the longer it takes\n"+
+    "Use !rg stats to see your inventory and allocate your stat points\n"+
+    "More features to come! Feel free to help contribute: https://github.com/RunEMC/NootBot \n";
     this.cmdsList =
     "--------------------Commands--------------------\n"+
     " - !rg explore [area]: Explore an area.\n"+
@@ -133,7 +141,7 @@ export class RogueGame {
         return "sendLog";
       }
       else if (matchCase(this.cmdArray[0], "help")) { // If !rg help
-        this.returnMsg += this.cmdsList;
+        this.returnMsg += this.gameInfo + this.cmdsList;
       }
       else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
         if (this.cmdArray.length > 1) {
