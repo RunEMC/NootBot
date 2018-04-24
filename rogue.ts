@@ -7,22 +7,22 @@ export class RogueGame {
   cmdArray:Array<string>;
   username:string;
   // Return Msg
-  returnMsg:string = "```\n";
-  exploreLog:string = "";
+  returnMsg:string;
+  exploreLog:string;
   // Players' Data
-  playersFile = 'roguedata/player_stats.json';
-  players = jsonfile.readFileSync(this.playersFile); //Read/Write
-  playerData = this.players[this.username];
+  playersFile:string;
+  players; //Read/Write
+  playerData;
   // Locations' Data
-  locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
+  locations; //Read only
   location:string;
-  locationData = this.locations.grassyfields; // Tempdata, will get populated
+  locationData; // Tempdata, will get populated
   mobs = [];
   items = [];
   // Mobs' Data
-  mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
+  mobsData; //Read only
   // Items' Data
-  itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
+  itemsData; //Read only
   // Encounter Data
   mobEncounters = {};
   newMobEncounters ={};
@@ -41,6 +41,17 @@ export class RogueGame {
   constructor(cmdArray, username) {
     this.cmdArray = cmdArray;
     this.username = username;
+    // Return val
+    this.returnMsg = "```\n";
+    this.exploreLog = "";
+    // Player Data
+    this.playersFile = 'roguedata/player_stats.json';
+    this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
+    this.playerData = this.players[this.username];
+    // Various Game Data
+    this.locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
+    this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
+    this.itemsData = jsonfile.readFileSync('roguedata/items.json'); //Read only
   }
 
   public getReturnMsg():string {
