@@ -240,11 +240,28 @@ export class SHGame {
     randomizeArray(this.lobbyData.players);
     var shChance = 1/fasAmt;
     var randNum = Math.random();
+    var fas = {
+      "players":[],
+      "playerNames":[],
+      "sh":"",
+      "shID":"",
+    };
 
     for (var i = 0; i < this.lobbyData.players) {
       if (libsAmt > 0) {
         this.lobbyData.players[i].affiliation = "lib";
         libsAmt--;
+        // Send out PM to players
+        var affil = this.lobbyData.players[i].affiliation;
+        this.server.fetchMember(this.lobbyData.players[i].id).then(
+          (member) => {
+            var msg = "```\n"+
+            "You have been assigned liberal\n"+
+            "Work with your fellow liberals to win\n"+
+            "```\n";
+            member.send(msg);
+          }
+        );
       }
       else {
         this.lobbyData.players[i].affiliation = "fas";
@@ -253,23 +270,45 @@ export class SHGame {
         if (randNum <= shChance) {
           this.lobbyData.sh = this.lobbyData.players[i].id;
           shChance = -1;
+          fas.shID = this.lobbyData.players[i].id;
+          fas.sh = this.lobbyData.players[i].name;
+          this.server.fetchMember(this.lobbyData.players[i].id).then(
+            (member) => {
+              var msg = "```\n"+
+              "You are the SH!\n"+
+              "```\n";
+              member.send(msg);
+            }
+          );
         }
         else {
           randNum -= shChance;
         }
+        fas.players.push(this.lobbyData.players[i].id)
+        fas.playerNames.push(this.lobbyData.players[i].name)
       }
-      // Send out PM to players
-      this.server.fetchMember(this.lobbyData.players[i].id).then(
-        (member) => {
-          member.send("You have been assigned "+this.lobbyData.players[i].affiliation);
-        }
-      );
 
       // Update playerdata
       this.lobbyData.players[i].inGame = true;
       this.lobbyData.players[i].gamesPlayed = true;
       this.players[i] = this.lobbyData.players[i];
     }
+    // Send PM to fas of team mates
+    for (var i = 0; i < fas.players.length; i++) {
+      this.server.fetchMember(this.lobbyData.players[i].id).then(
+        (member) => {
+          var msg = "```\n"+
+          "You have been assigned fasc\n"+
+          "The fascs are: \n";
+          for (var j = 0; j < fas.playerNames.length; j++) {
+            msg += " - "+fas.playerNames[j]+"\n";
+          }
+          msg += "SH is "+fas.sh+"\n```";
+          member.send(msg);
+        }
+      );
+    }
+
     // Randomize player order
     randomizeArray(this.lobbyData.players);
     this.returnMsg += "The order of play will be:\n";
