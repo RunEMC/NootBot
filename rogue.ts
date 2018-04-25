@@ -17,6 +17,10 @@ export class RogueGame {
   playersFile:string;
   players; //Read/Write
   playerData;
+  // Shop Data
+  shopFile:string;
+  shopData; // Read/Write
+  shopSettings; // Read only
   // Locations' Data
   locations; //Read only
   location:string;
@@ -52,6 +56,10 @@ export class RogueGame {
     this.playersFile = 'roguedata/player_stats.json';
     this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
     this.playerData = this.players[this.username];
+    // Shop Data
+    this.shopFile = 'roguedata/shop.json';
+    this.shopData = jsonfile.readFileSync(this.shopFile); //Read/Write
+    this.shopSettings = jsonfile.readFileSync('roguedata/shopSettings.json'); //Read only
     // Various Game Data
     this.locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
     this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
@@ -70,6 +78,7 @@ export class RogueGame {
     " - !rg log: Check the explore log.\n"+
     " - !rg help: Info on the game.\n"+
     " - !rg use [item] [amount]: Use item.\n"+
+    " - !rg shop [buy/sell] [item] [amount]: Buy/sell items to/from shop.\n"+
     " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.\n";
     this.locationsList =
     "------Explorable Locations (!rg explore [location])------\n" +
@@ -99,7 +108,13 @@ export class RogueGame {
     }
     // Process command
     if (this.cmdArray.length) {
-      if (matchCase(this.cmdArray[0], "explore")) { // If !rg explore
+      // Get the other words in the command
+      var firstWord = this.cmdArray[0];
+      var secondWord = this.cmdArray[1];
+      var thirdWord = this.cmdArray[2];
+      var fourthWord = this.cmdArray[3];
+      // Check cmmds
+      if (matchCase(firstWord, "explore")) { // If !rg explore
         if (this.cmdArray.length > 1) {
           // Get the time left from the previous exploration
           var timeLeft = Math.floor((this.playerData.exploreEndTime - Date.now())/millisecondsInSecond);
@@ -137,13 +152,13 @@ export class RogueGame {
           this.returnMsg += this.locationsList;
         }
       }
-      else if (matchCase(this.cmdArray[0], "log")) { // If !rg log
+      else if (matchCase(firstWord, "log")) { // If !rg log
         return "sendLog";
       }
-      else if (matchCase(this.cmdArray[0], "help")) { // If !rg help
+      else if (matchCase(firstWord, "help")) { // If !rg help
         this.returnMsg += this.gameInfo + this.cmdsList;
       }
-      else if (matchCase(this.cmdArray[0], "stats")) { // If !rg stats
+      else if (matchCase(firstWord, "stats")) { // If !rg stats
         if (this.cmdArray.length > 1) {
           if (matchCase(this.cmdArray[1], "allocate")) { // Assign skillpoints
             if (this.cmdArray.length > 2) { // If !rg stats allocate
@@ -185,9 +200,7 @@ export class RogueGame {
           this.getPlayerStats();
         }
       }
-      else if (matchCase(this.cmdArray[0], "use")) {// if !rg use
-        var secondWord = this.cmdArray[1];
-        var thirdWord = this.cmdArray[2];
+      else if (matchCase(firstWord, "use")) {// if !rg use
         var useAmt = parseInt(thirdWord);
         if (secondWord !== undefined && thirdWord !== undefined && useAmt > 0) {
           this.useItem(secondWord, useAmt);
@@ -200,6 +213,26 @@ export class RogueGame {
         }
         else {
           this.returnMsg+="Please input the amount as a positive integer.\n";
+        }
+      }
+      else if (matchCase(firstWord, "shop")) {// if !rg shop
+        if (secondWord === undefined) {
+          this.viewShop();
+        }
+        else if (thirdWord === undefined || items[thirdWord] === undefined) {
+          this.returnMsg += "Invalid item\n";
+        }
+        else if (fourthWord === undefined || parseInt(fourthWord) <= 0) {
+          this.returnMsg += "Invalid amount, needs to be positive integer\n";
+        }
+        else if (matchCase(firstWord, "buy")) {
+
+        }
+        else if (matchCase(firstWord, "sell")) {
+
+        }
+        else {
+          this.returnMsg += "Invalid shop usage\n";
         }
       }
       else {
@@ -458,6 +491,52 @@ export class RogueGame {
       else {
         this.returnMsg+="This item has no effect.\n";
       }
+    }
+  }
+
+  private viewShop() {
+    // Restock shop with new items if necessary
+    var refreshRate = this.shopSettings.shopRefreshTime;
+    if (this.shopData.nextUpdate <= Date.now()) {
+      this.shopData.nextUpdate = Date.now() + (refreshRate * millisecondsInSecond) - ((Date.now() - this.shopData.nextUpdate) % (refreshRate * millisecondsInSecond));
+      this.refreshShop();
+    }
+    var shop =
+    "--------------------Common Items--------------------"+
+  }
+
+  private refreshShop() {
+    // Generate common items
+    var common = this.shopSettings.commonItems;
+    for (var i = 0; i < this.shopSettings.commonAmt; i++) {
+      var randItemPos = Math.floor(Math.random() * (common.length - 1));
+      var randItemName = common[randItemPos];
+      var shopItem = this.items[randItemName];
+      this.shopData.curCommon.push(shopItem);
+      // Delete item from list to prevent duplicate
+      common.splice(randItemPos, 1);
+    }
+
+    // Generate uncommon items
+    var uncommon = this.shopSettings.uncommonItems;
+    for (var i = 0; i < this.shopSettings.uncommonAmt; i++) {
+      var randItemPos = Math.floor(Math.random() * (uncommon.length - 1));
+      var randItemName = uncommon[randItemPos];
+      var shopItem = this.items[randItemName];
+      this.shopData.curUncommon.push(shopItem);
+      // Delete item from list to prevent duplicate
+      uncommon.splice(randItemPos, 1);
+    }
+
+    // Generate rare items
+    var rare = this.shopSettings.rareItems;
+    for (var i = 0; i < this.shopSettings.rareAmt; i++) {
+      var randItemPos = Math.floor(Math.random() * (rare.length - 1));
+      var randItemName = rare[randItemPos];
+      var shopItem = this.items[randItemName];
+      this.shopData.curRare.push(shopItem);
+      // Delete item from list to prevent duplicate
+      rare.splice(randItemPos, 1);
     }
   }
 }
