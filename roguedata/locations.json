@@ -1,5 +1,6 @@
 {
   "saffronhills": {
+    "level": 6,
     "displayName": "Saffron Hills",
     "mobs": ["small_slime", "medium_slime", "large_slime", "goblin_scout", "goblin_worker"],
     "mobSpawnChance": {
@@ -22,6 +23,7 @@
     "events": []
   },
   "grassyfields": {
+    "level": 1,
     "displayName": "Grassy Fields",
     "mobs": ["small_slime", "medium_slime", "large_slime"],
     "mobSpawnChance": {
