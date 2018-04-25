@@ -157,7 +157,6 @@ export class SHGame {
       if (err) console.error("Write error: " + err);
     });
     if (this.lobbyData !== undefined && this.playerData.lobbyName !== "") {
-      console.log(this.lobbyData);
       this.lobbies[this.playerData.lobbyName] = this.lobbyData;
     }
     jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
