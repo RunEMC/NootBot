@@ -69,7 +69,7 @@ export class RogueGame {
     " - !rg explore [area]: Explore an area.\n"+
     " - !rg log: Check the explore log.\n"+
     " - !rg help: Info on the game.\n"+
-    " - !rg use [item]: Use item.\n"+
+    " - !rg use [item] [amount]: Use item.\n"+
     " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.\n";
     this.locationsList =
     "------Explorable Locations (!rg explore [location])------\n" +
@@ -184,6 +184,26 @@ export class RogueGame {
           // Update returnMsg with the player's stats
           this.getPlayerStats();
         }
+      }
+      else if (matchCase(this.cmdArray[0], "use")) {// if !rg use
+        var secondWord = this.cmdArray[1];
+        var thirdWord = this.cmdArray[2];
+        var useAmt = parseInt(thirdWord);
+        if (secondWord !== undefined && thirdWord !== undefined && useAmt > 0) {
+          this.useItem(secondWord, useAmt);
+        }
+        else if (secondWord === undefined) {
+          this.returnMsg+="Please input an item to use.\n";
+        }
+        else if (thirdWord === undefined) {
+          this.returnMsg+="Please input an amount to use.\n";
+        }
+        else {
+          this.returnMsg+="Please input the amount as a positive integer.\n";
+        }
+      }
+      else {
+        this.returnMsg += "Invalid command\n"+this.cmdsList;
       }
     }
     else { // Handles no parameters (just !rg)
@@ -407,6 +427,38 @@ export class RogueGame {
     this.playerData.atk = Math.round(this.baseAtk * ((this.playerData.str * 0.1) + 1));
     // Increase defence by 10% for each point in fortitude
     this.playerData.def = Math.round(this.baseDef * ((this.playerData.fort * 0.1) + 1));
+  }
+
+  private useItem(itemName, useAmt) {
+    var itemData = this.itemsData[itemName];
+    var itemAmt = this.playerData.inventory[itemName];
+
+    // Perform some basic checks to make sure item is usable
+    if (itemData === undefined) {
+      this.returnMsg += "Invalid item.\n";
+    }
+    else if (itemAmt === undefined) {
+      this.returnMsg += "You do not have any of this item in your inventory.\n";
+    }
+    else if (itemData.type !== "consumable") {
+      this.returnMsg += "You can not use this item.\n";
+    }
+    else if (itemAmt >= useAmt) {
+      this.returnMsg += "You do not have enough of this item in your inventory.\n";
+    }
+    else {
+      // Remove from inventory
+      this.playerData.inventory[itemName] -= useAmt;
+      if (this.playerData.inventory[itemName] <= 0) delete this.playerData.inventory[itemName];
+      // Check and use effect
+      if (itemData.effect === "hpGain") {
+        var restoreAmt = itemData.hpGain * useAmt;
+        this.playerData.hpCur = Math.min(this.playerData.hpCur + restoreAmt, this.playerData.hpMax);
+      }
+      else {
+        this.returnMsg+="This item has no effect.\n";
+      }
+    }
   }
 }
 

@@ -3,12 +3,14 @@
     "displayName": "Apples",
     "description": "A big juicy apple, heals for 2HP",
     "type": "consumable",
+    "effect":"hpGain",
     "hpGain": 2
   },
   "herb": {
     "displayName": "Herbs",
     "description": "Various medicinal plants, heals for 5HP",
     "type": "consumable",
+    "effect":"hpGain",
     "hpGain": 5
   },
   "log": {
