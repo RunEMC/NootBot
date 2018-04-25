@@ -1,26 +1,197 @@
 {
   "apple": {
+    "name":"apple",
     "displayName": "Apples",
-    "description": "A big juicy apple, heals for 2HP"
+    "description": "A big juicy apple, heals for 2HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 2,
+    "price":3
+  },
+  "apricot": {
+    "name":"apricot",
+    "displayName": "Apricots",
+    "description": "A small sweet fruit, heals for 1HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "banana": {
+    "name":"banana",
+    "displayName": "Banana",
+    "description": "Pirates find this delicious, heals for 2HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "cherry": {
+    "name":"cherry",
+    "displayName": "Cherries",
+    "description": "Commonly found in pairs, heals for 1HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "orange": {
+    "name":"orange",
+    "displayName": "Oranges",
+    "description": "It has a color named after it, heals for 3HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 3
+  },
+  "lemon": {
+    "name":"lemon",
+    "displayName": "Lemons",
+    "description": "A sour fruit, mostly used to make lemonade, heals for 1HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "coconut": {
+    "name":"coconut",
+    "displayName": "Coconuts",
+    "description": "A tropical fruit with a tough shell, heals for 3HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 3
+  },
+  "durian": {
+    "name":"durian",
+    "displayName": "Durians",
+    "description": "Some find this good, most find it gross, heals for 2HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "mango": {
+    "name":"mango",
+    "displayName": "Mangos",
+    "description": "Goes well in a smoothie, heals for 2HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "lychee": {
+    "name":"lychee",
+    "displayName": "Lychees",
+    "description": "A delicious fruit with a spikey shell, also the name of a cs teacher, heals for 1HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "pear": {
+    "name":"pear",
+    "displayName": "Pears",
+    "description": "A common fruit with small seeds, heals for 2HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "plum": {
+    "name":"plum",
+    "displayName": "Plums",
+    "description": "A sweet fruit with a hard pit, heals for 2HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 2
   },
   "herb": {
+    "name":"herb",
     "displayName": "Herbs",
-    "description": "Various medicinal plants, heals for 5HP"
+    "description": "Various medicinal plants, heals for 5HP",
+    "type": "consumable",
+    "price":3,
+    "effect":"hpGain",
+    "hpGain": 5
   },
-  "log": {
-    "displayName": "Logs",
-    "description": "Some lumber, usable for trading"
+  "oakLog": {
+    "name":"oakLog",
+    "displayName": "Oak Logs",
+    "description": "Some common lumber, usable for trading and crafting",
+    "type": "material",
+    "price": 3
   },
-  "copper_ore": {
+  "birchLog": {
+    "name":"birchLog",
+    "displayName": "Birch Logs",
+    "description": "Some common lumber, usable for trading and crafting",
+    "type": "material",
+    "price": 5
+  },
+  "spruceLog": {
+    "name":"spruceLog",
+    "displayName": "Spruce Logs",
+    "description": "Some uncommon lumber, usable for trading and crafting",
+    "type": "material",
+    "price": 50
+  },
+  "willowLog": {
+    "name":"willowLog",
+    "displayName": "Willow Logs",
+    "description": "Some rare lumber, usable for trading and crafting",
+    "type": "material",
+    "price": 300
+  },
+  "crimsonLog": {
+    "name":"crimsonLog",
+    "displayName": "Crimson Logs",
+    "description": "Some rare lumber, usable for trading and crafting",
+    "type": "material",
+    "price": 500
+  },
+  "copperOre": {
+    "name":"copperOre",
     "displayName": "Copper Ores",
-    "description": "A soft metal with a reddish-orange color"
+    "description": "A soft metal with a reddish-orange color",
+    "type": "material",
+    "price": 4
   },
-  "tin_ore": {
+  "tinOre": {
+    "name":"tinOre",
     "displayName": "Tin Ores",
-    "description": "An ore commonly used to make bronze"
+    "description": "An ore commonly used to make bronze",
+    "type": "material",
+    "price": 5
   },
-  "slime_chunk": {
+  "ironOre": {
+    "name":"ironOre",
+    "displayName": "Iron Ores",
+    "description": "An ore that is quite durable",
+    "type": "material",
+    "price": 30
+  },
+  "silverOre": {
+    "name":"silverOre",
+    "displayName": "Silver Ores",
+    "description": "An uncommon ore that is quite shiny",
+    "type": "material",
+    "price": 60
+  },
+  "goldOre": {
+    "name":"goldOre",
+    "displayName": "Gold Ores",
+    "description": "An expensive ore that is quite valuable",
+    "type": "material",
+    "price": 500
+  },
+  "slimeChunk": {
+    "name":"slimeChunk",
     "displayName": "Slime Chunks",
-    "description": "Some sludge leftover from slimes"
+    "description": "Some sludge leftover from slimes",
+    "type": "material",
+    "price": 3
   }
 }

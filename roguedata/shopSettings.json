@@ -1,0 +1,9 @@
+{
+  "commonItems":["apple","apricot","banana","cherry","orange","lemon","coconut","durian","mango","lychee","pear","plum","oakLog","birchLog","copperOre","tinOre"],
+  "uncommonItems":["herbs","spruceLog", "ironOre", "silverOre"],
+  "rareItems":["willowLog", "crimsonLog", "goldOre"],
+  "shopRefreshTime":1800,
+  "commonAmt": 3,
+  "uncommonAmt": 2,
+  "rareAmt": 1
+}
