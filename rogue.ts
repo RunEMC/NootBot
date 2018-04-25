@@ -232,13 +232,13 @@ export class RogueGame {
     this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n"
     for (var i = 0; i < this.locationData.mobs.length; i++) {
       var mob = this.locationData.mobs[i]
-      this.returnMsg += " - " + this.mobsData[mob].displayName + ": " + this.mobEncounters[mob] + "\n";
+      if (this.mobEncounters[mob]) this.returnMsg += " - "+this.mobsData[mob].displayName+": "+this.mobEncounters[mob]+"\n";
     }
 
     this.returnMsg += "\nYou acquired:\n"
     for (var i = 0; i < this.locationData.items.length; i++) {
       var item = this.locationData.items[i]
-      this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
+      if (this.itemEncounters[item]) this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
     }
   }
 
