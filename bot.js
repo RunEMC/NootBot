@@ -99,49 +99,6 @@ bot.on('message', message => {
     //console.log(files);
     message.channel.sendMessage(files);
   }
-  else if (message.content === 'newNation') {
-    var nationinfo = NationGame.NewNation(message.author.username);
-    message.channel.sendMessage(nationinfo);
-  }// Kingdom Game
-  else if (message.content === 'nationInfo') {
-
-    var nationinfo = NationGame.NationInfo(message.author.username);
-    message.channel.sendMessage(nationinfo);
-
-  }
-  else if (message.content.startsWith('upgrade')) {
-    // Get the infrastructure to upgrade
-    var building = message.content.split(" ");
-    building.splice(0, 1);
-
-    // Get the available buildings
-    var buildingsFile = 'playerdata/user_buildings.json';
-    var buildings = jsonfile.readFileSync(buildingsFile);
-
-    // Get the player's resources
-    var resourcesFile = 'playerdata/user_resources.json';
-    var resources = jsonfile.readFileSync(buildingsFile);
-
-    // Compare and build if player has the resources
-    //if ()
-
-  }
-  else if (message.content === 'sendHelp') {
-    var msg =
-    "------Commands------\n" +
-    "newPlayer: Start a new game\n" +
-    "playerInfo: Look at your player's info";
-
-    message.channel.sendMessage(msg)
-  }// Rogue like adventure game
-  else if (message.content === 'newPlayer') {
-    var msg = RogueGame.NewPlayer(authUser);
-    message.channel.sendMessage(msg);
-  }
-  else if (message.content === 'playerInfo') {
-    var msg = RogueGame.PlayerInfo(authUser);
-    message.channel.sendMessage(msg);
-  }
   else if (message.content.startsWith('!rg')) {
     var msg = "";
 
@@ -183,20 +140,6 @@ bot.on('message', message => {
     // // Send message
     message.channel.send(msg);
   }
-  else if (message.content.startsWith('encounter')) {
-    var msg = "";
-
-    var options = message.content.split(" ");
-    options.splice(0, 1);
-
-    if (options.length) {
-      msg += RogueGame.Encounter(authUser, options[0]);
-    }
-    else {
-      msg += RogueGame.Encounter(authUser, 'help');
-    }
-    message.channel.sendMessage(msg);
-  }
   else if (message.content.startsWith('!ele ')) { // Elements Incremental Game
     var commands = message.content.split(" ");
     commands.splice(0, 1);
@@ -223,21 +166,6 @@ bot.on('message', message => {
   }
   else if (message.content === '!ele') {
     // Help function
-  }
-  else if (message.content === 'recoverManpower') {
-    var jsonfile = require('jsonfile');
-    var file = 'playerdata/user_resources.json';
-    jsonfile.readFile(file, function (err, obj) {
-      // Increment manpower
-      var gain = randomNum(100, 5000);
-      obj["manpower"] += gain;
-      message.channel.sendMessage("Recovered " + gain + " men.");
-
-      // Write new data to json
-      jsonfile.writeFile(file, obj, function (err) {
-        if (err) console.error(err);
-      });
-    });
   }
   else if (message.content === 'getid') {
     message.channel.send(msgAuthor.id);
