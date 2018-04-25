@@ -501,8 +501,24 @@ export class RogueGame {
       this.shopData.nextUpdate = Date.now() + (refreshRate * millisecondsInSecond) - ((Date.now() - this.shopData.nextUpdate) % (refreshRate * millisecondsInSecond));
       this.refreshShop();
     }
-    var shop =
-    "--------------------Common Items--------------------"+
+    var commonAmt = this.shopData.curCommon.length;
+    if (commonAmt) this.returnMsg += "--------------------Common Items--------------------\n";
+    for (var i = 0; i < commonAmt ; i++) {
+      var item = this.shopData.curCommon[i];
+      this.returnMsg += item.displayName+": "+item.price+" coins\n";
+    }
+    var uncommonAmt = this.shopData.curUncommon.length;
+    if (uncommonAmt) this.returnMsg += "--------------------Uncommon Items--------------------\n";
+    for (var i = 0; i < uncommonAmt ; i++) {
+      var item = this.shopData.curUncommon[i];
+      this.returnMsg += item.displayName+": "+item.price+" coins\n";
+    }
+    var rarenAmt = this.shopData.curRare.length;
+    if (rarenAmt) this.returnMsg += "--------------------Rare Items--------------------\n";
+    for (var i = 0; i < rareAmt ; i++) {
+      var item = this.shopData.curRare[i];
+      this.returnMsg += item.displayName+": "+item.price+" coins\n";
+    }
   }
 
   private refreshShop() {
