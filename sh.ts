@@ -45,7 +45,7 @@ export class SHGame {
     "--------------------General Commands--------------------\n"+
     "!sh help: Check the game info\n"+
     "!sh stats: Check your stats\n"+
-    "!sh lobby join [Lobby Name]: Joins a game lobby, creates a new one if it doesn't exist\n"+
+    "!sh lobby join [Lobby Name]: Joins a game lobby, make sure that the lobby exist\n"+
     "!sh lobby create [Lobby Name]: Create a new game lobby, make sure that the lobby name is one word\n"+
     "!sh lobby leave: Leave your current lobby\n"+
     "!sh lobby: View a list of existing lobbies\n"+
@@ -99,15 +99,7 @@ export class SHGame {
           }
         }
         else { // Display the list of lobbies
-          this.returnMsg +=
-          "--------------------Lobbies--------------------\n";
-          for (var lobbyID in this.lobbies) {
-            var lobby = this.lobbies[lobbyID];
-            this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":lobby.players.length+"/"+_maxPlayers)+"): \n";
-            for (var playerID = 0; playerID < lobby.players.length; playerID++) {
-              this.returnMsg += "\t- "+lobby.players[playerID].name+"\n";
-            }
-          }
+          this.getLobbies();
         }
       }
       else {
@@ -164,12 +156,13 @@ export class SHGame {
     jsonfile.writeFile(this.playersFile, this.players, function (err) {
       if (err) console.error("Write error: " + err);
     });
-    if (this.lobbyData !== undefined) {
+    if (this.lobbyData !== undefined && this.playerData.lobbyName !== "") {
+      console.log(this.lobbyData);
       this.lobbies[this.playerData.lobbyName] = this.lobbyData;
-      jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
-        if (err) console.error("Write error: " + err);
-      });
     }
+    jsonfile.writeFile(this.lobbiesFile, this.lobbies, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
   }
 
   private createNewPlayer() {
@@ -201,6 +194,18 @@ export class SHGame {
     return stats;
   }
 
+  private getLobbies() {
+    this.returnMsg +=
+    "--------------------Lobbies--------------------\n";
+    for (var lobbyID in this.lobbies) {
+      var lobby = this.lobbies[lobbyID];
+      this.returnMsg += "["+lobbyID+"] - "+lobby.name+" ("+(lobby.started?"Started":lobby.players.length+"/"+_maxPlayers)+"): \n";
+      for (var playerID = 0; playerID < lobby.players.length; playerID++) {
+        this.returnMsg += "\t- "+lobby.players[playerID].name+"\n";
+      }
+    }
+  }
+
   private createNewLobby(lobbyName) {
     if (this.lobbies[lobbyName] !== undefined) {
       this.returnMsg += "Lobby "+lobbyName+" already exists!\n";
@@ -209,24 +214,34 @@ export class SHGame {
       var lobby = {
         "name":lobbyName,
         "started":false,
-        "players": [this.playerData]
+        "president":"",
+        "chancellor":"",
+        "sh":"",
+        "fasPol":0,
+        "libPol":0,
+        "stage":"",
+        "policies":[],
+        "policiesDrawn":[],
+        "players":[]
       }
       this.lobbyData = lobby;
-      this.lobbies[lobbyName] = lobby;
+      this.lobbies[lobbyName] = this.lobbyData;
 
       this.returnMsg += "Lobby "+lobbyName+" created!\n";
 
+      // Join the new lobby
       this.joinLobby(lobbyName);
     }
   }
 
   private joinLobby(lobbyName) {
-    // Leave lobby if currently in one
-    if (this.playerData.inLobby) this.leaveLobby();
     // Set lobby data to that of new lobby if it exists
-    this.lobbyData = this.lobbies[lobbyName];
-    if (this.lobbyData !== undefined) {
-      if (this.lobbyData.players.length <= _maxPlayers) {
+    if (this.lobbies[lobbyName] !== undefined) {
+      if (this.lobbies[lobbyName].players.length <= _maxPlayers) {
+        // Leave lobby if currently in one and can join new one
+        if (this.playerData.inLobby && this.lobbies[lobbyName] !== undefined) this.leaveLobby();
+        // Set lobbyData to join new lobby
+        this.lobbyData = this.lobbies[lobbyName];
         this.lobbyData.players.push(this.playerData);
         this.playerData.inLobby = true;
         this.playerData.lobbyName = lobbyName;
@@ -238,8 +253,12 @@ export class SHGame {
       }
     }
     else {
-      this.createNewLobby(lobbyName);
+      this.returnMsg+="The lobby "+lobbyName+" does not exist\n";
+      this.getLobbies();
     }
+    // else {
+    //   this.createNewLobby(lobbyName);
+    // }
   }
 
   private leaveLobby() {
@@ -253,6 +272,12 @@ export class SHGame {
         this.playerData.lobbyName = "";
 
         this.returnMsg += "Left lobby "+lobbyName+"\n";
+
+        if (this.lobbyData.players.length <= 0) {
+          delete this.lobbies[lobbyName];
+          this.lobbyData = undefined;
+          this.returnMsg += "Lobby "+lobbyName+" has no one left, it has been deleted\n";
+        }
       }
       else {
         this.returnMsg += "You are currently in a game\n";
