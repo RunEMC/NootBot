@@ -7,6 +7,94 @@
     "effect":"hpGain",
     "hpGain": 2
   },
+  "apricot": {
+    "name":"apricot",
+    "displayName": "Apricot",
+    "description": "A small sweet fruit, heals for 1HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "banana": {
+    "name":"banana",
+    "displayName": "Banana",
+    "description": "Pirates find this delicious, heals for 2HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "cherry": {
+    "name":"cherry",
+    "displayName": "Cherry",
+    "description": "Commonly found in pairs, heals for 1HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "orange": {
+    "name":"orange",
+    "displayName": "Orange",
+    "description": "It has a color named after it, heals for 3HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 3
+  },
+  "lemon": {
+    "name":"lemon",
+    "displayName": "Lemon",
+    "description": "A sour fruit, mostly used to make lemonade, heals for 1HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "coconut": {
+    "name":"coconut",
+    "displayName": "Coconut",
+    "description": "A tropical fruit with a tough shell, heals for 3HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 3
+  },
+  "durian": {
+    "name":"durian",
+    "displayName": "Durian",
+    "description": "Some find this good, most find it gross, heals for 2HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "mango": {
+    "name":"mango",
+    "displayName": "Mango",
+    "description": "Goes well in a smoothie, heals for 2HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "lychee": {
+    "name":"lychee",
+    "displayName": "Lychee",
+    "description": "A delicious fruit with a spikey shell, also the name of a cs teacher, heals for 1HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 1
+  },
+  "pear": {
+    "name":"pear",
+    "displayName": "Pear",
+    "description": "A common fruit with small seeds, heals for 2HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 2
+  },
+  "Plum": {
+    "name":"plum",
+    "displayName": "Plum",
+    "description": "A sweet fruit with a hard pit, heals for 2HP",
+    "type": "consumable",
+    "effect":"hpGain",
+    "hpGain": 2
+  },
   "herb": {
     "name":"herb",
     "displayName": "Herbs",
