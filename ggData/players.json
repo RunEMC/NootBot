@@ -5,6 +5,9 @@
     "id": "171429655008509954",
     "coins": 0,
     "nextStealTime": 0,
+    "nestMax": 5,
+    "breedMax": 2,
+    "eggsMax": 3,
     "nest": {
       "1" : {
         "name": "Basic Goose",
