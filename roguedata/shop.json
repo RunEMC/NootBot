@@ -1,6 +1,1 @@
-{
-  "curCommon":[],
-  "curUncommon":[],
-  "curRare":[],
-  "nextUpdate":0
-}
+{"curCommon":[{"name":"coconut","displayName":"Coconuts","description":"A tropical fruit with a tough shell, heals for 3HP","type":"consumable","price":3,"effect":"hpGain","hpGain":3},{"name":"copperOre","displayName":"Copper Ores","description":"A soft metal with a reddish-orange color","type":"material","price":4},{"name":"apricot","displayName":"Apricots","description":"A small sweet fruit, heals for 1HP","type":"consumable","price":3,"effect":"hpGain","hpGain":1}],"curUncommon":[{"name":"ironOre","displayName":"Iron Ores","description":"An ore that is quite durable","type":"material","price":30},{"name":"spruceLog","displayName":"Spruce Logs","description":"Some uncommon lumber, usable for trading and crafting","type":"material","price":50}],"curRare":[{"name":"willowLog","displayName":"Willow Logs","description":"Some rare lumber, usable for trading and crafting","type":"material","price":300}],"nextUpdate":1524706200000}

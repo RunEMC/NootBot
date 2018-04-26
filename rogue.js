@@ -28,6 +28,10 @@ var RogueGame = /** @class */ (function () {
         this.playersFile = 'roguedata/player_stats.json';
         this.players = jsonfile.readFileSync(this.playersFile); //Read/Write
         this.playerData = this.players[this.username];
+        // Shop Data
+        this.shopFile = 'roguedata/shop.json';
+        this.shopData = jsonfile.readFileSync(this.shopFile); //Read/Write
+        this.shopSettings = jsonfile.readFileSync('roguedata/shopSettings.json'); //Read only
         // Various Game Data
         this.locations = jsonfile.readFileSync('roguedata/locations.json'); //Read only
         this.mobsData = jsonfile.readFileSync('roguedata/mobs.json'); //Read only
@@ -45,7 +49,8 @@ var RogueGame = /** @class */ (function () {
                 " - !rg explore [area]: Explore an area.\n" +
                 " - !rg log: Check the explore log.\n" +
                 " - !rg help: Info on the game.\n" +
-                " - !rg use [item]: Use item.\n" +
+                " - !rg use [item] [amount]: Use item.\n" +
+                " - !rg shop [buy/sell] [item] [amount]: Buy/sell items to/from shop.\n" +
                 " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.\n";
         this.locationsList =
             "------Explorable Locations (!rg explore [location])------\n" +
@@ -72,7 +77,13 @@ var RogueGame = /** @class */ (function () {
         }
         // Process command
         if (this.cmdArray.length) {
-            if (matchCase(this.cmdArray[0], "explore")) {
+            // Get the other words in the command
+            var firstWord = this.cmdArray[0];
+            var secondWord = this.cmdArray[1];
+            var thirdWord = this.cmdArray[2];
+            var fourthWord = this.cmdArray[3];
+            // Check cmmds
+            if (matchCase(firstWord, "explore")) {
                 if (this.cmdArray.length > 1) {
                     // Get the time left from the previous exploration
                     var timeLeft = Math.floor((this.playerData.exploreEndTime - Date.now()) / millisecondsInSecond);
@@ -110,13 +121,13 @@ var RogueGame = /** @class */ (function () {
                     this.returnMsg += this.locationsList;
                 }
             }
-            else if (matchCase(this.cmdArray[0], "log")) {
+            else if (matchCase(firstWord, "log")) {
                 return "sendLog";
             }
-            else if (matchCase(this.cmdArray[0], "help")) {
+            else if (matchCase(firstWord, "help")) {
                 this.returnMsg += this.gameInfo + this.cmdsList;
             }
-            else if (matchCase(this.cmdArray[0], "stats")) {
+            else if (matchCase(firstWord, "stats")) {
                 if (this.cmdArray.length > 1) {
                     if (matchCase(this.cmdArray[1], "allocate")) {
                         if (this.cmdArray.length > 2) {
@@ -158,6 +169,42 @@ var RogueGame = /** @class */ (function () {
                     this.getPlayerStats();
                 }
             }
+            else if (matchCase(firstWord, "use")) {
+                var useAmt = parseInt(thirdWord);
+                if (secondWord !== undefined && thirdWord !== undefined && useAmt > 0) {
+                    this.useItem(secondWord, useAmt);
+                }
+                else if (secondWord === undefined) {
+                    this.returnMsg += "Please input an item to use.\n";
+                }
+                else if (thirdWord === undefined) {
+                    this.returnMsg += "Please input an amount to use.\n";
+                }
+                else {
+                    this.returnMsg += "Please input the amount as a positive integer.\n";
+                }
+            }
+            else if (matchCase(firstWord, "shop")) {
+                if (secondWord === undefined) {
+                    this.viewShop();
+                }
+                else if (thirdWord === undefined || this.items[thirdWord] === undefined) {
+                    this.returnMsg += "Invalid item\n";
+                }
+                else if (fourthWord === undefined || parseInt(fourthWord) <= 0) {
+                    this.returnMsg += "Invalid amount, needs to be positive integer\n";
+                }
+                else if (matchCase(firstWord, "buy")) {
+                }
+                else if (matchCase(firstWord, "sell")) {
+                }
+                else {
+                    this.returnMsg += "Invalid shop usage\n";
+                }
+            }
+            else {
+                this.returnMsg += "Invalid command\n" + this.cmdsList;
+            }
         }
         else {
             this.returnMsg += this.cmdsList;
@@ -165,6 +212,10 @@ var RogueGame = /** @class */ (function () {
         // Write to file
         this.players[this.username] = this.playerData;
         jsonfile.writeFile(this.playersFile, this.players, function (err) {
+            if (err)
+                console.error("Write error: " + err);
+        });
+        jsonfile.writeFile(this.shopFile, this.shopData, function (err) {
             if (err)
                 console.error("Write error: " + err);
         });
@@ -198,12 +249,14 @@ var RogueGame = /** @class */ (function () {
         this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n";
         for (var i = 0; i < this.locationData.mobs.length; i++) {
             var mob = this.locationData.mobs[i];
-            this.returnMsg += " - " + this.mobsData[mob].displayName + ": " + this.mobEncounters[mob] + "\n";
+            if (this.mobEncounters[mob])
+                this.returnMsg += " - " + this.mobsData[mob].displayName + ": " + this.mobEncounters[mob] + "\n";
         }
         this.returnMsg += "\nYou acquired:\n";
         for (var i = 0; i < this.locationData.items.length; i++) {
             var item = this.locationData.items[i];
-            this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
+            if (this.itemEncounters[item])
+                this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
         }
     };
     RogueGame.prototype.spawnMobs = function () {
@@ -362,6 +415,101 @@ var RogueGame = /** @class */ (function () {
         this.playerData.atk = Math.round(this.baseAtk * ((this.playerData.str * 0.1) + 1));
         // Increase defence by 10% for each point in fortitude
         this.playerData.def = Math.round(this.baseDef * ((this.playerData.fort * 0.1) + 1));
+    };
+    RogueGame.prototype.useItem = function (itemName, useAmt) {
+        var itemData = this.itemsData[itemName];
+        var itemAmt = this.playerData.inventory[itemName];
+        // Perform some basic checks to make sure item is usable
+        if (itemData === undefined) {
+            this.returnMsg += "Invalid item.\n";
+        }
+        else if (itemAmt === undefined) {
+            this.returnMsg += "You do not have any of this item in your inventory.\n";
+        }
+        else if (itemData.type !== "consumable") {
+            this.returnMsg += "You can not use this item.\n";
+        }
+        else if (itemAmt >= useAmt) {
+            this.returnMsg += "You do not have enough of this item in your inventory.\n";
+        }
+        else {
+            console.log(this.playerData.inventory[itemName]);
+            // Remove from inventory
+            this.playerData.inventory[itemName] -= useAmt;
+            if (this.playerData.inventory[itemName] <= 0)
+                delete this.playerData.inventory[itemName];
+            // Check and use effect
+            if (itemData.effect === "hpGain") {
+                var restoreAmt = itemData.hpGain * useAmt;
+                this.playerData.hpCur = Math.min(this.playerData.hpCur + restoreAmt, this.playerData.hpMax);
+            }
+            else {
+                this.returnMsg += "This item has no effect.\n";
+            }
+            console.log(this.playerData.inventory[itemName]);
+        }
+    };
+    RogueGame.prototype.viewShop = function () {
+        // Restock shop with new items if necessary
+        var refreshRate = this.shopSettings.shopRefreshTime;
+        if (this.shopData.nextUpdate <= Date.now()) {
+            this.shopData.nextUpdate = Date.now() + (refreshRate * millisecondsInSecond) - ((Date.now() - this.shopData.nextUpdate) % (refreshRate * millisecondsInSecond));
+            this.refreshShop();
+        }
+        this.returnMsg += "Shop Changes In: " + Math.floor((this.shopData.nextUpdate - Date.now()) / millisecondsInSecond) + " seconds\n";
+        var commonAmt = this.shopData.curCommon.length;
+        if (commonAmt)
+            this.returnMsg += "--------------------Common Items--------------------\n";
+        for (var i = 0; i < commonAmt; i++) {
+            var item = this.shopData.curCommon[i];
+            this.returnMsg += item.displayName + ": " + item.price + " coins\n";
+        }
+        var uncommonAmt = this.shopData.curUncommon.length;
+        if (uncommonAmt)
+            this.returnMsg += "--------------------Uncommon Items--------------------\n";
+        for (var i = 0; i < uncommonAmt; i++) {
+            var item = this.shopData.curUncommon[i];
+            this.returnMsg += item.displayName + ": " + item.price + " coins\n";
+        }
+        var rareAmt = this.shopData.curRare.length;
+        if (rareAmt)
+            this.returnMsg += "--------------------Rare Items--------------------\n";
+        for (var i = 0; i < rareAmt; i++) {
+            var item = this.shopData.curRare[i];
+            this.returnMsg += item.displayName + ": " + item.price + " coins\n";
+        }
+    };
+    RogueGame.prototype.refreshShop = function () {
+        // Generate common items
+        var common = this.shopSettings.commonItems;
+        for (var i = 0; i < this.shopSettings.commonAmt; i++) {
+            var randItemPos = Math.floor(Math.random() * (common.length - 1));
+            var randItemName = common[randItemPos];
+            var shopItem = this.itemsData[randItemName];
+            this.shopData.curCommon.push(shopItem);
+            // Delete item from list to prevent duplicate
+            common.splice(randItemPos, 1);
+        }
+        // Generate uncommon items
+        var uncommon = this.shopSettings.uncommonItems;
+        for (var i = 0; i < this.shopSettings.uncommonAmt; i++) {
+            var randItemPos = Math.floor(Math.random() * (uncommon.length - 1));
+            var randItemName = uncommon[randItemPos];
+            var shopItem = this.itemsData[randItemName];
+            this.shopData.curUncommon.push(shopItem);
+            // Delete item from list to prevent duplicate
+            uncommon.splice(randItemPos, 1);
+        }
+        // Generate rare items
+        var rare = this.shopSettings.rareItems;
+        for (var i = 0; i < this.shopSettings.rareAmt; i++) {
+            var randItemPos = Math.floor(Math.random() * (rare.length - 1));
+            var randItemName = rare[randItemPos];
+            var shopItem = this.itemsData[randItemName];
+            this.shopData.curRare.push(shopItem);
+            // Delete item from list to prevent duplicate
+            rare.splice(randItemPos, 1);
+        }
     };
     return RogueGame;
 }());

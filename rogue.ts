@@ -219,7 +219,7 @@ export class RogueGame {
         if (secondWord === undefined) {
           this.viewShop();
         }
-        else if (thirdWord === undefined || items[thirdWord] === undefined) {
+        else if (thirdWord === undefined || this.items[thirdWord] === undefined) {
           this.returnMsg += "Invalid item\n";
         }
         else if (fourthWord === undefined || parseInt(fourthWord) <= 0) {
@@ -246,6 +246,9 @@ export class RogueGame {
     // Write to file
     this.players[this.username] = this.playerData;
     jsonfile.writeFile(this.playersFile, this.players, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
+    jsonfile.writeFile(this.shopFile, this.shopData, function (err) {
       if (err) console.error("Write error: " + err);
     });
     // Append return messages
@@ -480,6 +483,7 @@ export class RogueGame {
       this.returnMsg += "You do not have enough of this item in your inventory.\n";
     }
     else {
+      console.log(this.playerData.inventory[itemName]);
       // Remove from inventory
       this.playerData.inventory[itemName] -= useAmt;
       if (this.playerData.inventory[itemName] <= 0) delete this.playerData.inventory[itemName];
@@ -491,6 +495,7 @@ export class RogueGame {
       else {
         this.returnMsg+="This item has no effect.\n";
       }
+      console.log(this.playerData.inventory[itemName]);
     }
   }
 
@@ -501,6 +506,7 @@ export class RogueGame {
       this.shopData.nextUpdate = Date.now() + (refreshRate * millisecondsInSecond) - ((Date.now() - this.shopData.nextUpdate) % (refreshRate * millisecondsInSecond));
       this.refreshShop();
     }
+    this.returnMsg+="Shop Changes In: "+Math.floor((this.shopData.nextUpdate-Date.now())/millisecondsInSecond)+" seconds\n";
     var commonAmt = this.shopData.curCommon.length;
     if (commonAmt) this.returnMsg += "--------------------Common Items--------------------\n";
     for (var i = 0; i < commonAmt ; i++) {
@@ -513,8 +519,8 @@ export class RogueGame {
       var item = this.shopData.curUncommon[i];
       this.returnMsg += item.displayName+": "+item.price+" coins\n";
     }
-    var rarenAmt = this.shopData.curRare.length;
-    if (rarenAmt) this.returnMsg += "--------------------Rare Items--------------------\n";
+    var rareAmt = this.shopData.curRare.length;
+    if (rareAmt) this.returnMsg += "--------------------Rare Items--------------------\n";
     for (var i = 0; i < rareAmt ; i++) {
       var item = this.shopData.curRare[i];
       this.returnMsg += item.displayName+": "+item.price+" coins\n";
@@ -527,7 +533,7 @@ export class RogueGame {
     for (var i = 0; i < this.shopSettings.commonAmt; i++) {
       var randItemPos = Math.floor(Math.random() * (common.length - 1));
       var randItemName = common[randItemPos];
-      var shopItem = this.items[randItemName];
+      var shopItem = this.itemsData[randItemName];
       this.shopData.curCommon.push(shopItem);
       // Delete item from list to prevent duplicate
       common.splice(randItemPos, 1);
@@ -538,7 +544,7 @@ export class RogueGame {
     for (var i = 0; i < this.shopSettings.uncommonAmt; i++) {
       var randItemPos = Math.floor(Math.random() * (uncommon.length - 1));
       var randItemName = uncommon[randItemPos];
-      var shopItem = this.items[randItemName];
+      var shopItem = this.itemsData[randItemName];
       this.shopData.curUncommon.push(shopItem);
       // Delete item from list to prevent duplicate
       uncommon.splice(randItemPos, 1);
@@ -549,7 +555,7 @@ export class RogueGame {
     for (var i = 0; i < this.shopSettings.rareAmt; i++) {
       var randItemPos = Math.floor(Math.random() * (rare.length - 1));
       var randItemName = rare[randItemPos];
-      var shopItem = this.items[randItemName];
+      var shopItem = this.itemsData[randItemName];
       this.shopData.curRare.push(shopItem);
       // Delete item from list to prevent duplicate
       rare.splice(randItemPos, 1);

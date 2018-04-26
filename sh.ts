@@ -376,10 +376,10 @@ export class SHGame {
     randomizeArray(this.lobbyData.players);
     this.returnMsg += "The order of play will be:\n";
     // Assign president
-    this.lobbyData.chancellor = this.playerData.players[0].id;
-    this.returnMsg+="1: "+this.playerData.players[0].name+" (Chancellor)\n";
-    for (var i = 1; i < this.playerData.players; i++) {
-      this.returnMsg+=(i+1)+": "+this.playerData.players[i].name+"\n";
+    this.lobbyData.chancellor = this.lobbyData.players[0].id;
+    this.returnMsg+="1: "+this.lobbyData.players[0].name+" (Chancellor)\n";
+    for (var i = 1; i < this.lobbyData.players; i++) {
+      this.returnMsg+=(i+1)+": "+this.lobbyData.players[i].name+"\n";
     }
     this.lobbyData.stage = "chooseChan";
   }
