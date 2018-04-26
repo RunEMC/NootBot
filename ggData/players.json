@@ -1,0 +1,36 @@
+{
+  "_nextID":2,
+  "RunEMC": {
+    "name": "RunEMC",
+    "id": "171429655008509954",
+    "coins": 0,
+    "nextStealTime": 0,
+    "nest": {
+      "1" : {
+        "name": "Basic Goose",
+        "id":"1",
+        "level":1,
+        "type":"basic",
+        "coins": 1,
+        "coinGenTime": 15
+      },
+      "2": {
+        "name": "Red Goose",
+        "id":"2",
+        "level":1,
+        "type":"red",
+        "coins":1,
+        "coinsGenTime":15
+      }
+    },
+    "breeding": {
+
+    },
+    "eggs": {
+
+    },
+    "materials": {
+
+    }
+  }
+}

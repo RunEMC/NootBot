@@ -1,0 +1,11 @@
+{
+  "basic": {
+    "name": "Basic Goose",
+    "coins": 1,
+    "coinGenTime": 15,
+    "partnersAny": true,
+    "partners": {},
+    "type": "basic",
+    "tier":0
+  }
+}
