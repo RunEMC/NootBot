@@ -485,12 +485,18 @@ export class RogueGame {
     else {
       console.log(this.playerData.inventory[itemName]);
       // Remove from inventory
-      this.playerData.inventory[itemName] -= useAmt;
-      if (this.playerData.inventory[itemName] <= 0) delete this.playerData.inventory[itemName];
+      itemAmt -= useAmt;
+      if (itemAmt <= 0) {
+        delete this.playerData.inventory[itemName];
+      }
+      else {
+        this.playerData.inventory[itemName] = itemAmt;
+      }
       // Check and use effect
       if (itemData.effect === "hpGain") {
         var restoreAmt = itemData.hpGain * useAmt;
         this.playerData.hpCur = Math.min(this.playerData.hpCur + restoreAmt, this.playerData.hpMax);
+        this.returnMsg+="Healed for "+restoreAmt+"HP\n";
       }
       else {
         this.returnMsg+="This item has no effect.\n";
