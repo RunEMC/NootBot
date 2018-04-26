@@ -226,7 +226,13 @@ export class RogueGame {
           this.returnMsg += "Invalid amount, needs to be positive integer\n";
         }
         else if (matchCase(firstWord, "buy")) {
+          var playerCoins = this.playerData.coins;
+          var pos = findObjInArray(itemName, "name", this.shopData.curCommon);
+          if (pos >= 0) {
+          }
+          else {
 
+          }
         }
         else if (matchCase(firstWord, "sell")) {
 
@@ -513,60 +519,40 @@ export class RogueGame {
       this.refreshShop();
     }
     this.returnMsg+="Shop Changes In: "+Math.floor((this.shopData.nextUpdate-Date.now())/millisecondsInSecond)+" seconds\n";
-    var commonAmt = this.shopData.curCommon.length;
-    if (commonAmt) this.returnMsg += "--------------------Common Items--------------------\n";
-    for (var i = 0; i < commonAmt ; i++) {
-      var item = this.shopData.curCommon[i];
-      this.returnMsg += item.displayName+": "+item.price+" coins\n";
-    }
-    var uncommonAmt = this.shopData.curUncommon.length;
-    if (uncommonAmt) this.returnMsg += "--------------------Uncommon Items--------------------\n";
-    for (var i = 0; i < uncommonAmt ; i++) {
-      var item = this.shopData.curUncommon[i];
-      this.returnMsg += item.displayName+": "+item.price+" coins\n";
-    }
-    var rareAmt = this.shopData.curRare.length;
-    if (rareAmt) this.returnMsg += "--------------------Rare Items--------------------\n";
-    for (var i = 0; i < rareAmt ; i++) {
-      var item = this.shopData.curRare[i];
-      this.returnMsg += item.displayName+": "+item.price+" coins\n";
+    this.returnMsg += "--------------------Shop Items--------------------\n";
+    for (var itemName in this.shopData.stock) {
+      var item = this.shopData.stock[itemName];
+      this.returnMsg += item.displayName+": "+item.price+" coins ["+item.name+"]\n";
     }
   }
 
   private refreshShop() {
-    // Generate common items
-    var common = this.shopSettings.commonItems;
-    for (var i = 0; i < this.shopSettings.commonAmt; i++) {
-      var randItemPos = Math.floor(Math.random() * (common.length - 1));
-      var randItemName = common[randItemPos];
-      var shopItem = this.itemsData[randItemName];
-      this.shopData.curCommon.push(shopItem);
-      // Delete item from list to prevent duplicate
-      common.splice(randItemPos, 1);
-    }
-
-    // Generate uncommon items
-    var uncommon = this.shopSettings.uncommonItems;
-    for (var i = 0; i < this.shopSettings.uncommonAmt; i++) {
-      var randItemPos = Math.floor(Math.random() * (uncommon.length - 1));
-      var randItemName = uncommon[randItemPos];
-      var shopItem = this.itemsData[randItemName];
-      this.shopData.curUncommon.push(shopItem);
-      // Delete item from list to prevent duplicate
-      uncommon.splice(randItemPos, 1);
-    }
-
-    // Generate rare items
-    var rare = this.shopSettings.rareItems;
-    for (var i = 0; i < this.shopSettings.rareAmt; i++) {
-      var randItemPos = Math.floor(Math.random() * (rare.length - 1));
-      var randItemName = rare[randItemPos];
-      var shopItem = this.itemsData[randItemName];
-      this.shopData.curRare.push(shopItem);
-      // Delete item from list to prevent duplicate
-      rare.splice(randItemPos, 1);
+    for (var rarity in this.shopSettings.rarities) {
+      var itemsList = this.shopSettings[rarity];
+      for (var i = 0; i < this.shopSettings.rarities[rarity]; i++) {
+        var randItemPos = Math.floor(Math.random() * (itemsList.length - 1));
+        var randItemName = itemsList[randItemPos];
+        var shopItem = this.itemsData[randItemName];
+        this.shopData.stock.push(shopItem);
+        // Delete item from list to prevent duplicate
+        itemsList.splice(randItemPos, 1);
+      }
     }
   }
+
+  private buyItems(itemName, amt) {
+
+  }
+}
+
+// Check if an object with specific field is in an array
+function findObjInArray(val, field, arr) {
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i][field] === val) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 // Checks if two strings are equal regardless of case
