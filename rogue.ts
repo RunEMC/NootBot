@@ -79,6 +79,7 @@ export class RogueGame {
     " - !rg help: Info on the game.\n"+
     " - !rg use [item] [amount]: Use item.\n"+
     " - !rg shop [buy/sell] [item] [amount]: Buy/sell items to/from shop.\n"+
+    " - !rg inspect [item]: Examine an item.\n"+
     " - !rg stats [allocate] [str/dex/int/fort] [amount]: Check your stats and allocate new stat points.\n";
     this.locationsList =
     "------Explorable Locations (!rg explore [location])------\n" +
@@ -322,9 +323,13 @@ export class RogueGame {
       if (spawnchance[item] >= randNum) {
         // this.itemEncounters[item] === undefined ? this.itemEncounters[item] = 1 : this.itemEncounters[item]++;
         // Add the acquired items to the player's inventory
-        this.playerData.inventory[item] === undefined ? this.playerData.inventory[item] = 1 : this.playerData.inventory[item]++;
+        this.addItemsToInv(item, 1);
       }
     }
+  }
+
+  private addItemsToInv(item, amt) {
+    this.playerData.inventory[item] === undefined ? this.playerData.inventory[item] = amt : this.playerData.inventory[item]+=amt;
   }
 
   // Simulate a fight between the player and the mobs
@@ -404,7 +409,7 @@ export class RogueGame {
     "Coins: "+stats.coins+"\n"+
     "\n--------------------"+this.username+"\'s Inventory--------------------\n";
     for (var item in stats.inventory) {
-      this.returnMsg += "- "+this.itemsData[item].displayName+" x"+this.playerData.inventory[item]+": ("+this.itemsData[item].description+")\n";
+      this.returnMsg += "- "+this.itemsData[item].displayName+" x"+this.playerData.inventory[item]+": ["+this.itemsData[item].name+"]\n";
     }
   }
 
@@ -541,7 +546,23 @@ export class RogueGame {
   }
 
   private buyItems(itemName, amt) {
-
+    var itemPos = findObjInArray(itemName, "name", this.shopData.stock);
+    if (itemPos < 0) {
+      this.returnMsg += "Item not available in shop.\n";
+    }
+    else {
+      var item = this.shopData.stock[itemPos];
+      var price = item.price;
+      var cost = price * amt;
+      var playerCoins = this.playerData.coins;
+      if (playerCoins < cost) {
+        this.returnMsg+="You can't afford that! (Coins: "+playerCoins+", Cost: "+cost+")";
+      }
+      else {
+        this.playerData.coins -= cost;
+        this.addItemsToInv(itemName, amt);
+      }
+    }
   }
 }
 
