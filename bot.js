@@ -7,6 +7,7 @@ const botSettings = require('./botSettings.json');
 //const NationGame = require('./nationgame.js');
 const RogueGame = require('./rogue.js').RogueGame;
 const SHGame = require('./sh.js').SHGame;
+const GooseGame = require('./goosegame.js').GooseGame;
 
 // Create new bot client
 const bot = new Discord.Client();
@@ -138,6 +139,17 @@ bot.on('message', message => {
     //   if (rogueGame.getExploreLog() != "") rogueGameLog = rogueGame.getExploreLog();
     // }
     // // Send message
+    message.channel.send(msg);
+  }
+  else if (message.content.startsWith('!gg')) {
+    var msg = "";
+    var cmd = message.content.split(" ");
+    cmd.splice(0, 1);
+
+    var gooseGame = new GooseGame(cmd, msgAuthor);
+    var response = gooseGame.processCommand();
+    msg = gooseGame.getReturnMsg();
+    // Send message
     message.channel.send(msg);
   }
   else if (message.content.startsWith('!ele ')) { // Elements Incremental Game

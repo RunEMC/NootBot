@@ -22,11 +22,12 @@ export class GooseGame {
     // Init player info
     this.playersFile = 'ggData/players.json';
     this.players = jsonfile.readFileSync(this.playersFile);
-    this.playerData = this.players[author.id];
+    this.playerData = this.players[author.username];
     if (this.playerData === undefined) this.createNewPlayer();
     // Init geese info
     this.geeseData = jsonfile.readFileSync('ggData/geese.json');
     // Init game info
+    this.returnMsg = "```\n";
     this.gameInfo =
     "--------------------Goose Game by RunEMC--------------------\n"+
     "Collect geese by buying basic ones from the shop.\n"+
@@ -45,10 +46,30 @@ export class GooseGame {
     " - !gg eggs: Check hatching progress.\n"+
     " - !gg upgrade: Check upgrades available.\n"+
     " - !gg shop: Check the geese available for purchase.\n"+
-    " - !rg buy [goose]: Purchase a goose.\n"+
-    " - !rg sell [goose]: Sell a goose.\n";
+    " - !gg buy [goose]: Purchase a goose.\n";
   }
 
-  
+  public getReturnMsg():string {
+    // console.log(this.returnMsg);
+    this.returnMsg+="```\n";
+    return this.returnMsg;
+  }
 
+  public processCommand() {
+    var firstWord = this.cmdArray[0];
+    var firstWord = this.cmdArray[1];
+    var firstWord = this.cmdArray[2];
+    var firstWord = this.cmdArray[3];
+    // Error check
+    if (firstWord === undefined || firstWord === "help") {
+      this.returnMsg += this.gameInfo+this.cmdsList;
+    }
+    else if (firstWord === nest) {
+      this.getPlayerNest();
+    }
+  }
+
+  private getPlayerNest() {
+    
+  }
 }
