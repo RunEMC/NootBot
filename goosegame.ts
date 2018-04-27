@@ -70,19 +70,11 @@ export class GooseGame {
   }
 
   private getPlayerNest() {
-<<<<<<< HEAD
     var info = this.playerData;
     this.returnMsg +=
     "\n--------------------"+info.name+"\'s Nest--------------------\n";
     for (var gooseID in info.nest) {
-      
+
     }
-=======
-
-  }
-
-  private createNewPlayer() {
-    
->>>>>>> 9065c6ed4c73f4e4801517128c893eca6187b7b0
   }
 }
