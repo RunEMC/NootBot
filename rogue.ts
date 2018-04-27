@@ -292,17 +292,21 @@ export class RogueGame {
     }
 
     // Create flavor text
-    this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n"
+    var mobsMsg = "";
     for (var i = 0; i < this.locationData.mobs.length; i++) {
       var mob = this.locationData.mobs[i]
-      if (this.mobEncounters[mob]) this.returnMsg += " - "+this.mobsData[mob].displayName+": "+this.mobEncounters[mob]+"\n";
+      if (this.mobEncounters[mob]) mobsMsg += " - "+this.mobsData[mob].displayName+": "+this.mobEncounters[mob]+"\n";
+    }
+    if (mobsMsg.length) {
+      this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n"+mobsMsg;
     }
 
-    this.returnMsg += "\nYou acquired:\n"
+    var itemsMsg = "";
     for (var i = 0; i < this.locationData.items.length; i++) {
       var item = this.locationData.items[i]
-      if (this.itemEncounters[item]) this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
+      if (this.itemEncounters[item]) itemsMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
     }
+    if (itemsMsg.length) this.returnMsg += "\nYou acquired:\n"+itemsMsg;
   }
 
   private spawnMobs() {
