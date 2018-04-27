@@ -19,13 +19,13 @@
     "atkmax": 4,
     "xpGain": 1,
     "coinGain": 1,
-    "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
+    "drops": ["slimeChunk", "apple", "herb", "log", "copperOre"],
     "dropChance": {
-      "slime_chunk": 0.7,
+      "slimeChunk": 0.7,
       "apple": 0.1,
       "herb": 0.05,
       "log": 0.05,
-      "copper_ore": 0.05
+      "copperOre": 0.05
     }
   },
   "medium_slime": {
@@ -36,13 +36,13 @@
     "atkmax": 4,
     "xpGain": 3,
     "coinGain": 3,
-    "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
+    "drops": ["slimeChunk", "apple", "herb", "log", "copperOre"],
     "dropChance": {
-      "slime_chunk": 0.8,
+      "slimeChunk": 0.8,
       "apple": 0.2,
       "herb": 0.05,
       "log": 0.1,
-      "copper_ore": 0.1
+      "copperOre": 0.1
     }
   },
   "large_slime": {
@@ -53,13 +53,13 @@
     "atkmax": 4,
     "xpGain": 5,
     "coinGain": 5,
-    "drops": ["slime_chunk", "apple", "herb", "log", "copper_ore"],
+    "drops": ["slimeChunk", "apple", "herb", "log", "copperOre"],
     "dropChance": {
-      "slime_chunk": 0.9,
+      "slimeChunk": 0.9,
       "apple": 0.3,
       "herb": 0.1,
       "log": 0.15,
-      "copper_ore": 0.15
+      "copperOre": 0.15
     }
   },
   "goblin_scout": {
@@ -70,13 +70,13 @@
     "atkmax": 4,
     "xpGain": 6,
     "coinGain": 7,
-    "drops": ["apple", "herb", "log", "copper_ore", "tin_ore"],
+    "drops": ["apple", "herb", "log", "copperOre", "tinOre"],
     "dropChance": {
       "apple": 0.3,
       "herb": 0.1,
       "log": 0.1,
-      "copper_ore": 0.3,
-      "tin_ore": 0.2
+      "copperOre": 0.3,
+      "tinOre": 0.2
     }
   },
   "goblin_worker": {
@@ -87,13 +87,13 @@
     "atkmax": 4,
     "xpGain": 6,
     "coinGain": 10,
-    "drops": ["apple", "herb", "log", "copper_ore", "tin_ore"],
+    "drops": ["apple", "herb", "log", "copperOre", "tinOre"],
     "dropChance": {
       "apple": 0.3,
       "herb": 0.1,
       "log": 0.1,
-      "copper_ore": 0.2,
-      "tin_ore": 0.3
+      "copperOre": 0.2,
+      "tinOre": 0.3
     }
   }
 }

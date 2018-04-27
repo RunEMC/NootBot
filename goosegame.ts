@@ -64,12 +64,16 @@ export class GooseGame {
     if (firstWord === undefined || firstWord === "help") {
       this.returnMsg += this.gameInfo+this.cmdsList;
     }
-    else if (firstWord === nest) {
+    else if (firstWord === "nest") {
       this.getPlayerNest();
     }
   }
 
   private getPlayerNest() {
+
+  }
+
+  private createNewPlayer() {
     
   }
 }

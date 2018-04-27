@@ -10,13 +10,13 @@
       "goblin_scout": 0.4,
       "goblin_worker": 0.2
     },
-    "items": ["apple", "herb", "log", "copper_ore", "tin_ore"],
+    "items": ["apple", "herb", "log", "copperOre", "tinOre"],
     "itemSpawnChance": {
       "apple": 0.1,
       "herb": 0.1,
       "log": 0.1,
-      "copper_ore": 0.3,
-      "tin_ore": 0.3
+      "copperOre": 0.3,
+      "tinOre": 0.3
     },
     "time": 15,
     "stages": 3,
@@ -31,12 +31,12 @@
       "medium_slime": 0.15,
       "large_slime": 0.05
     },
-    "items": ["apple", "herb", "log", "copper_ore"],
+    "items": ["apple", "herb", "log", "copperOre"],
     "itemSpawnChance": {
       "apple": 0.6,
       "herb": 0.2,
       "log": 0.15,
-      "copper_ore": 0.05
+      "copperOre": 0.05
     },
     "time": 10,
     "stages": 3,
