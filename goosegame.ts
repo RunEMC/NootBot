@@ -69,6 +69,32 @@ export class GooseGame {
     }
   }
 
+  private createNewPlayer() {
+    var nextID = this.players._nextID;
+    var goose = {
+      "name": "Basic Goose",
+      "id":nextID.toString(),
+      "level":1,
+      "type":"basic",
+      "coins": 1,
+      "coinGenTime": 15
+    }
+    this.playerData = {
+      "name": this.author.username,
+      "id": this.author.id.toString(),
+      "coins": 0,
+      "nextStealTime": 0,
+      "nestMax": 10,
+      "breedMax": 2,
+      "eggsMax": 3,
+      "nest": {},
+      "breeding": {},
+      "eggs": {},
+      "materials": {}
+    }
+    this.playerData.nest[nextID] = goose;
+  }
+
   private getPlayerNest() {
     var info = this.playerData;
     this.returnMsg +=
