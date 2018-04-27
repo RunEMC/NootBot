@@ -220,7 +220,7 @@ export class RogueGame {
         if (secondWord === undefined) {
           this.viewShop();
         }
-        else if (thirdWord === undefined || this.items[thirdWord] === undefined) {
+        else if (thirdWord === undefined || this.itemsData[thirdWord] === undefined) {
           this.returnMsg += "Invalid item\n";
         }
         else if (fourthWord === undefined || parseInt(fourthWord) <= 0) {
@@ -228,7 +228,7 @@ export class RogueGame {
         }
         else if (matchCase(firstWord, "buy")) {
           var playerCoins = this.playerData.coins;
-          var pos = findObjInArray(itemName, "name", this.shopData.curCommon);
+          var pos = findObjInArray(thirdWord, "name", this.shopData.curCommon);
           if (pos >= 0) {
           }
           else {
@@ -490,11 +490,10 @@ export class RogueGame {
     else if (itemData.type !== "consumable") {
       this.returnMsg += "You can not use this item.\n";
     }
-    else if (itemAmt >= useAmt) {
+    else if (itemAmt < useAmt) {
       this.returnMsg += "You do not have enough of this item in your inventory.\n";
     }
     else {
-      console.log(this.playerData.inventory[itemName]);
       // Remove from inventory
       itemAmt -= useAmt;
       if (itemAmt <= 0) {
@@ -512,7 +511,6 @@ export class RogueGame {
       else {
         this.returnMsg+="This item has no effect.\n";
       }
-      console.log(this.playerData.inventory[itemName]);
     }
   }
 
@@ -532,17 +530,19 @@ export class RogueGame {
   }
 
   private refreshShop() {
+    var newStock = {};
     for (var rarity in this.shopSettings.rarities) {
       var itemsList = this.shopSettings[rarity];
       for (var i = 0; i < this.shopSettings.rarities[rarity]; i++) {
         var randItemPos = Math.floor(Math.random() * (itemsList.length - 1));
         var randItemName = itemsList[randItemPos];
         var shopItem = this.itemsData[randItemName];
-        this.shopData.stock.push(shopItem);
+        newStock[randItemName] = shopItem;
         // Delete item from list to prevent duplicate
         itemsList.splice(randItemPos, 1);
       }
     }
+    this.shopData.stock = newStock;
   }
 
   private buyItems(itemName, amt) {
