@@ -67,6 +67,12 @@ export class GooseGame {
     else if (firstWord === "nest") {
       this.getPlayerNest();
     }
+
+    // Write to file
+    this.players[this.author.username] = this.playerData;
+    jsonfile.writeFile(this.playersFile, this.players, function (err) {
+      if (err) console.error("Write error: " + err);
+    });
   }
 
   private createNewPlayer() {
@@ -93,14 +99,18 @@ export class GooseGame {
       "materials": {}
     }
     this.playerData.nest[nextID] = goose;
+    this.players[this.author.username] = this.playerData;
   }
 
   private getPlayerNest() {
     var info = this.playerData;
     this.returnMsg +=
     "\n--------------------"+info.name+"\'s Nest--------------------\n";
+    var geeseMsg = "";
     for (var gooseID in info.nest) {
-
+      var goose = this.nest[gooseID];
+      geeseMsg += goose.name+" (Lvl "+goose.level+"): $"+goose.coins+"/"+goose.coinGenTime+"sec\n";
     }
+
   }
 }
