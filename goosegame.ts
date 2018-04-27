@@ -70,6 +70,11 @@ export class GooseGame {
   }
 
   private getPlayerNest() {
-    
+    var info = this.playerData;
+    this.returnMsg +=
+    "\n--------------------"+info.name+"\'s Nest--------------------\n";
+    for (var gooseID in info.nest) {
+      
+    }
   }
 }
