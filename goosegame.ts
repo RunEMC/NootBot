@@ -108,7 +108,7 @@ export class GooseGame {
     "\n--------------------"+info.name+"\'s Nest--------------------\n";
     var geeseMsg = "";
     for (var gooseID in info.nest) {
-      var goose = this.nest[gooseID];
+      var goose = info.nest[gooseID];
       geeseMsg += goose.name+" (Lvl "+goose.level+"): $"+goose.coins+"/"+goose.coinGenTime+"sec\n";
     }
 

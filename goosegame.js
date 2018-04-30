@@ -52,10 +52,48 @@ var GooseGame = /** @class */ (function () {
         else if (firstWord === "nest") {
             this.getPlayerNest();
         }
-    };
-    GooseGame.prototype.getPlayerNest = function () {
+        // Write to file
+        this.players[this.author.username] = this.playerData;
+        jsonfile.writeFile(this.playersFile, this.players, function (err) {
+            if (err)
+                console.error("Write error: " + err);
+        });
     };
     GooseGame.prototype.createNewPlayer = function () {
+        var nextID = this.players._nextID;
+        var goose = {
+            "name": "Basic Goose",
+            "id": nextID.toString(),
+            "level": 1,
+            "type": "basic",
+            "coins": 1,
+            "coinGenTime": 15
+        };
+        this.playerData = {
+            "name": this.author.username,
+            "id": this.author.id.toString(),
+            "coins": 0,
+            "nextStealTime": 0,
+            "nestMax": 10,
+            "breedMax": 2,
+            "eggsMax": 3,
+            "nest": {},
+            "breeding": {},
+            "eggs": {},
+            "materials": {}
+        };
+        this.playerData.nest[nextID] = goose;
+        this.players[this.author.username] = this.playerData;
+    };
+    GooseGame.prototype.getPlayerNest = function () {
+        var info = this.playerData;
+        this.returnMsg +=
+            "\n--------------------" + info.name + "\'s Nest--------------------\n";
+        var geeseMsg = "";
+        for (var gooseID in info.nest) {
+            var goose = info.nest[gooseID];
+            geeseMsg += goose.name + " (Lvl " + goose.level + "): $" + goose.coins + "/" + goose.coinGenTime + "sec\n";
+        }
     };
     return GooseGame;
 }());
