@@ -3,7 +3,7 @@
 Discord bot built using discord js
 
 # Features
-- Plays custom sound files (play [filename])
+- ~~Plays custom sound files (play [filename])~~ Currently not working!
 - Semi-working rogue like adventure game (!rg)
 - Semi-working avalon game (!sh)
 - Semi-working goose breeding game (!gg)
