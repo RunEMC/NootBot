@@ -36,20 +36,21 @@ bot.on('ready', async () => {
 var rogueGameLog;
 
 bot.on('message', message => {
-  var msg = message.content;
+  var msgContent = message.content;
   var msgAuthor = message.author;
+  var msgChannel = message.channel;
   var authUser = msgAuthor.username;
   var serverGuild = message.channel.guild;
-  var vChan = message.member.voiceChannel;;
+  var vChan = message.member.voiceChannel;
 
   // Check that the message is not sent by a bot
   if (!msgAuthor.bot) {
 
     // Get the command as an array of strings
-    var commandArray = msg.split(" ");
+    var commandArray = msgContent.split(" ");
 
     // Assuming messages will always have content, might need to check this
-    if (msg[0] == '!') {
+    if (msgContent[0] == '!') {
       // Process the message as a command
       var command = commandArray[0].substring(1);
       switch (command) {
@@ -58,6 +59,16 @@ bot.on('message', message => {
           message.channel.send('Test');
           break;
           
+        case "join":
+          if (vChan != undefined) {
+            vChan.join()  
+            .then(connection => console.log("Joined " + connection.channel.name))
+            .catch(error => console.error(error.stack));
+          } else {
+            msgChannel.send("You're not in a channel for me to join!");
+          }
+          break;
+
         case "die":
           message.channel.send("Goodbye!");
           bot.destroy();
@@ -80,7 +91,6 @@ bot.on('message', message => {
     }
   }
 });
-
 
 // Starts the client for secret harry (INCOMPLETE)
 function startSH(message) {
