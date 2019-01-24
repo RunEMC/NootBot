@@ -253,18 +253,23 @@ var RogueGame = /** @class */ (function () {
             this.spawnItems(this.locationData.itemSpawnChance);
         }
         // Create flavor text
-        this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n";
+        var mobsMsg = "";
         for (var i = 0; i < this.locationData.mobs.length; i++) {
             var mob = this.locationData.mobs[i];
             if (this.mobEncounters[mob])
-                this.returnMsg += " - " + this.mobsData[mob].displayName + ": " + this.mobEncounters[mob] + "\n";
+                mobsMsg += " - " + this.mobsData[mob].displayName + ": " + this.mobEncounters[mob] + "\n";
         }
-        this.returnMsg += "\nYou acquired:\n";
+        if (mobsMsg.length) {
+            this.returnMsg += "\nWhile exploring " + this.locationData.displayName + " you defeated:\n" + mobsMsg;
+        }
+        var itemsMsg = "";
         for (var i = 0; i < this.locationData.items.length; i++) {
             var item = this.locationData.items[i];
             if (this.itemEncounters[item])
-                this.returnMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
+                itemsMsg += " - " + this.itemsData[item].displayName + ": " + this.itemEncounters[item] + "\n";
         }
+        if (itemsMsg.length)
+            this.returnMsg += "\nYou acquired:\n" + itemsMsg;
     };
     RogueGame.prototype.spawnMobs = function () {
         for (var i = 0; i < this.mobs.length; i++) {
