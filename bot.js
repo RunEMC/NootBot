@@ -36,12 +36,53 @@ bot.on('ready', async () => {
 var rogueGameLog;
 
 bot.on('message', message => {
-  // var authUser = Sanitizer.sanitize(message.author.username);
-  var authUser = message.author.username;
+  var msg = message.content;
   var msgAuthor = message.author;
+  var authUser = msgAuthor.username;
   var serverGuild = message.channel.guild;
   var vChan = message.member.voiceChannel;;
 
+  // Check that the message is not sent by a bot
+  if (!msgAuthor.bot) {
+
+    // Get the command as an array of strings
+    var commandArray = msg.split(" ");
+
+    // Assuming messages will always have content, might need to check this
+    if (msg[0] == '!') {
+      // Process the message as a command
+      var command = commandArray[0].substring(1);
+      switch (command) {
+        // Basic commands
+        case "help":
+          message.channel.send('Test');
+          break;
+          
+        case "die":
+          message.channel.send("Goodbye!");
+          bot.destroy();
+          break;
+
+        // Roguelike game
+        case "rg":
+          startRogueLike(message);
+          break;
+
+        // Secret Harry
+        case "sh":
+          startSH(message);
+          break;
+
+        default:
+          message.channel.send("Invalid command: " + command);
+          break;
+      }
+    }
+  }
+
+  
+
+  /*
   if (message.content === 'ping') {
     if (DEBUG) {
       message.channel.send('pong');
@@ -182,15 +223,64 @@ bot.on('message', message => {
   else if (message.content === 'getid') {
     message.channel.send(msgAuthor.id);
   }
-
+*/
 });
 
 
+// Starts the client for secret harry (INCOMPLETE)
+function startSH(message) {
+  var msg = "";
+
+    var cmd = message.content.split(" ");
+    cmd.splice(0, 1);
+
+    var sHGame = new SHGame(cmd, msgAuthor, serverGuild);
+    var response = sHGame.processCommand();
+    msg = sHGame.getReturnMsg();
+    // // Check response
+    // if (response === "sendLog") {
+    //   msg = rogueGameLog;
+    // }
+    // else {
+    //   msg = rogueGame.getReturnMsg();
+    //   // Set the explore log if it is not nothing
+    //   if (rogueGame.getExploreLog() != "") rogueGameLog = rogueGame.getExploreLog();
+    // }
+    // // Send message
+    message.channel.send(msg);
+}
+
+
+// Starts the client for the rogue like game (INCOMPLETE)
+function startRogueLike(message) {
+  var msg = "";
+
+  var cmd = message.content.split(" ");
+  cmd.splice(0, 1);
+
+  var rogueGame = new RogueGame(cmd, authUser);
+  var response = rogueGame.runGame();
+  // Check response
+  if (response === "sendLog") {
+    msg = rogueGameLog;
+  }
+  else {
+    msg = rogueGame.getReturnMsg();
+    // Set the explore log if it is not nothing
+    if (rogueGame.getExploreLog() != "") rogueGameLog = rogueGame.getExploreLog();
+  }
+  // Send message
+  message.channel.send(msg);
+}
+
+
+// Leave a channel
 function leaveChan(voiceChan) {
   if (voiceChan !== undefined) {
     voiceChan.leave();
   }
 }
+
 
 //Get random integer, inclusive
 function randomNum(min, max) {
