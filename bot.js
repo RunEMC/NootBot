@@ -9,6 +9,13 @@ const RogueGame = require('./rogue.js').RogueGame;
 const SHGame = require('./sh.js').SHGame;
 const GooseGame = require('./goosegame.js').GooseGame;
 const ytdl = require('ytdl-core');
+const youtubeSearch = require('youtube-search');
+
+const youtubeSearchOptions = {
+  maxResults: '1',
+  type: 'video',
+  key: botToken.youtubeApiKey
+}
 
 // Create new bot client
 const bot = new Discord.Client();
@@ -43,7 +50,6 @@ bot.on('message', message => {
   var authUser = msgAuthor.username;
   var serverGuild = message.channel.guild;
   var vChan = message.member.voiceChannel;
-  var vConnection;
 
   // Check that the message is not sent by a bot
   if (!msgAuthor.bot) {
@@ -62,12 +68,26 @@ bot.on('message', message => {
           break;
           
         case "play":
+          // Check that the author typed a query
           if (commandArray.length > 1) {
+            // Try join msg author's channel
             if (vChan != undefined) {
-              vChan.join()  
+              vChan.join()
               .then(connection => {
-                vConnection = connection;
-                vConnection.playStream(ytdl(commandArray[1], { filter: 'audioonly' }));
+                // Create search term
+                var searchTerm = msgContent.substring("!play ".length);
+                // Search for and play result
+                youtubeSearch(searchTerm, youtubeSearchOptions, (err, results) => {
+                  if (err) return console.log("Search Error: " + err);
+                  if (results != undefined && results.length >= 1) {
+                    console.log(commandArray[1]);
+                    var nowPlayingUrl = commandArray[1]; // "https://www.youtube.com/watch?v=" + results[0].id;
+                    msgChannel.send("Now playing: " + nowPlayingUrl);
+                    connection.playStream(ytdl(nowPlayingUrl, { filter: 'audioonly' })).on();
+                  } else {
+                    msgChannel.send("No results found!");
+                  }
+                });
               })
               .catch(error => console.error(error.stack));
             } else {
