@@ -8,6 +8,7 @@ const botSettings = require('./botSettings.json');
 const RogueGame = require('./rogue.js').RogueGame;
 const SHGame = require('./sh.js').SHGame;
 const GooseGame = require('./goosegame.js').GooseGame;
+const ytdl = require('ytdl-core');
 
 // Create new bot client
 const bot = new Discord.Client();
@@ -42,6 +43,7 @@ bot.on('message', message => {
   var authUser = msgAuthor.username;
   var serverGuild = message.channel.guild;
   var vChan = message.member.voiceChannel;
+  var vConnection;
 
   // Check that the message is not sent by a bot
   if (!msgAuthor.bot) {
@@ -50,7 +52,7 @@ bot.on('message', message => {
     var commandArray = msgContent.split(" ");
 
     // Assuming messages will always have content, might need to check this
-    if (msgContent[0] == '!') {
+    if (msgContent.startsWith('!')) {
       // Process the message as a command
       var command = commandArray[0].substring(1);
       switch (command) {
@@ -59,20 +61,27 @@ bot.on('message', message => {
           message.channel.send('Test');
           break;
           
-        case "join":
-          if (vChan != undefined) {
-            vChan.join()  
-            .then(connection => console.log("Joined " + connection.channel.name))
-            .catch(error => console.error(error.stack));
+        case "play":
+          if (commandArray.length > 1) {
+            if (vChan != undefined) {
+              vChan.join()  
+              .then(connection => {
+                vConnection = connection;
+                vConnection.playStream(ytdl(commandArray[1], { filter: 'audioonly' }));
+              })
+              .catch(error => console.error(error.stack));
+            } else {
+              msgChannel.send("You're not in a channel for me to join!");
+            }
           } else {
-            msgChannel.send("You're not in a channel for me to join!");
+            msgChannel.send("Invalid command usage, !play [url]");
           }
           break;
 
         case "die":
           message.channel.send("Goodbye!");
           bot.destroy();
-          break;
+          throw new Error("Bot is ded x_x");
 
         // Roguelike game
         case "rg":

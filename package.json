@@ -13,6 +13,8 @@
     "discord.js": "^11.0.0",
     "jsonfile": "^2.4.0",
     "node-opus": "^0.2.7",
-    "opusscript": "0.0.3"
+    "opusscript": "0.0.3",
+    "youtube-search": "^1.1.4",
+    "ytdl-core": "^0.29.1"
   }
 }
