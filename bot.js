@@ -76,18 +76,25 @@ bot.on('message', message => {
               .then(connection => {
                 // Create search term
                 var searchTerm = msgContent.substring("!play ".length);
-                // Search for and play result
-                youtubeSearch(searchTerm, youtubeSearchOptions, (err, results) => {
-                  if (err) return console.log("Search Error: " + err);
-                  if (results != undefined && results.length >= 1) {
-                    console.log(commandArray[1]);
-                    var nowPlayingUrl = commandArray[1]; // "https://www.youtube.com/watch?v=" + results[0].id;
-                    msgChannel.send("Now playing: " + nowPlayingUrl);
-                    connection.playStream(ytdl(nowPlayingUrl, { filter: 'audioonly' })).on();
-                  } else {
-                    msgChannel.send("No results found!");
-                  }
-                });
+                // Check if searchTerm is a url
+                if (searchTerm.startsWith("https://www.youtube.com/watch?v=") && searchTerm.substring("https://www.youtube.com/watch?v=".length).length == 11) {
+                  connection.playStream(ytdl(searchTerm, { filter: 'audioonly' }));
+                } else {
+                  // Search for and play result
+                  youtubeSearch(searchTerm, youtubeSearchOptions, (err, results) => {
+                    // Return if error
+                    if (err) return console.log("Search Error: " + err);
+
+                    // If results are fine, then play audio
+                    if (results != undefined && results.length >= 1) {
+                      var nowPlayingUrl = "https://www.youtube.com/watch?v=" + results[0].id;
+                      msgChannel.send("Now playing: " + nowPlayingUrl);
+                      connection.playStream(ytdl(nowPlayingUrl, { filter: 'audioonly' }));
+                    } else {
+                      msgChannel.send("No results found!");
+                    }
+                  });
+                }
               })
               .catch(error => console.error(error.stack));
             } else {
