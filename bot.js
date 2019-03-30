@@ -40,8 +40,14 @@ bot.on('ready', async () => {
 
 });
 
+// Persistent Data
+var songQueue = [];
+
 // Store the log for roguegame
 var rogueGameLog;
+
+// Flag variables
+var lastMsgChannel;
 
 bot.on('message', message => {
   var msgContent = message.content;
@@ -50,6 +56,9 @@ bot.on('message', message => {
   var authUser = msgAuthor.username;
   var serverGuild = message.channel.guild;
   var vChan = message.member.voiceChannel;
+
+  // Set last msg channel
+  lastMsgChannel = msgChannel;
 
   // Check that the message is not sent by a bot
   if (!msgAuthor.bot) {
@@ -66,8 +75,20 @@ bot.on('message', message => {
         case "help":
           message.channel.send('Test');
           break;
+
+        case "listsongs":
+          if (songQueue.length > 0) {
+            var msg = "Currently in queue:";
+            songQueue.forEach(song => {
+              msg += "\n" + song;
+            });
+            message.channel.send(msg);
+          } else {
+            message.channel.send('There are currently no songs in queue');
+          }
+          break;
           
-        case "play":
+        case "addsong":
           // Check that the author typed a query
           if (commandArray.length > 1) {
             // Try join msg author's channel
@@ -75,33 +96,35 @@ bot.on('message', message => {
               vChan.join()
               .then(connection => {
                 // Create search term
-                var searchTerm = msgContent.substring("!play ".length);
-                // Check if searchTerm is a url
-                if (searchTerm.startsWith("https://www.youtube.com/watch?v=") && searchTerm.substring("https://www.youtube.com/watch?v=".length).length == 11) {
-                  connection.playStream(ytdl(searchTerm, { filter: 'audioonly' }));
-                } else {
-                  // Search for and play result
-                  youtubeSearch(searchTerm, youtubeSearchOptions, (err, results) => {
-                    // Return if error
-                    if (err) return console.log("Search Error: " + err);
-
-                    // If results are fine, then play audio
-                    if (results != undefined && results.length >= 1) {
-                      var nowPlayingUrl = "https://www.youtube.com/watch?v=" + results[0].id;
-                      msgChannel.send("Now playing: " + nowPlayingUrl);
-                      connection.playStream(ytdl(nowPlayingUrl, { filter: 'audioonly' }));
-                    } else {
-                      msgChannel.send("No results found!");
-                    }
-                  });
-                }
+                var searchTerm = msgContent.substring("!addsong ".length);
+                AddSong(msgChannel, searchTerm, connection);
               })
               .catch(error => console.error(error.stack));
             } else {
               msgChannel.send("You're not in a channel for me to join!");
             }
           } else {
-            msgChannel.send("Invalid command usage, !play [url]");
+            msgChannel.send("Invalid command usage, !addsong [url]");
+          }
+          break;
+
+        case "play":
+          // Check that there is a voice connection
+          if (vChan.connection != undefined && vChan.connection.dispatcher.paused) {
+            vChan.connection.dispatcher.resume()
+            .catch(error => console.error(error.stack));
+          } else {
+            msgChannel.send("There is nothing paused right now.");
+          }
+          break;
+
+        case "pause":
+          // Check that there is a voice connection
+          if (vChan.connection != undefined && !vChan.connection.dispatcher.paused) {
+            vChan.connection.dispatcher.pause()
+            .catch(error => console.error(error.stack));
+          } else {
+            msgChannel.send("There is nothing playing right now.");
           }
           break;
 
@@ -127,6 +150,72 @@ bot.on('message', message => {
     }
   }
 });
+
+// Auto play next song if possible
+if (bot.voiceConnections.length > 0) {
+  bot.voiceConnections.forEach(player => {
+    player.dispatcher.on("speaking", (user, isSpeaking) => {
+      if (!isSpeaking && !player.dispatcher.paused && songQueue.length > 0) {
+        console.log("Plaing: " + songQueue);
+        playSong(lastMsgChannel, player);
+      }
+    });
+  });
+}
+
+function AddSong(msgChannel, searchTerm, connection) {
+  // Create new songinfo to pushinto queue
+  var songInfo = {
+    stream: undefined,
+    url: "",
+    searchQuery: searchTerm
+  };
+
+  // Check if searchTerm is a url
+  if (searchTerm.startsWith("https://www.youtube.com/watch?v=") && searchTerm.substring("https://www.youtube.com/watch?v=".length).length == 11) {
+    // Add to queue and play if no song is in queue
+    songInfo.stream = ytdl(searchTerm, { filter: 'audioonly' });
+    songInfo.url = searchTerm;
+    songQueue.push(songInfo);
+    msgChannel.send("Song added to queue! Type !listsongs to see the queue.");
+    if (songQueue.length > 1) return;
+
+    // Didn't return, so play song
+    playSong(msgChannel, connection);
+  } else {
+    // Search for and play result
+    youtubeSearch(searchTerm, youtubeSearchOptions, (err, results) => {
+      // Return if error
+      if (err) return console.log("Search Error: " + err);
+
+      // If results are fine, then play audio
+      if (results != undefined && results.length >= 1) {
+        var songUrl = "https://www.youtube.com/watch?v=" + results[0].id;
+
+        // Add to queue and play if no song is in queue
+        songInfo.stream = ytdl(songUrl, { filter: 'audioonly' });
+        songInfo.url = songUrl;
+        songQueue.push(songInfo);
+        console.log(songInfo);
+        msgChannel.send("Song added to queue! Type !listsongs to see the queue.");
+        if (songQueue.length > 1) return;
+
+        // Didn't return, so play song, need this in here to wait for search to finish
+        playSong(msgChannel, connection);
+      } else {
+        msgChannel.send("No results found!");
+      }
+    });
+  }
+}
+
+function playSong(msgChannel, vConnection) {
+  console.log(songQueue);
+  var songInfo = songQueue.shift();
+  // Send msg to channel
+  msgChannel.send("Now playing: " + songInfo.url);
+  vConnection.playStream(songInfo.stream);
+}
 
 // Starts the client for secret harry (INCOMPLETE)
 function startSH(message) {
