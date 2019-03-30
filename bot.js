@@ -151,18 +151,6 @@ bot.on('message', message => {
   }
 });
 
-// Auto play next song if possible
-if (bot.voiceConnections.length > 0) {
-  bot.voiceConnections.forEach(player => {
-    player.dispatcher.on("speaking", (user, isSpeaking) => {
-      if (!isSpeaking && !player.dispatcher.paused && songQueue.length > 0) {
-        console.log("Plaing: " + songQueue);
-        playSong(lastMsgChannel, player);
-      }
-    });
-  });
-}
-
 function AddSong(msgChannel, searchTerm, connection) {
   // Create new songinfo to pushinto queue
   var songInfo = {
@@ -212,7 +200,14 @@ function playSong(msgChannel, vConnection) {
   var songInfo = songQueue.shift();
   // Send msg to channel
   msgChannel.send("Now playing: " + songInfo.url);
-  vConnection.playStream(songInfo.stream);
+  const dispatcher = vConnection.playStream(songInfo.stream);
+  // Auto play next song if possible
+  dispatcher.on("end", reason => {
+    if (songQueue.length > 0) {
+      console.log("Plaing: " + songQueue);
+      playSong(msgChannel, vConnection);
+    }
+  });
 }
 
 // Starts the client for secret harry (INCOMPLETE)
