@@ -79,8 +79,8 @@ bot.on('message', message => {
         case "listsongs":
           if (songQueue.length > 0) {
             var msg = "Currently in queue:";
-            songQueue.forEach(song => {
-              msg += "\n" + song;
+            songQueue.forEach(songInfo => {
+              msg += "\n" + songInfo.url;
             });
             message.channel.send(msg);
           } else {
@@ -178,7 +178,7 @@ function AddSong(msgChannel, searchTerm, connection) {
     songInfo.url = searchTerm;
     songQueue.push(songInfo);
     msgChannel.send("Song added to queue! Type !listsongs to see the queue.");
-    if (songQueue.length > 1) return;
+    if (connection.dispatcher != undefined) return;
 
     // Didn't return, so play song
     playSong(msgChannel, connection);
@@ -196,9 +196,8 @@ function AddSong(msgChannel, searchTerm, connection) {
         songInfo.stream = ytdl(songUrl, { filter: 'audioonly' });
         songInfo.url = songUrl;
         songQueue.push(songInfo);
-        console.log(songInfo);
         msgChannel.send("Song added to queue! Type !listsongs to see the queue.");
-        if (songQueue.length > 1) return;
+        if (connection.dispatcher != undefined) return;
 
         // Didn't return, so play song, need this in here to wait for search to finish
         playSong(msgChannel, connection);
@@ -210,7 +209,6 @@ function AddSong(msgChannel, searchTerm, connection) {
 }
 
 function playSong(msgChannel, vConnection) {
-  console.log(songQueue);
   var songInfo = songQueue.shift();
   // Send msg to channel
   msgChannel.send("Now playing: " + songInfo.url);
